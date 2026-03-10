@@ -148,9 +148,13 @@ def run_detectors(
             if progress_callback:
                 progress_callback(f"Warning: {detector.name} failed - {e}")
 
-    # Get file count from Python index if available
+    # Get file count from all language indexes
     if ctx._python_index is not None:
-        total_files_scanned = len(ctx._python_index.files)
+        total_files_scanned += len(ctx._python_index.files)
+    for cache_key in ("node_index", "go_index", "rust_index"):
+        index = ctx.cache.get(cache_key)
+        if index is not None and hasattr(index, "files"):
+            total_files_scanned += len(index.files)
 
     # Build output
     return ConventionsOutput(
