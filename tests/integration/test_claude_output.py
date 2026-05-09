@@ -75,7 +75,7 @@ class TestClaudeFormatCli:
         assert "## Known Pitfalls" in content
 
     def test_claude_flag(self, node_repo: Path):
-        """--claude writes to .claude/CLAUDE.md."""
+        """--claude writes to ./CLAUDE.md (repo root, canonical location)."""
         result = runner.invoke(app, [
             "discover",
             "--repo", str(node_repo),
@@ -84,11 +84,9 @@ class TestClaudeFormatCli:
         ])
         assert result.exit_code == 0
 
-        personal_path = node_repo / ".claude" / "CLAUDE.md"
-        assert personal_path.exists()
-
-        # Root should NOT have CLAUDE.md
-        assert not (node_repo / "CLAUDE.md").exists()
+        # As of 1.4.0 --claude writes to the repo root (per Claude Code's
+        # documented canonical location), not .claude/CLAUDE.md.
+        assert (node_repo / "CLAUDE.md").exists()
 
     def test_claude_combined_with_other_formats(self, node_repo: Path):
         """Claude format can be combined with other formats."""
