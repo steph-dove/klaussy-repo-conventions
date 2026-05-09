@@ -122,6 +122,81 @@ def _get_stat(rule: ConventionRule, key: str, default: Any = None) -> Any:
     return rule.stats.get(key, default)
 
 
+# --- Path-glob inference ---
+
+# Path segments that are treated as code roots — a rule scoped to "src/api"
+# is more useful than one scoped to "src" (too broad), so we walk past these
+# when deciding whether the longest common prefix is meaningful.
+_TOP_LEVEL_CODE_DIRS = frozenset({
+    "src", "lib", "app", "packages", "internal", "pkg", "cmd", "apps",
+})
+
+
+def _infer_path_glob(rule: ConventionRule) -> str | None:
+    """Infer a glob like 'src/api/**/*.py' from a rule's evidence file paths.
+
+    Returns None for rules whose evidence is too broad to scope to a path —
+    those should be rendered under a 'Project-wide' bucket.
+    """
+    if not rule.evidence:
+        return None
+
+    paths = [Path(e.file_path) for e in rule.evidence]
+    parents = [p.parent for p in paths]
+    suffixes = sorted({p.suffix.lstrip(".") for p in paths if p.suffix})
+
+    parent_strs = [str(p) for p in parents]
+    if not parent_strs:
+        return None
+
+    common_parts: list[str] = []
+    first_parts = parent_strs[0].split("/") if parent_strs[0] else []
+    for i, part in enumerate(first_parts):
+        if all(
+            len(other.split("/")) > i and other.split("/")[i] == part
+            for other in parent_strs
+        ):
+            common_parts.append(part)
+        else:
+            break
+
+    while common_parts and common_parts[-1] in {"", "."}:
+        common_parts.pop()
+
+    if not common_parts:
+        return None
+
+    meaningful = [p for p in common_parts if p not in _TOP_LEVEL_CODE_DIRS]
+    if not meaningful:
+        return None
+
+    coverage = sum(1 for p in parent_strs if p.startswith("/".join(common_parts)))
+    if coverage / len(parent_strs) < 0.8:
+        return None
+
+    lcp = "/".join(common_parts)
+    if not suffixes:
+        return f"{lcp}/**/*"
+    if len(suffixes) == 1:
+        return f"{lcp}/**/*.{suffixes[0]}"
+    return f"{lcp}/**/*.{{{','.join(suffixes)}}}"
+
+
+def _bucket_rules_by_path(
+    rules: list[ConventionRule],
+) -> tuple[dict[str, list[ConventionRule]], list[ConventionRule]]:
+    """Group rules by inferred path glob; return (path_buckets, project_wide)."""
+    buckets: dict[str, list[ConventionRule]] = {}
+    project_wide: list[ConventionRule] = []
+    for rule in rules:
+        glob = _infer_path_glob(rule)
+        if glob is None:
+            project_wide.append(rule)
+        else:
+            buckets.setdefault(glob, []).append(rule)
+    return buckets, project_wide
+
+
 # --- Section builders ---
 
 
@@ -231,13 +306,25 @@ def _build_architecture_section(include_rules: list[ConventionRule]) -> str:
     if not arch_rules:
         return ""
 
-    lines = ["## Architecture\n", "### Key Patterns\n"]
-    for rule in arch_rules:
-        suffix = _get_suffix(rule)
-        rendered = _render_arch_rule(rule, suffix)
-        if rendered:
-            lines.append(rendered)
-    lines.append("")
+    buckets, project_wide = _bucket_rules_by_path(arch_rules)
+
+    lines = ["## Architecture\n"]
+
+    for glob in sorted(buckets):
+        lines.append(f"### `{glob}`\n")
+        for rule in buckets[glob]:
+            rendered = _render_arch_rule(rule, _get_suffix(rule))
+            if rendered:
+                lines.append(rendered)
+        lines.append("")
+
+    if project_wide:
+        lines.append("### Key Patterns\n")
+        for rule in project_wide:
+            rendered = _render_arch_rule(rule, _get_suffix(rule))
+            if rendered:
+                lines.append(rendered)
+        lines.append("")
 
     return "\n".join(lines)
 
@@ -725,19 +812,34 @@ def _build_conventions_section(
         _get_suffix(r) == "logging_library" for r in (tech_rules or [])
     )
 
-    lines = ["## Conventions\n"]
-    for rule in conv_rules:
-        if _get_suffix(rule) == "structured_logging" and has_logging_library:
-            continue
-        # Extract the most useful stat or fall back to description
-        summary = _summarize_rule(rule)
-        # Avoid "Title: Title" duplication
-        if summary.lower() == rule.title.lower():
-            lines.append(f"- **{rule.title}**")
-        else:
-            lines.append(f"- **{rule.title}**: {summary}")
+    visible_rules = [
+        r for r in conv_rules
+        if not (_get_suffix(r) == "structured_logging" and has_logging_library)
+    ]
 
-    lines.append("")
+    buckets, project_wide = _bucket_rules_by_path(visible_rules)
+
+    def _render_rule(rule: ConventionRule) -> str:
+        summary = _summarize_rule(rule)
+        if summary.lower() == rule.title.lower():
+            return f"- **{rule.title}**"
+        return f"- **{rule.title}**: {summary}"
+
+    lines = ["## Conventions\n"]
+
+    for glob in sorted(buckets):
+        lines.append(f"### `{glob}`\n")
+        for rule in buckets[glob]:
+            lines.append(_render_rule(rule))
+        lines.append("")
+
+    if project_wide:
+        if buckets:
+            lines.append("### Project-wide\n")
+        for rule in project_wide:
+            lines.append(_render_rule(rule))
+        lines.append("")
+
     lines.append("[TODO: Add project-specific conventions]")
     lines.append("")
     return "\n".join(lines)
