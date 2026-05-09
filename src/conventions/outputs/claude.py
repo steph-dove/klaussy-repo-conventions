@@ -122,6 +122,128 @@ def _get_stat(rule: ConventionRule, key: str, default: Any = None) -> Any:
     return rule.stats.get(key, default)
 
 
+# --- Path-glob inference ---
+
+# Path segments that are treated as code roots — a rule scoped to "src/api"
+# is more useful than one scoped to "src" (too broad), so we walk past these
+# when deciding whether the longest common prefix is meaningful.
+_TOP_LEVEL_CODE_DIRS = frozenset({
+    "src", "lib", "app", "packages", "internal", "pkg", "cmd", "apps",
+})
+
+
+def _infer_path_glob(rule: ConventionRule) -> str | None:
+    """Infer a glob like 'src/api/**/*.py' from a rule's evidence file paths.
+
+    Returns None for rules whose evidence is too broad to scope to a path —
+    those should be rendered under a 'Project-wide' bucket.
+    """
+    if not rule.evidence:
+        return None
+
+    paths = [Path(e.file_path) for e in rule.evidence]
+    parents = [p.parent for p in paths]
+    suffixes = sorted({p.suffix.lstrip(".") for p in paths if p.suffix})
+
+    parent_strs = [str(p) for p in parents]
+    if not parent_strs:
+        return None
+
+    common_parts: list[str] = []
+    first_parts = parent_strs[0].split("/") if parent_strs[0] else []
+    for i, part in enumerate(first_parts):
+        if all(
+            len(other.split("/")) > i and other.split("/")[i] == part
+            for other in parent_strs
+        ):
+            common_parts.append(part)
+        else:
+            break
+
+    while common_parts and common_parts[-1] in {"", "."}:
+        common_parts.pop()
+
+    if not common_parts:
+        return None
+
+    meaningful = [p for p in common_parts if p not in _TOP_LEVEL_CODE_DIRS]
+    if not meaningful:
+        return None
+
+    # No coverage check needed — the strict LCP loop above only advances when
+    # every parent shares the prefix, so all parents start with common_parts
+    # by construction.
+
+    lcp = "/".join(common_parts)
+    if not suffixes:
+        return f"{lcp}/**/*"
+    if len(suffixes) == 1:
+        return f"{lcp}/**/*.{suffixes[0]}"
+    return f"{lcp}/**/*.{{{','.join(suffixes)}}}"
+
+
+_ARCHITECTURE_SUFFIXES = frozenset({
+    "layer_separation", "middleware_patterns", "route_organization",
+    "response_patterns", "handler_pattern", "route_factory",
+    "response_utility", "store_pattern", "context_pattern",
+    "project_structure", "dependency_injection", "repository_pattern",
+    "singleton_pattern", "constructor_injection", "di_style",
+    "di_framework", "layering_direction", "forbidden_imports",
+    "interface_segregation", "interfaces", "dependency_direction",
+    "builder_pattern", "options_pattern", "context_usage",
+    "goroutine_patterns", "sync_primitives", "channel_usage",
+    "modules", "package_structure",
+    "import_graph", "endpoint_chains", "service_dependencies",
+    "api_routes", "monorepo", "db_entities",
+})
+
+
+_CONVENTION_SUFFIXES = frozenset({
+    "file_naming", "test_file_naming", "module_system", "async_style",
+    "error_classes", "error_handling", "error_handling_boundary",
+    "error_taxonomy", "error_types", "error_wrapping", "error_wrapper",
+    "error_transformation", "error_response_pattern", "exception_chaining",
+    "exception_handlers", "commit_messages", "branch_naming",
+    "naming", "constant_naming", "enum_usage", "string_constants",
+    "class_style", "data_class_style", "typing_coverage", "type_coverage",
+    "typescript", "ts_migration", "validation_style",
+    "test_patterns", "test_structure", "test_naming", "mocking",
+    "async_error_handling", "async_orm", "caching",
+    "auth_pattern", "auth_provider", "rate_limiting",
+    "secret_management", "secrets_access_style", "password_hashing",
+    "sql_injection", "input_validation", "helmet_security",
+    "structured_logging", "logging_fields", "correlation_ids",
+    "custom_decorators", "decorator_patterns",
+    "db_session_lifecycle", "db_query_style", "db_transactions",
+    "db_migrations", "db_connection_pooling", "migrations",
+    "response_shape", "response_envelope", "pagination_pattern",
+    "api_versioning", "background_tasks", "background_jobs",
+    "context_managers", "sentinel_errors", "subtests",
+    "table_driven_tests", "test_helpers",
+    "serialization", "resilience",
+    "state_management",
+    "config_access",
+    "code_owners", "file_hotspots",
+    "pr_template",
+    "import_aliases",
+})
+
+
+def _bucket_rules_by_path(
+    rules: list[ConventionRule],
+) -> tuple[dict[str, list[ConventionRule]], list[ConventionRule]]:
+    """Group rules by inferred path glob; return (path_buckets, project_wide)."""
+    buckets: dict[str, list[ConventionRule]] = {}
+    project_wide: list[ConventionRule] = []
+    for rule in rules:
+        glob = _infer_path_glob(rule)
+        if glob is None:
+            project_wide.append(rule)
+        else:
+            buckets.setdefault(glob, []).append(rule)
+    return buckets, project_wide
+
+
 # --- Section builders ---
 
 
@@ -212,29 +334,19 @@ def _render_tree(tree: dict, lines: list[str], indent: int) -> None:
 
 def _build_architecture_section(include_rules: list[ConventionRule]) -> str:
     """Build the Architecture section from pattern/structure rules."""
-    arch_suffixes = {
-        "layer_separation", "middleware_patterns", "route_organization",
-        "response_patterns", "handler_pattern", "route_factory",
-        "response_utility", "store_pattern", "context_pattern",
-        "project_structure", "dependency_injection", "repository_pattern",
-        "singleton_pattern", "constructor_injection", "di_style",
-        "di_framework", "layering_direction", "forbidden_imports",
-        "interface_segregation", "interfaces", "dependency_direction",
-        "builder_pattern", "options_pattern", "context_usage",
-        "goroutine_patterns", "sync_primitives", "channel_usage",
-        "modules", "package_structure",
-        "import_graph", "endpoint_chains", "service_dependencies",
-        "api_routes", "monorepo", "db_entities",
-    }
-
-    arch_rules = [r for r in include_rules if _get_suffix(r) in arch_suffixes]
+    arch_rules = [r for r in include_rules if _get_suffix(r) in _ARCHITECTURE_SUFFIXES]
     if not arch_rules:
         return ""
 
+    # Path-scoped rules are emitted as `.claude/rules/<glob>.md` files via
+    # `write_claude_rules`. Only project-wide rules belong in CLAUDE.md.
+    _, project_wide = _bucket_rules_by_path(arch_rules)
+    if not project_wide:
+        return ""
+
     lines = ["## Architecture\n", "### Key Patterns\n"]
-    for rule in arch_rules:
-        suffix = _get_suffix(rule)
-        rendered = _render_arch_rule(rule, suffix)
+    for rule in project_wide:
+        rendered = _render_arch_rule(rule, _get_suffix(rule))
         if rendered:
             lines.append(rendered)
     lines.append("")
@@ -686,37 +798,7 @@ def _build_conventions_section(
     tech_rules: list[ConventionRule] | None = None,
 ) -> str:
     """Build the Conventions section from naming, module, async rules."""
-    conv_suffixes = {
-        "file_naming", "test_file_naming", "module_system", "async_style",
-        "error_classes", "error_handling", "error_handling_boundary",
-        "error_taxonomy", "error_types", "error_wrapping", "error_wrapper",
-        "error_transformation", "error_response_pattern", "exception_chaining",
-        "exception_handlers", "commit_messages", "branch_naming",
-        "naming", "constant_naming", "enum_usage", "string_constants",
-        "class_style", "data_class_style", "typing_coverage", "type_coverage",
-        "typescript", "ts_migration", "validation_style",
-        "test_patterns", "test_structure", "test_naming", "mocking",
-        "async_error_handling", "async_orm", "caching",
-        "auth_pattern", "auth_provider", "rate_limiting",
-        "secret_management", "secrets_access_style", "password_hashing",
-        "sql_injection", "input_validation", "helmet_security",
-        "structured_logging", "logging_fields", "correlation_ids",
-        "custom_decorators", "decorator_patterns",
-        "db_session_lifecycle", "db_query_style", "db_transactions",
-        "db_migrations", "db_connection_pooling", "migrations",
-        "response_shape", "response_envelope", "pagination_pattern",
-        "api_versioning", "background_tasks", "background_jobs",
-        "context_managers", "sentinel_errors", "subtests",
-        "table_driven_tests", "test_helpers",
-        "serialization", "resilience",
-        "state_management",
-        "config_access",
-        "code_owners", "file_hotspots",
-        "commit_messages", "pr_template",
-        "import_aliases",
-    }
-
-    conv_rules = [r for r in include_rules if _get_suffix(r) in conv_suffixes]
+    conv_rules = [r for r in include_rules if _get_suffix(r) in _CONVENTION_SUFFIXES]
     if not conv_rules:
         return ""
 
@@ -725,13 +807,21 @@ def _build_conventions_section(
         _get_suffix(r) == "logging_library" for r in (tech_rules or [])
     )
 
+    visible_rules = [
+        r for r in conv_rules
+        if not (_get_suffix(r) == "structured_logging" and has_logging_library)
+    ]
+
+    # Path-scoped rules are emitted as `.claude/rules/<glob>.md` files via
+    # `write_claude_rules`. Only project-wide rules belong in CLAUDE.md so the
+    # root file stays focused on what applies everywhere.
+    _, project_wide = _bucket_rules_by_path(visible_rules)
+    if not project_wide:
+        return ""
+
     lines = ["## Conventions\n"]
-    for rule in conv_rules:
-        if _get_suffix(rule) == "structured_logging" and has_logging_library:
-            continue
-        # Extract the most useful stat or fall back to description
+    for rule in project_wide:
         summary = _summarize_rule(rule)
-        # Avoid "Title: Title" duplication
         if summary.lower() == rule.title.lower():
             lines.append(f"- **{rule.title}**")
         else:
@@ -1257,12 +1347,20 @@ def write_claude_md(
     repo_root: Path,
     personal: bool = False,
 ) -> Path:
-    """Write CLAUDE.md to the repo root or .claude/ directory.
+    """Write CLAUDE.md to the repo root (canonical) or .claude/ directory.
+
+    The repo root location is the documented canonical position; the
+    `personal` flag is retained for back-compat with callers that want the
+    file tucked under `.claude/`.
+
+    Path-scoped rules (per-layer Conventions and Architecture findings) are
+    emitted as separate `.claude/rules/<name>.md` files via
+    :func:`write_claude_rules`, which the caller should invoke alongside.
 
     Args:
         output: Conventions scan output.
         repo_root: Path to the repository root.
-        personal: If True, write to .claude/CLAUDE.md instead of root.
+        personal: If True, write to .claude/CLAUDE.md instead of repo root.
 
     Returns:
         Path to the written file.
@@ -1278,6 +1376,152 @@ def write_claude_md(
 
     target_path.write_text(content, encoding="utf-8")
     return target_path
+
+
+def _glob_to_filename(glob: str, *, include_top_level: bool = False) -> str:
+    """Derive a kebab-case filename stem from a path glob.
+
+    `src/api/v1/**/*.py` → `api-v1`
+    `src/db/**/*.{py,pyi}` → `db`
+    `packages/web/src/api/**/*.ts` → `web-src-api`
+
+    When `include_top_level=True`, common code-root segments (`src`, `lib`,
+    etc.) are kept rather than stripped — used as the disambiguation step
+    for filename collisions, e.g. `src/api/**/*.py` AND `lib/api/**/*.py`
+    would both reduce to `api` under default stripping; with the flag set,
+    they become `src-api` and `lib-api` so each glob gets its own file.
+    """
+    prefix = glob.split("**", 1)[0].rstrip("/")
+    if not prefix:
+        return "scoped"
+    if include_top_level:
+        parts = [p for p in prefix.split("/") if p]
+    else:
+        parts = [p for p in prefix.split("/") if p and p not in _TOP_LEVEL_CODE_DIRS]
+    if not parts:
+        parts = [prefix.split("/")[-1]]
+    return "-".join(parts)
+
+
+def _resolve_rule_filenames(globs: list[str]) -> dict[str, str]:
+    """Map each glob to a unique filename stem.
+
+    Tries the readable form (`_glob_to_filename(glob)`) first; if any stem
+    collides across globs, every glob in the colliding group falls back to
+    the full-prefix form that includes top-level code dirs. Final guarantee:
+    no two globs share a stem; matching `.claude/rules/<stem>.md` files do
+    not silently overwrite each other.
+    """
+    readable = {glob: _glob_to_filename(glob) for glob in globs}
+    counts: dict[str, int] = {}
+    for stem in readable.values():
+        counts[stem] = counts.get(stem, 0) + 1
+
+    resolved: dict[str, str] = {}
+    for glob, stem in readable.items():
+        if counts[stem] > 1:
+            resolved[glob] = _glob_to_filename(glob, include_top_level=True)
+        else:
+            resolved[glob] = stem
+    return resolved
+
+
+def _render_rule_for_rules_file(rule: ConventionRule) -> str:
+    """Render a single rule line for a `.claude/rules/<name>.md` file."""
+    summary = _summarize_rule(rule)
+    if summary.lower() == rule.title.lower():
+        return f"- **{rule.title}**"
+    return f"- **{rule.title}**: {summary}"
+
+
+def write_claude_rules(
+    output: ConventionsOutput,
+    repo_root: Path,
+) -> list[Path]:
+    """Write `.claude/rules/<name>.md` files for path-scoped rules.
+
+    Each rule whose evidence files share a common path prefix becomes a bullet
+    in a `.claude/rules/<name>.md` file with `paths:` YAML frontmatter, so
+    Claude Code only loads the file when editing files that match. Rules with
+    no clear path scope are NOT emitted here — they remain in CLAUDE.md as
+    project-wide guidance.
+
+    Conventions and architecture rules for the same path glob are merged into
+    one rules file with `## Conventions` and `## Architecture` subsections so
+    Claude only loads one file per layer.
+
+    Returns the list of written paths.
+    """
+    # Pick the same rule set CLAUDE.md uses (post-classification, post-suppression).
+    tech_rules: list[ConventionRule] = []
+    include_rules: list[ConventionRule] = []
+    for rule in output.rules:
+        bucket = _classify_rule(rule)
+        if bucket == "tech_stack":
+            tech_rules.append(rule)
+        elif bucket == "include":
+            include_rules.append(rule)
+
+    has_logging_library = any(
+        _get_suffix(r) == "logging_library" for r in tech_rules
+    )
+
+    conv_suffixes = _CONVENTION_SUFFIXES
+    arch_suffixes = _ARCHITECTURE_SUFFIXES
+
+    conv_rules = [
+        r for r in include_rules
+        if _get_suffix(r) in conv_suffixes
+        and not (_get_suffix(r) == "structured_logging" and has_logging_library)
+    ]
+    arch_rules = [r for r in include_rules if _get_suffix(r) in arch_suffixes]
+
+    conv_buckets, _ = _bucket_rules_by_path(conv_rules)
+    arch_buckets, _ = _bucket_rules_by_path(arch_rules)
+
+    all_globs = sorted(set(conv_buckets) | set(arch_buckets))
+    if not all_globs:
+        return []
+
+    rules_dir = repo_root / ".claude" / "rules"
+    rules_dir.mkdir(parents=True, exist_ok=True)
+
+    stems = _resolve_rule_filenames(all_globs)
+
+    written: list[Path] = []
+    for glob in all_globs:
+        target = rules_dir / f"{stems[glob]}.md"
+
+        body_parts: list[str] = [
+            "---",
+            "paths:",
+            f'  - "{glob}"',
+            "---",
+            "",
+            f"# Rules for `{glob}`",
+            "",
+        ]
+
+        if glob in conv_buckets:
+            body_parts.append("## Conventions")
+            body_parts.append("")
+            for rule in conv_buckets[glob]:
+                body_parts.append(_render_rule_for_rules_file(rule))
+            body_parts.append("")
+
+        if glob in arch_buckets:
+            body_parts.append("## Architecture")
+            body_parts.append("")
+            for rule in arch_buckets[glob]:
+                rendered = _render_arch_rule(rule, _get_suffix(rule))
+                if rendered:
+                    body_parts.append(rendered)
+            body_parts.append("")
+
+        target.write_text("\n".join(body_parts), encoding="utf-8")
+        written.append(target)
+
+    return written
 
 
 _ENRICH_PROMPT = """\

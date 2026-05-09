@@ -79,7 +79,7 @@ def discover(
     claude: bool = typer.Option(
         False,
         "--claude",
-        help="Generate CLAUDE.md for Claude Code (writes to .claude/ directory)",
+        help="Generate CLAUDE.md (repo root) and path-scoped rule files in .claude/rules/",
     ),
     init: bool = typer.Option(
         False,
@@ -217,10 +217,17 @@ def discover(
 
     if "claude" in formats or claude:
         try:
-            from .outputs.claude import write_claude_md
-            claude_path = write_claude_md(output, repo, personal=claude)
+            from .outputs.claude import write_claude_md, write_claude_rules
+            # Repo root is the canonical CLAUDE.md location per Claude Code docs.
+            claude_path = write_claude_md(output, repo, personal=False)
             if not quiet:
                 console.print(f"[green]Wrote CLAUDE.md to:[/green] {claude_path}")
+            rule_paths = write_claude_rules(output, repo)
+            if not quiet and rule_paths:
+                console.print(
+                    f"[green]Wrote {len(rule_paths)} path-scoped rule file(s) to:[/green] "
+                    f"{repo / '.claude' / 'rules'}"
+                )
         except Exception as e:
             console.print(f"[red]Error writing CLAUDE.md: {e}[/red]")
             raise typer.Exit(1)
