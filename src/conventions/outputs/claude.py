@@ -170,9 +170,9 @@ def _infer_path_glob(rule: ConventionRule) -> str | None:
     if not meaningful:
         return None
 
-    coverage = sum(1 for p in parent_strs if p.startswith("/".join(common_parts)))
-    if coverage / len(parent_strs) < 0.8:
-        return None
+    # No coverage check needed — the strict LCP loop above only advances when
+    # every parent shares the prefix, so all parents start with common_parts
+    # by construction.
 
     lcp = "/".join(common_parts)
     if not suffixes:
@@ -1378,20 +1378,52 @@ def write_claude_md(
     return target_path
 
 
-def _glob_to_filename(glob: str) -> str:
+def _glob_to_filename(glob: str, *, include_top_level: bool = False) -> str:
     """Derive a kebab-case filename stem from a path glob.
 
     `src/api/v1/**/*.py` → `api-v1`
     `src/db/**/*.{py,pyi}` → `db`
     `packages/web/src/api/**/*.ts` → `web-src-api`
+
+    When `include_top_level=True`, common code-root segments (`src`, `lib`,
+    etc.) are kept rather than stripped — used as the disambiguation step
+    for filename collisions, e.g. `src/api/**/*.py` AND `lib/api/**/*.py`
+    would both reduce to `api` under default stripping; with the flag set,
+    they become `src-api` and `lib-api` so each glob gets its own file.
     """
     prefix = glob.split("**", 1)[0].rstrip("/")
     if not prefix:
         return "scoped"
-    parts = [p for p in prefix.split("/") if p and p not in _TOP_LEVEL_CODE_DIRS]
+    if include_top_level:
+        parts = [p for p in prefix.split("/") if p]
+    else:
+        parts = [p for p in prefix.split("/") if p and p not in _TOP_LEVEL_CODE_DIRS]
     if not parts:
         parts = [prefix.split("/")[-1]]
     return "-".join(parts)
+
+
+def _resolve_rule_filenames(globs: list[str]) -> dict[str, str]:
+    """Map each glob to a unique filename stem.
+
+    Tries the readable form (`_glob_to_filename(glob)`) first; if any stem
+    collides across globs, every glob in the colliding group falls back to
+    the full-prefix form that includes top-level code dirs. Final guarantee:
+    no two globs share a stem; matching `.claude/rules/<stem>.md` files do
+    not silently overwrite each other.
+    """
+    readable = {glob: _glob_to_filename(glob) for glob in globs}
+    counts: dict[str, int] = {}
+    for stem in readable.values():
+        counts[stem] = counts.get(stem, 0) + 1
+
+    resolved: dict[str, str] = {}
+    for glob, stem in readable.items():
+        if counts[stem] > 1:
+            resolved[glob] = _glob_to_filename(glob, include_top_level=True)
+        else:
+            resolved[glob] = stem
+    return resolved
 
 
 def _render_rule_for_rules_file(rule: ConventionRule) -> str:
@@ -1454,10 +1486,11 @@ def write_claude_rules(
     rules_dir = repo_root / ".claude" / "rules"
     rules_dir.mkdir(parents=True, exist_ok=True)
 
+    stems = _resolve_rule_filenames(all_globs)
+
     written: list[Path] = []
     for glob in all_globs:
-        stem = _glob_to_filename(glob)
-        target = rules_dir / f"{stem}.md"
+        target = rules_dir / f"{stems[glob]}.md"
 
         body_parts: list[str] = [
             "---",
