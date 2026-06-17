@@ -5,9 +5,9 @@
     {
       "tool": {
         "driver": {
-          "name": "conventions-cli",
+          "name": "klaussy-repo-conventions",
           "version": "1.0.0",
-          "informationUri": "https://github.com/conventions-cli/conventions-cli",
+          "informationUri": "https://github.com/steph-dove/klaussy-repo-conventions",
           "rules": [
             {
               "id": "node.conventions.typescript",
@@ -1179,7 +1179,7 @@
               "fullDescription": {
                 "text": "Uses httpx for HTTP requests."
               },
-              "helpUri": "https://github.com/conventions-cli/conventions-cli#rules",
+              "helpUri": "https://github.com/steph-dove/klaussy-repo-conventions#rules",
               "properties": {
                 "category": "async",
                 "language": "python",
