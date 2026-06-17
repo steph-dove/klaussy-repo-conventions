@@ -16,9 +16,9 @@ from ..schemas import ConventionsOutput
 
 SARIF_SCHEMA = "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"
 SARIF_VERSION = "2.1.0"
-TOOL_NAME = "conventions-cli"
+TOOL_NAME = "klaussy-repo-conventions"
 TOOL_VERSION = "1.0.0"
-TOOL_INFO_URI = "https://github.com/conventions-cli/conventions-cli"
+TOOL_INFO_URI = "https://github.com/steph-dove/klaussy-repo-conventions"
 
 
 def _score_to_level(score: int) -> str:

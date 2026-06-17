@@ -25,18 +25,18 @@ A command-line tool that automatically discovers and documents coding convention
 brew install pipx  # macOS
 # or: pip install --user pipx
 
-# Install conventions-cli
-pipx install conventions-cli
+# Install klaussy-repo-conventions
+pipx install klaussy-repo-conventions
 ```
 
 ### Using pip
 
 ```bash
 # In a virtual environment
-pip install conventions-cli
+pip install klaussy-repo-conventions
 
 # Or with --user flag
-pip install --user conventions-cli
+pip install --user klaussy-repo-conventions
 ```
 
 ### From Source
@@ -245,7 +245,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install conventions-cli
+      - run: pip install klaussy-repo-conventions
       - run: conventions discover
       - run: cat .conventions/conventions-review.md
 ```
@@ -278,7 +278,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install conventions-cli
+      - run: pip install klaussy-repo-conventions
       - run: conventions discover --format sarif
       - uses: github/codeql-action/upload-sarif@v3
         with:
