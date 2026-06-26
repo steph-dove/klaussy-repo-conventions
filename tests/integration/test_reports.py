@@ -12,6 +12,8 @@ from conventions.report import (
     write_review_report,
 )
 from conventions.schemas import ConventionRule, ConventionsOutput, EvidenceSnippet, RepoMetadata
+from conventions.outputs.html import generate_html_report
+from conventions.outputs.sarif import generate_sarif_report
 
 
 @pytest.fixture
@@ -34,6 +36,7 @@ def multi_rule_output() -> ConventionsOutput:
                 )
             ],
             stats={"any_annotation_coverage": 0.85},
+            tags=["typing", "static-analysis"],
         ),
         ConventionRule(
             id="python.conventions.testing_framework",
@@ -113,6 +116,12 @@ class TestMarkdownReport:
         assert "**Evidence:**" in report
         assert "```" in report  # Code block
         assert "src/main.py" in report
+
+    def test_markdown_report_includes_tags(self, multi_rule_output: ConventionsOutput):
+        """Test markdown report includes tags."""
+        report = generate_markdown_report(multi_rule_output)
+
+        assert "**Tags:** `typing`, `static-analysis`" in report
 
     def test_write_markdown_report(self, tmp_path: Path, sample_output: ConventionsOutput):
         """Test writing markdown report to file."""
@@ -231,3 +240,24 @@ class TestReportWithWarnings:
         assert "## Warnings" in report
         assert "test_detector" in report
         assert "Test warning" in report
+
+
+class TestHTMLReport:
+    """Tests for HTML report generation."""
+
+    def test_html_report_includes_tags(self, multi_rule_output: ConventionsOutput):
+        """Test HTML report includes tags."""
+        html = generate_html_report(multi_rule_output)
+        assert "<strong>Tags:</strong> typing, static-analysis" in html
+
+
+class TestSARIFReport:
+    """Tests for SARIF report generation."""
+
+    def test_sarif_report_includes_tags(self, multi_rule_output: ConventionsOutput):
+        """Test SARIF report includes tags."""
+        sarif = generate_sarif_report(multi_rule_output)
+        rules = sarif["runs"][0]["tool"]["driver"]["rules"]
+        typing_rule = next(r for r in rules if r["id"] == "python.conventions.typing_coverage")
+        assert typing_rule["properties"]["tags"] == ["typing", "static-analysis"]
+
