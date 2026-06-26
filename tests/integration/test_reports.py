@@ -73,6 +73,7 @@ def multi_rule_output() -> ConventionsOutput:
             path="/test/project",
             detected_languages=["python"],
             total_files_scanned=50,
+            description="A test project description",
         ),
         rules=rules,
         warnings=[],
@@ -122,6 +123,12 @@ class TestMarkdownReport:
         report = generate_markdown_report(multi_rule_output)
 
         assert "**Tags:** `typing`, `static-analysis`" in report
+
+    def test_markdown_report_includes_description(self, multi_rule_output: ConventionsOutput):
+        """Test markdown report includes description."""
+        report = generate_markdown_report(multi_rule_output)
+
+        assert "**Description:** A test project description" in report
 
     def test_write_markdown_report(self, tmp_path: Path, sample_output: ConventionsOutput):
         """Test writing markdown report to file."""
@@ -250,6 +257,11 @@ class TestHTMLReport:
         html = generate_html_report(multi_rule_output)
         assert "<strong>Tags:</strong> typing, static-analysis" in html
 
+    def test_html_report_includes_description(self, multi_rule_output: ConventionsOutput):
+        """Test HTML report includes description."""
+        html = generate_html_report(multi_rule_output)
+        assert "A test project description" in html
+
 
 class TestSARIFReport:
     """Tests for SARIF report generation."""
@@ -260,4 +272,11 @@ class TestSARIFReport:
         rules = sarif["runs"][0]["tool"]["driver"]["rules"]
         typing_rule = next(r for r in rules if r["id"] == "python.conventions.typing_coverage")
         assert typing_rule["properties"]["tags"] == ["typing", "static-analysis"]
+
+    def test_sarif_report_includes_description(self, multi_rule_output: ConventionsOutput):
+        """Test SARIF report includes description."""
+        sarif = generate_sarif_report(multi_rule_output)
+        properties = sarif["runs"][0]["properties"]
+        assert properties["projectDescription"] == "A test project description"
+
 

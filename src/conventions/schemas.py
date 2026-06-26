@@ -61,6 +61,7 @@ class RepoMetadata(BaseModel):
     path: str = Field(..., description="Absolute path to the repository")
     detected_languages: list[str] = Field(default_factory=list, description="Detected programming languages")
     total_files_scanned: int = Field(0, description="Number of files scanned")
+    description: Optional[str] = Field(None, description="Project description")
 
     class Config:
         extra = "forbid"

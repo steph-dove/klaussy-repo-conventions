@@ -109,6 +109,9 @@ def generate_markdown_report(output: ConventionsOutput) -> str:
     # Metadata
     lines.append("## Summary")
     lines.append("")
+    if output.metadata.description:
+        lines.append(f"**Description:** {output.metadata.description}")
+        lines.append("")
     lines.append(f"- **Repository:** `{output.metadata.path}`")
     lines.append(f"- **Languages:** {', '.join(output.metadata.detected_languages) or 'none'}")
     lines.append(f"- **Files scanned:** {output.metadata.total_files_scanned}")

@@ -198,6 +198,7 @@ def generate_sarif_report(output: ConventionsOutput) -> dict[str, Any]:
                 "conventionsVersion": output.version,
                 "detectedLanguages": output.metadata.detected_languages,
                 "totalFilesScanned": output.metadata.total_files_scanned,
+                "projectDescription": output.metadata.description,
             },
         }],
     }

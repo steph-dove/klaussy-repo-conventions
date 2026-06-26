@@ -156,6 +156,13 @@ def run_detectors(
         if index is not None and hasattr(index, "files"):
             total_files_scanned += len(index.files)
 
+    # Get project description if layout rule exists
+    project_desc = None
+    for rule in all_rules:
+        if rule.stats and "project_description" in rule.stats:
+            project_desc = rule.stats["project_description"]
+            break
+
     # Build output
     return ConventionsOutput(
         version="1.0.0",
@@ -163,6 +170,7 @@ def run_detectors(
             path=str(repo_root),
             detected_languages=sorted(languages),
             total_files_scanned=total_files_scanned,
+            description=project_desc,
         ),
         rules=all_rules,
         warnings=all_warnings,
