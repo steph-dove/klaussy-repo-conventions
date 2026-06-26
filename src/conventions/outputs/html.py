@@ -488,6 +488,10 @@ def _html_detailed_rules(rated_rules: list) -> str:
         if rule.docs_url:
             docs_html = f'<span><strong>Docs:</strong> <a href="{_escape(rule.docs_url)}" target="_blank" rel="noopener">{_escape(rule.docs_url)}</a></span>'
 
+        tags_html = ""
+        if rule.tags:
+            tags_html = f"<span><strong>Tags:</strong> {', '.join(_escape(t) for t in rule.tags)}</span>"
+
         details.append(f'''
             <div class="rule-detail" id="rule-{_escape(rule.id.replace('.', '-'))}">
                 <div class="rule-header" onclick="toggleRule(this)">
@@ -506,6 +510,7 @@ def _html_detailed_rules(rated_rules: list) -> str:
                         <span><strong>Language:</strong> {_escape(rule.language or 'generic')}</span>
                         <span><strong>Confidence:</strong> {rule.confidence * 100:.0f}%</span>
                         {docs_html}
+                        {tags_html}
                     </div>
                     <p>{_escape(rule.description)}</p>
                     <p><strong>Assessment:</strong> {_escape(reason)}</p>

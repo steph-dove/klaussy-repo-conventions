@@ -76,6 +76,7 @@ def generate_sarif_report(output: ConventionsOutput) -> dict[str, Any]:
                 "scoreLabel": get_score_label(score),
                 "precision": "high" if rule.confidence >= 0.8 else "medium",
                 "docsUrl": rule.docs_url,
+                "tags": rule.tags,
             },
         }
 

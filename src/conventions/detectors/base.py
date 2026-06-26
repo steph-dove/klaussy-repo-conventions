@@ -130,6 +130,7 @@ class BaseDetector(ABC):
         evidence: Optional[list[EvidenceSnippet]] = None,
         stats: Optional[dict[str, Any]] = None,
         docs_url: Optional[str] = None,
+        tags: Optional[list[str]] = None,
     ) -> ConventionRule:
         """Helper to create a ConventionRule with validated fields.
 
@@ -143,6 +144,7 @@ class BaseDetector(ABC):
             evidence: Evidence snippets from source code
             stats: Statistics supporting this rule
             docs_url: Explicit documentation URL (if None, auto-detected from stats)
+            tags: Tags associated with this rule
 
         Returns:
             ConventionRule with documentation URL if available
@@ -164,6 +166,7 @@ class BaseDetector(ABC):
             evidence=evidence or [],
             stats=final_stats,
             docs_url=docs_url,
+            tags=tags or [],
         )
 
 

@@ -83,6 +83,19 @@ class TestConventionRule:
         assert rule.language is None
         assert rule.evidence == []
         assert rule.stats == {}
+        assert rule.tags == []
+
+    def test_rule_with_tags(self):
+        """Test creating a rule with tags."""
+        rule = ConventionRule(
+            id="test.rule",
+            category="test",
+            title="Test Rule",
+            description="A test rule",
+            confidence=0.5,
+            tags=["django", "orm", "database"]
+        )
+        assert rule.tags == ["django", "orm", "database"]
 
     def test_confidence_range_validation(self):
         """Test confidence must be between 0 and 1."""

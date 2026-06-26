@@ -156,6 +156,8 @@ def generate_markdown_report(output: ConventionsOutput) -> str:
             lines.append(f"**Confidence:** {rule.confidence * 100:.0f}%")
             if rule.docs_url:
                 lines.append(f"  \n**Documentation:** [{rule.docs_url}]({rule.docs_url})")
+            if rule.tags:
+                lines.append(f"  \n**Tags:** {', '.join(f'`{t}`' for t in rule.tags)}")
             lines.append("")
             lines.append(rule.description)
             lines.append("")
