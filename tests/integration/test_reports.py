@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from conventions.outputs.html import generate_html_report
+from conventions.outputs.sarif import generate_sarif_report
 from conventions.report import (
     generate_markdown_report,
     generate_review_markdown,
@@ -12,8 +14,6 @@ from conventions.report import (
     write_review_report,
 )
 from conventions.schemas import ConventionRule, ConventionsOutput, EvidenceSnippet, RepoMetadata
-from conventions.outputs.html import generate_html_report
-from conventions.outputs.sarif import generate_sarif_report
 
 
 @pytest.fixture

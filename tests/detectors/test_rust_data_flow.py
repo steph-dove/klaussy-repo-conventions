@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from conventions.detectors.base import DetectorContext, DetectorResult
+from conventions.detectors.base import DetectorContext
 from conventions.detectors.rust.data_flow import RustDataFlowDetector
 
 

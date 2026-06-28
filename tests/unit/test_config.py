@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 
 from conventions.config import (
-    CONFIG_FILE_NAMES,
     ConventionsConfig,
     find_config_file,
     load_config,

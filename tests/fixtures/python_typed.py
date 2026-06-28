@@ -1,5 +1,5 @@
 """Example of well-typed Python code."""
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
 
 
 def greet(name: str, formal: bool = False) -> str:

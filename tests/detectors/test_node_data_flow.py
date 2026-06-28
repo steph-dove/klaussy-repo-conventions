@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from conventions.detectors.base import DetectorContext, DetectorResult
+from conventions.detectors.base import DetectorContext
 from conventions.detectors.node.data_flow import NodeDataFlowDetector
 
 

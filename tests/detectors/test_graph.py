@@ -2,12 +2,8 @@
 from __future__ import annotations
 
 from conventions.detectors.graph import (
-    CircularDependency,
-    DependencyCluster,
-    EndpointChain,
     FileNode,
     ImportEdge,
-    ImportGraphSummary,
     build_import_graph,
     compute_summary,
     find_clusters,

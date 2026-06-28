@@ -1,8 +1,6 @@
 """Tests for CLAUDE.md output generator."""
 from __future__ import annotations
 
-import pytest
-
 from conventions.outputs.claude import (
     _classify_rule,
     _summarize_rule,
@@ -670,7 +668,7 @@ class TestGenerateClaudeMd:
             }),
         ]
         output = _make_output(rules)
-        
+
         # Verify directory-map.md renders the tree
         map_result = generate_directory_map_md(output)
         assert "## Directory Structure" in map_result
@@ -1092,7 +1090,7 @@ class TestAgentCompatibilityFeatures:
             )
         ]
         output = _make_output(rules)
-        
+
         # Verify directory-map.md contains the full tree
         map_result = generate_directory_map_md(output)
         assert "## Directory Structure" in map_result

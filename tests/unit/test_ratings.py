@@ -6,12 +6,11 @@ import pytest
 from conventions.ratings import (
     DEFAULT_RATING_RULE,
     RATING_RULES,
-    SCORE_LABELS,
     get_rating_rule,
     get_score_label,
     rate_convention,
 )
-from conventions.schemas import ConventionRule, EvidenceSnippet
+from conventions.schemas import ConventionRule
 
 
 def make_rule(rule_id: str, **stats) -> ConventionRule:

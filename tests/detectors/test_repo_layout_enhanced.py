@@ -188,7 +188,7 @@ class TestEnhancedRepoLayout:
 
         rules = [r for r in result.rules if r.id == "generic.conventions.repo_layout"]
         tree = rules[0].stats["directory_tree"]
-        
+
         # Verify depth 8 (g) is present
         g_node = tree["src"]["children"]["a"]["children"]["b"]["children"]["c"]["children"]["d"]["children"]["e"]["children"]["f"]["children"]["g"]
         assert "h" not in g_node["children"]

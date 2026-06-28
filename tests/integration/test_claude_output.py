@@ -110,3 +110,20 @@ class TestClaudeFormatCli:
         ])
         assert result.exit_code == 0
         assert "Wrote CLAUDE.md to:" in result.output
+
+    def test_claude_format_creates_directory_map(self, node_repo: Path):
+        """Running discover with --claude creates .claude/directory-map.md."""
+        result = runner.invoke(app, [
+            "discover",
+            "--repo", str(node_repo),
+            "--claude",
+            "--quiet",
+        ])
+        assert result.exit_code == 0
+
+        directory_map = node_repo / ".claude" / "directory-map.md"
+        assert directory_map.exists()
+
+        content = directory_map.read_text()
+        assert "# Directory Map" in content
+        assert "## Directory Structure" in content
