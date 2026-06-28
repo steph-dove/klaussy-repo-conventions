@@ -1,7 +1,10 @@
 """CLAUDE.md generator for conventions detection.
 
-Generates a structured CLAUDE.md file optimized for Claude Code,
-filtering conventions by signal quality rather than score.
+Generates a structured CLAUDE.md file optimized for Claude Code. Conventions are
+gated by their 1-5 review score: well-followed conventions (score >= 3) are
+emitted as patterns to mirror, while low-scoring ones (score <= 2) are surfaced
+separately as anti-patterns present in the codebase, so an agent never mistakes
+existing tech debt for a convention to imitate.
 """
 
 from __future__ import annotations
@@ -9,7 +12,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from ..ratings import rate_convention
 from ..schemas import ConventionRule, ConventionsOutput
+
+# Conventions whose review score is at or below this threshold are treated as
+# anti-patterns present in the codebase rather than patterns to mirror.
+_ANTIPATTERN_MAX_SCORE = 2
 
 # --- Rule classification ---
 
@@ -867,14 +875,19 @@ def _build_commands_inferred(
     return "\n".join(lines)
 
 
-def _build_conventions_section(
+def _select_project_wide_conventions(
     include_rules: list[ConventionRule],
     tech_rules: list[ConventionRule] | None = None,
-) -> str:
-    """Build the Conventions section from naming, module, async rules."""
+) -> list[ConventionRule]:
+    """Return project-wide convention rules eligible for CLAUDE.md.
+
+    Path-scoped rules are emitted as `.claude/rules/<glob>.md` files via
+    `write_claude_rules`; only project-wide rules belong in CLAUDE.md so the
+    root file stays focused on what applies everywhere.
+    """
     conv_rules = [r for r in include_rules if _get_suffix(r) in _CONVENTION_SUFFIXES]
     if not conv_rules:
-        return ""
+        return []
 
     # Suppress structured_logging (console.log) when a real logging library is detected
     has_logging_library = any(
@@ -886,17 +899,63 @@ def _build_conventions_section(
         if not (_get_suffix(r) == "structured_logging" and has_logging_library)
     ]
 
-    # Path-scoped rules are emitted as `.claude/rules/<glob>.md` files via
-    # `write_claude_rules`. Only project-wide rules belong in CLAUDE.md so the
-    # root file stays focused on what applies everywhere.
     _, project_wide = _bucket_rules_by_path(visible_rules)
-    if not project_wide:
+    return project_wide
+
+
+def _build_conventions_section(
+    include_rules: list[ConventionRule],
+    tech_rules: list[ConventionRule] | None = None,
+) -> str:
+    """Build the Conventions section from well-followed convention rules.
+
+    Only conventions scoring above :data:`_ANTIPATTERN_MAX_SCORE` are emitted
+    here as patterns to mirror; low-scoring ones are surfaced separately by
+    :func:`_build_antipatterns_section`.
+    """
+    project_wide = _select_project_wide_conventions(include_rules, tech_rules)
+    follow = [r for r in project_wide if rate_convention(r)[0] > _ANTIPATTERN_MAX_SCORE]
+    if not follow:
         return ""
 
     lines = ["## Conventions\n"]
-    for rule in project_wide:
+    for rule in follow:
         prescriptive = _render_prescriptive_summary(rule)
         lines.append(f"- **{rule.title}**: {prescriptive}")
+
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _build_antipatterns_section(
+    include_rules: list[ConventionRule],
+    tech_rules: list[ConventionRule] | None = None,
+) -> str:
+    """Build the Anti-patterns Present section from low-scoring conventions.
+
+    These are patterns the scan detected in the codebase that score at or below
+    :data:`_ANTIPATTERN_MAX_SCORE`. They are reported so an agent treats them as
+    existing tech debt to avoid in new code, not as conventions to imitate.
+    """
+    project_wide = _select_project_wide_conventions(include_rules, tech_rules)
+
+    flagged: list[tuple[ConventionRule, str | None]] = []
+    for rule in project_wide:
+        score, _, suggestion = rate_convention(rule)
+        if score <= _ANTIPATTERN_MAX_SCORE:
+            flagged.append((rule, suggestion))
+
+    if not flagged:
+        return ""
+
+    lines = [
+        "## Anti-patterns Present\n",
+        "> Detected in the codebase but **not** conventions to imitate. Avoid "
+        "these in new code; fix on touch where practical.\n",
+    ]
+    for rule, suggestion in flagged:
+        fix = f" {suggestion}" if suggestion else ""
+        lines.append(f"- **{rule.title}**:{fix}".rstrip())
 
     lines.append("")
     return "\n".join(lines)
@@ -1535,6 +1594,11 @@ def generate_claude_md(output: ConventionsOutput) -> str:
     conv = _build_conventions_section(include_rules, tech_rules)
     if conv:
         sections.append(conv)
+
+    # Anti-patterns present (low-scoring conventions to avoid, not mirror)
+    antipatterns = _build_antipatterns_section(include_rules, tech_rules)
+    if antipatterns:
+        sections.append(antipatterns)
 
     # Generated Code warning
     gen_code = _build_generated_code_section(include_rules)

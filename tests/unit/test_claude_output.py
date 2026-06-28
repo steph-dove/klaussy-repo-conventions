@@ -372,6 +372,58 @@ class TestGenerateClaudeMd:
         assert "camelCase" in result
         assert "async/await" in result
 
+    def test_low_score_convention_moves_to_antipatterns(self):
+        """A low-scoring convention is surfaced as an anti-pattern, not a convention."""
+        good = ConventionRule(
+            id="python.conventions.naming",
+            category="style",
+            title="PEP 8 snake_case naming",
+            description="snake_case naming",
+            confidence=0.95,
+            language="python",
+            stats={"snake_case_ratio": 1.0},
+        )
+        bad = ConventionRule(
+            id="python.conventions.password_hashing",
+            category="security",
+            title="Password hashing: hashlib (not recommended)",
+            description="Uses hashlib for hashing",
+            confidence=0.75,
+            language="python",
+            stats={"primary_library": "hashlib"},
+        )
+        output = _make_output([good, bad])
+        result = generate_claude_md(output)
+
+        conv_idx = result.index("## Conventions")
+        anti_idx = result.index("## Anti-patterns Present")
+
+        # Well-followed convention stays under Conventions.
+        assert result.index("PEP 8 snake_case naming") < anti_idx
+        # Low-scoring convention is listed only under Anti-patterns, with its fix.
+        hashlib_idx = result.index("Password hashing: hashlib")
+        assert hashlib_idx > anti_idx
+        assert result.count("Password hashing: hashlib") == 1
+        assert "argon2" in result[anti_idx:] or "bcrypt" in result[anti_idx:]
+        assert conv_idx < anti_idx
+
+    def test_no_antipatterns_section_when_all_high_scoring(self):
+        """The Anti-patterns section is omitted when no convention scores low."""
+        good = ConventionRule(
+            id="python.conventions.naming",
+            category="style",
+            title="PEP 8 snake_case naming",
+            description="snake_case naming",
+            confidence=0.95,
+            language="python",
+            stats={"snake_case_ratio": 1.0},
+        )
+        output = _make_output([good])
+        result = generate_claude_md(output)
+
+        assert "## Conventions" in result
+        assert "## Anti-patterns Present" not in result
+
     def test_auto_generated_header(self):
         """Output includes auto-generated notice."""
         output = _make_output([])
