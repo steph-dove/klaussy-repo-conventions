@@ -166,11 +166,15 @@ allowed to fail (continue-on-error: true)`. Tests:
 ## Regenerating examples
 
 `scripts/regen-examples.sh` clones the latest httpx + fastapi, runs the scanner
-with all formats, and copies artifacts into `examples/<name>/`. Decision: track
-**latest upstream** (so per-step diffs may include upstream drift; in practice
-both repos are stable and drift is mostly the `Generated:` timestamp lines).
-**Run this after every step** so examples reflect the current code. The source
-repos are not vendored — the script clones into `<name>_repo/` and cleans up.
+with all formats, and copies artifacts into `examples/<name>/`. This includes the
+full `.claude/` agent bundle — the repo map (`directory-map.md`) and the
+path-scoped rule files (`rules/*.md`) — which are rebuilt from scratch each run
+so they stay in sync with `CLAUDE.md` and the reports (an earlier version of the
+script omitted these, leaving them stale). Decision: track **latest upstream**
+(so per-step diffs may include upstream drift; in practice both repos are stable
+and drift is mostly the `Generated:` timestamp lines). **Run this after every
+step** so examples reflect the current code. The source repos are not vendored —
+the script clones into `<name>_repo/` and cleans up.
 
 ## Status log
 - 2026-06-28: Plan created. Starting step 1.

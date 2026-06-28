@@ -62,8 +62,22 @@ for entry in "${EXAMPLES[@]}"; do
     fi
   done
 
+  # Refresh the full .claude agent bundle (repo map + path-scoped rule files).
+  # Rebuilt from scratch so rules that are no longer generated are dropped,
+  # keeping the bundle in sync with CLAUDE.md and the reports above.
+  rm -rf "$dest/.claude"
+  mkdir -p "$dest/.claude"
+  if [ -f "$clone_dir/.claude/directory-map.md" ]; then
+    cp "$clone_dir/.claude/directory-map.md" "$dest/.claude/directory-map.md"
+  else
+    echo "   WARNING: expected directory map missing" >&2
+  fi
+  if [ -d "$clone_dir/.claude/rules" ]; then
+    cp -R "$clone_dir/.claude/rules" "$dest/.claude/rules"
+  fi
+
   rm -rf "$clone_dir"
-  echo "   wrote -> examples/$name/"
+  echo "   wrote -> examples/$name/ (incl. .claude/ bundle)"
 done
 
 echo "Done. Review 'git diff examples/' to see the effect of code changes (plus upstream drift)."

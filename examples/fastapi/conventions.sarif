@@ -15832,8 +15832,8 @@
               "decorator_handlers": 6,
               "call_handlers": 11,
               "handler_files": [
-                "tests/test_validation_error_context.py",
-                "fastapi/applications.py"
+                "fastapi/applications.py",
+                "tests/test_validation_error_context.py"
               ]
             }
           },
@@ -18026,7 +18026,7 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "startTimeUtc": "2026-06-28T22:19:56.272863+00:00",
+          "startTimeUtc": "2026-06-28T22:42:38.323064+00:00",
           "workingDirectory": {
             "uri": "/Users/stephaniedover/projects/klaussy-repo-conventions/fastapi_repo"
           }
