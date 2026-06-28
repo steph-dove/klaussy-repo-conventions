@@ -831,8 +831,37 @@ def _build_commands_inferred(
     if single_test:
         lines.append(f"- **Test single**: `{single_test}`")
 
-    lines.append("")
-    lines.append("[TODO: Add project-specific commands]")
+    # Append detected task runner commands if any
+    for rule in include_rules:
+        if _get_suffix(rule) == "task_runner":
+            targets_dict = rule.stats.get("targets", {})
+            primary = rule.stats.get("primary_runner", "")
+            if primary in targets_dict:
+                runner_targets = targets_dict[primary]
+                valid_targets = [t for t in runner_targets if t.get("name")]
+                if valid_targets:
+                    for target in valid_targets[:8]:
+                        name = target.get("name", "")
+                        desc = target.get("description", "")
+
+                        if primary == "makefile":
+                            cmd_str = f"make {name}"
+                        elif primary == "justfile":
+                            cmd_str = f"just {name}"
+                        elif primary == "taskfile":
+                            cmd_str = f"task {name}"
+                        elif primary == "package_json":
+                            cmd_str = f"{pkg_mgr or 'npm'} run {name}"
+                        else:
+                            cmd_str = name
+
+                        label = name.replace("-", " ").replace("_", " ").capitalize()
+                        if desc:
+                            lines.append(f"- **{label}**: `{cmd_str}` — {desc}")
+                        else:
+                            lines.append(f"- **{label}**: `{cmd_str}`")
+            break
+
     lines.append("")
     return "\n".join(lines)
 
@@ -868,8 +897,6 @@ def _build_conventions_section(
         prescriptive = _render_prescriptive_summary(rule)
         lines.append(f"- **{rule.title}**: {prescriptive}")
 
-    lines.append("")
-    lines.append("[TODO: Add project-specific conventions]")
     lines.append("")
     return "\n".join(lines)
 
@@ -1520,9 +1547,9 @@ def generate_claude_md(output: ConventionsOutput) -> str:
 
     # Skeleton sections
     sections.append("## Decision Log\n")
-    sections.append("[TODO: Record architectural decisions]\n")
+    sections.append("- *No architectural decisions recorded yet. Add major design and library choices here.*\n")
     sections.append("## Known Pitfalls\n")
-    sections.append("[TODO: Document gotchas and anti-patterns]\n")
+    sections.append("- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*\n")
 
     return "\n".join(sections)
 

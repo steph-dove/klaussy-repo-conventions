@@ -52,8 +52,6 @@ For the repository directory map and file layout, see [.claude/directory-map.md]
 - **Test**: `pytest`
 - **Test single**: `pytest path/to/test.py::TestClass::test_method`
 
-[TODO: Add project-specific commands]
-
 ## Conventions
 
 - **Config access patterns**: Manage environment configuration: Use `pydantic_settings` for env config.
@@ -65,16 +63,14 @@ For the repository directory map and file layout, see [.claude/directory-map.md]
 - **Distributed test files**: Test files spread across 2 directories. 496 total test files.
 - **High type annotation coverage**: Standardize on typing: Type annotations are commonly used in this codebase. 434/438 functions have at least one type annotation..
 
-[TODO: Add project-specific conventions]
-
 ## Deployment
 
 - **CI features**: tests, deploy, caching, matrix builds
 
 ## Decision Log
 
-[TODO: Record architectural decisions]
+- *No architectural decisions recorded yet. Add major design and library choices here.*
 
 ## Known Pitfalls
 
-[TODO: Document gotchas and anti-patterns]
+- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*

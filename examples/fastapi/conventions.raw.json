@@ -12618,8 +12618,8 @@
         "decorator_handlers": 6,
         "call_handlers": 11,
         "handler_files": [
-          "fastapi/applications.py",
-          "tests/test_validation_error_context.py"
+          "tests/test_validation_error_context.py",
+          "fastapi/applications.py"
         ]
       },
       "docs_url": "https://fastapi.tiangolo.com/",

@@ -285,7 +285,8 @@ class TestGenerateClaudeMd:
         assert "## Commands" in result
         assert "## Decision Log" in result
         assert "## Known Pitfalls" in result
-        assert "[TODO:" in result
+        assert "No architectural decisions recorded yet" in result
+        assert "No project gotchas or anti-patterns documented yet" in result
 
     def test_project_name_from_path(self):
         """Project name is extracted from repo path."""

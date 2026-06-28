@@ -1,6 +1,6 @@
 # Code Conventions Report
 
-*Generated: 2026-06-28 12:28:51*
+*Generated: 2026-06-28 12:30:45*
 
 ## Summary
 
@@ -2337,7 +2337,7 @@ Exception handlers are spread across 2 modules. Total handlers: 17.
 - total_handlers: `17`
 - decorator_handlers: `6`
 - call_handlers: `11`
-- handler_files: `['fastapi/applications.py', 'tests/test_validation_error_context.py']`
+- handler_files: `['tests/test_validation_error_context.py', 'fastapi/applications.py']`
 
 **Evidence:**
 
