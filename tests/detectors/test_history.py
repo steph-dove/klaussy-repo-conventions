@@ -76,15 +76,43 @@ chore: refactor auth logic
         rule = result.rules[0]
         assert rule.id == "generic.conventions.history"
 
-        # Assert decisions were parsed
+        # Assert decisions were parsed, with version context from the headings.
         decisions = rule.stats["detected_decisions"]
         assert "Migration/refactor commit: feat!: migrate to new configuration structure" in decisions
-        assert "Changelog breaking change: breaking change: migrated database schema to postgresql v16" in decisions
-        assert "Changelog breaking change: deprecated: old endpoint /v1/users is deprecated" in decisions
+        assert "v1.2.0: breaking change: migrated database schema to postgresql v16" in decisions
+        assert "v1.2.0: deprecated: old endpoint /v1/users is deprecated" in decisions
 
         # Assert pitfalls were parsed
         pitfalls = rule.stats["detected_pitfalls"]
         assert "CI/test flakiness fix or workaround: fix ci builds: retry linting step" in pitfalls
-        assert "Changelog noted issue: fix flaky test by adding retry logic" in pitfalls
+        assert "v1.1.0: fix flaky test by adding retry logic" in pitfalls
         assert "CI workflow `ci.yml` contains steps allowed to fail (`continue-on-error: true`)." in pitfalls
         assert "CI workflow `ci.yml` uses retry logic for flaky execution steps." in pitfalls
+
+
+def test_changelog_decision_fidelity(tmp_path: Path):
+    """Truncated, link-laden changelog prose becomes a clean, versioned entry."""
+    changelog = """# Changelog
+
+## 0.27.0 (21st February, 2024)
+
+- The deprecated `verify=<ssl_context>` string cases have been removed and require migration...*
+- The deprecated `proxies` argument has now been removed. See PR [#3005](https://github.com/encode/httpx/pull/3005) for details.
+"""
+    (tmp_path / "CHANGELOG.md").write_text(changelog)
+
+    ctx = DetectorContext(repo_root=tmp_path, selected_languages=set())
+    mock_run_result = MagicMock(returncode=0, stdout="")
+    with patch("subprocess.run", return_value=mock_run_result):
+        rule = HistoryDetector().detect(ctx).rules[0]
+
+    decisions = rule.stats["detected_decisions"]
+
+    # Every entry carries version (and date) context.
+    assert all(d.startswith("v0.27.0 (21st February, 2024): ") for d in decisions)
+    # No truncated mid-sentence markdown artifacts survive.
+    assert not any(d.rstrip().endswith(("...", "*", "…")) for d in decisions)
+    # Markdown links are reduced to their visible text (no raw URLs).
+    assert not any("http" in d or "](" in d for d in decisions)
+    # The first complete sentence is kept, not a fragment.
+    assert "v0.27.0 (21st February, 2024): The deprecated proxies argument has now been removed." in decisions
