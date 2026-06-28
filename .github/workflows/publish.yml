@@ -8,6 +8,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/klaussy-repo-conventions
     permissions:
       id-token: write  # Required for trusted publishing
 
