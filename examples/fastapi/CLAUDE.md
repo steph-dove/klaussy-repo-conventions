@@ -31,45 +31,849 @@ For the complete, uncollapsed directory structure, see [.claude/directory-map.md
 - `docs/` — documentation
   - `de/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `en/`
     - `data/`
+      - `contributors.yml`
+      - `github_sponsors.yml`
+      - `members.yml`
+      - `people.yml`
+      - `skip_users.yml`
+      - `sponsors.yml`
+      - `sponsors_badge.yml`
+      - `topic_repos.yml`
+      - `translation_reviewers.yml`
+      - `translators.yml`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `css/`
+        - `custom.css`
+        - `termynal.css`
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `img/`
+        - `async/`
+          - `concurrent-burgers/`
+          - `parallel-burgers/`
+        - `deployment/`
+          - `concepts/`
+          - `deta/`
+          - `https/`
+        - `index/`
+        - `logo-margin/`
+        - `logos/`
+        - `python-types/`
+        - `sponsors/`
+        - `tutorial/`
+          - `additional-responses/`
+          - `async-sql-databases/`
+          - `behind-a-proxy/`
+          - `bigger-applications/`
+          - `body/`
+          - `body-fields/`
+          - `body-nested-models/`
+          - `cookie-param-models/`
+          - `custom-response/`
+          - `dataclasses/`
+          - `debugging/`
+          - `dependencies/`
+          - `extending-openapi/`
+          - `generate-clients/`
+          - `graphql/`
+          - `header-param-models/`
+          - `json-base64-bytes/`
+          - `metadata/`
+          - `openapi-callbacks/`
+          - `openapi-webhooks/`
+          - `path-operation-advanced-configuration/`
+          - `path-operation-configuration/`
+          - `path-params/`
+          - `query-param-models/`
+          - `query-params-str-validations/`
+          - `request-form-models/`
+          - `response-model/`
+          - `response-status-code/`
+          - `security/`
+          - `separate-openapi-schemas/`
+          - `sql-databases/`
+          - `sub-applications/`
+          - `websockets/`
+      - `js/`
+        - `custom.js`
+        - `init_kapa_widget.js`
+        - `termynal.js`
+      - `learn/`
+        - `index.md`
+      - `reference/`
+        - `openapi/`
+          - `docs.md`
+          - `index.md`
+          - `models.md`
+        - `security/`
+          - `index.md`
+        - `apirouter.md`
+        - `background.md`
+        - `dependencies.md`
+        - `encoders.md`
+        - `exceptions.md`
+        - ... and 14 more files
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 35 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `contributing.md`
+      - ... and 17 more files
     - `overrides/`
+      - `partials/`
+        - `banner-sponsors.html`
+        - `copyright.html`
+      - `main.html`
     - `mkdocs.yml`
   - `es/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `fr/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `hi/`
     - `docs/`
+      - `_llm-test.md`
+      - `index.md`
+      - `translation-banner.md`
     - `llm-prompt.md`
     - `mkdocs.yml`
   - `ja/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `ko/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `pt/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `ru/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `tr/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `uk/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `zh/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `zh-hant/`
     - `docs/`
+      - `about/`
+        - `index.md`
+      - `advanced/`
+        - `security/`
+          - `http-basic-auth.md`
+          - `index.md`
+          - `oauth2-scopes.md`
+        - `additional-responses.md`
+        - `additional-status-codes.md`
+        - `advanced-dependencies.md`
+        - `advanced-python-types.md`
+        - `async-tests.md`
+        - ... and 26 more files
+      - `deployment/`
+        - `cloud.md`
+        - `concepts.md`
+        - `docker.md`
+        - `fastapicloud.md`
+        - `https.md`
+        - `index.md`
+        - `manually.md`
+        - `server-workers.md`
+        - `versions.md`
+      - `how-to/`
+        - `authentication-error-status-code.md`
+        - `conditional-openapi.md`
+        - `configure-swagger-ui.md`
+        - `custom-docs-ui-assets.md`
+        - `custom-request-and-route.md`
+        - ... and 7 more files
+      - `learn/`
+        - `index.md`
+      - `resources/`
+        - `index.md`
+      - `tutorial/`
+        - `dependencies/`
+          - `classes-as-dependencies.md`
+          - `dependencies-in-path-operation-decorators.md`
+          - `dependencies-with-yield.md`
+          - `global-dependencies.md`
+          - `index.md`
+          - `sub-dependencies.md`
+        - `security/`
+          - `first-steps.md`
+          - `get-current-user.md`
+          - `index.md`
+          - `oauth2-jwt.md`
+          - `simple-oauth2.md`
+        - `background-tasks.md`
+        - `bigger-applications.md`
+        - `body-fields.md`
+        - `body-multiple-params.md`
+        - `body-nested-models.md`
+        - ... and 34 more files
+      - `_llm-test.md`
+      - `alternatives.md`
+      - `async.md`
+      - `benchmarks.md`
+      - `editor-support.md`
+      - ... and 10 more files
     - `llm-prompt.md`
   - `language_names.yml`
   - `missing-translation.md`
@@ -114,6 +918,56 @@ For the complete, uncollapsed directory structure, see [.claude/directory-map.md
   - `playwright/`
   - `tests/`
     - `test_translation_fixer/`
+      - `test_code_blocks/`
+        - `data/`
+          - `en_doc.md`
+          - `translated_doc_lines_number_gt.md`
+          - `translated_doc_lines_number_lt.md`
+          - `translated_doc_mermaid_not_translated.md`
+          - `translated_doc_mermaid_translated.md`
+          - `translated_doc_number_gt.md`
+          - `translated_doc_number_lt.md`
+          - `translated_doc_wrong_lang_code.md`
+          - `translated_doc_wrong_lang_code_2.md`
+        - `test_code_blocks_lines_number_mismatch.py`
+        - `test_code_blocks_mermaid.py`
+        - `test_code_blocks_number_mismatch.py`
+        - `test_code_blocks_wrong_lang_code.py`
+      - `test_code_includes/`
+        - `data/`
+          - `en_doc.md`
+          - `translated_doc_number_gt.md`
+          - `translated_doc_number_lt.md`
+        - `test_number_mismatch.py`
+      - `test_complex_doc/`
+        - `data/`
+          - `en_doc.md`
+          - `translated_doc.md`
+          - `translated_doc_expected.md`
+        - `test_compex_doc.py`
+      - `test_header_permalinks/`
+        - `data/`
+          - `en_doc.md`
+          - `translated_doc_level_mismatch_1.md`
+          - `translated_doc_level_mismatch_2.md`
+          - `translated_doc_number_gt.md`
+          - `translated_doc_number_lt.md`
+        - `test_header_level_mismatch.py`
+        - `test_header_number_mismatch.py`
+      - `test_html_links/`
+        - `data/`
+          - `en_doc.md`
+          - `translated_doc_number_gt.md`
+          - `translated_doc_number_lt.md`
+        - `test_html_links_number_mismatch.py`
+      - `test_markdown_links/`
+        - `data/`
+          - `en_doc.md`
+          - `translated_doc.md`
+          - `translated_doc_number_gt.md`
+          - `translated_doc_number_lt.md`
+        - `test_mkd_links_number_mismatch.py`
+      - `conftest.py`
   - `add_latest_release_date.py`
   - `contributors.py`
   - `deploy_docs_status.py`
@@ -126,93 +980,419 @@ For the complete, uncollapsed directory structure, see [.claude/directory-map.md
     - `test_general_performance.py`
   - `test_modules_same_name_body/`
     - `app/`
+      - `__init__.py`
+      - `a.py`
+      - `b.py`
+      - `main.py`
     - `__init__.py`
     - `test_main.py`
   - `test_request_params/`
     - `test_body/`
+      - `__init__.py`
+      - `test_list.py`
+      - `test_optional_list.py`
+      - `test_optional_str.py`
+      - `test_required_str.py`
+      - `utils.py`
     - `test_cookie/`
+      - `__init__.py`
+      - `test_list.py`
+      - `test_optional_list.py`
+      - `test_optional_str.py`
+      - `test_required_str.py`
     - `test_file/`
+      - `__init__.py`
+      - `test_list.py`
+      - `test_optional.py`
+      - `test_optional_list.py`
+      - `test_required.py`
+      - `utils.py`
     - `test_form/`
+      - `__init__.py`
+      - `test_list.py`
+      - `test_optional_list.py`
+      - `test_optional_str.py`
+      - `test_required_str.py`
+      - `utils.py`
     - `test_header/`
+      - `__init__.py`
+      - `test_list.py`
+      - `test_optional_list.py`
+      - `test_optional_str.py`
+      - `test_required_str.py`
     - `test_path/`
+      - `__init__.py`
+      - `test_list.py`
+      - `test_optional_list.py`
+      - `test_optional_str.py`
+      - `test_required_str.py`
     - `test_query/`
+      - `__init__.py`
+      - `test_list.py`
+      - `test_optional_list.py`
+      - `test_optional_str.py`
+      - `test_required_str.py`
     - `__init__.py`
   - `test_tutorial/`
     - `test_additional_responses/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
     - `test_additional_status_codes/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_advanced_middleware/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_async_tests/`
+      - `__init__.py`
+      - `test_main_a.py`
     - `test_authentication_error_status_code/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_background_tasks/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_behind_a_proxy/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial001_01.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
     - `test_bigger_applications/`
+      - `__init__.py`
+      - `test_main.py`
     - `test_body/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
     - `test_body_fields/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_body_multiple_params/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
     - `test_body_nested_models/`
+      - `__init__.py`
+      - `test_tutorial001_tutorial002_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
+      - `test_tutorial007.py`
+      - `test_tutorial008.py`
+      - `test_tutorial009.py`
     - `test_body_updates/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_conditional_openapi/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_configure_swagger_ui/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_cookie_param_models/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_cookie_params/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_cors/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_custom_docs_ui/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_custom_request_and_route/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_custom_response/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial001b.py`
+      - `test_tutorial002_tutorial003_tutorial004.py`
+      - `test_tutorial005.py`
+      - ... and 9 more files
     - `test_dataclasses/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_debugging/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_dependencies/`
+      - `__init__.py`
+      - `test_tutorial001_tutorial001_02.py`
+      - `test_tutorial002_tutorial003_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
+      - ... and 9 more files
     - `test_encoder/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_events/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_extending_openapi/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_extra_data_types/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_extra_models/`
+      - `__init__.py`
+      - `test_tutorial001_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
     - `test_first_steps/`
+      - `__init__.py`
+      - `test_tutorial001_tutorial002_tutorial003.py`
     - `test_generate_clients/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
     - `test_graphql/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_handling_errors/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
     - `test_header_param_models/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_header_params/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_json_base64_bytes/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_metadata/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial001_1.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
     - `test_middleware/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_openapi_callbacks/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_openapi_webhooks/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_path_operation_advanced_configurations/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
+      - `test_tutorial007.py`
     - `test_path_operation_configurations/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial002b.py`
+      - `test_tutorial003_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
     - `test_path_params/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial003b.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
     - `test_path_params_numeric_validations/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
     - `test_python_types/`
+      - `__init__.py`
+      - `test_tutorial001_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
+      - ... and 8 more files
     - `test_query_param_models/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_query_params/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
     - `test_query_params_str_validations/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - ... and 12 more files
     - `test_request_files/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial001_02.py`
+      - `test_tutorial001_03.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_request_form_models/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_request_forms/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_request_forms_and_files/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_response_change_status_code/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_response_cookies/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_response_directly/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_response_headers/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_response_model/`
+      - `__init__.py`
+      - `test_tutorial001_tutorial001_01.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial003_01.py`
+      - ... and 7 more files
     - `test_response_status_code/`
+      - `__init__.py`
+      - `test_tutorial001_tutorial002.py`
     - `test_schema_extra_example/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
     - `test_security/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
+      - `test_tutorial006.py`
+      - `test_tutorial007.py`
     - `test_separate_openapi_schemas/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_server_sent_events/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
+      - `test_tutorial005.py`
     - `test_settings/`
+      - `__init__.py`
+      - `test_app01.py`
+      - `test_app02.py`
+      - `test_app03.py`
+      - `test_tutorial001.py`
     - `test_sql_databases/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_static_files/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_stream_data/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
     - `test_stream_json_lines/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_strict_content_type/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_sub_applications/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_templates/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_testing/`
+      - `__init__.py`
+      - `test_main_a.py`
+      - `test_main_b.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
+      - `test_tutorial004.py`
     - `test_testing_dependencies/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_using_request_directly/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `test_websockets/`
+      - `__init__.py`
+      - `test_tutorial001.py`
+      - `test_tutorial002.py`
+      - `test_tutorial003.py`
     - `test_wsgi/`
+      - `__init__.py`
+      - `test_tutorial001.py`
     - `__init__.py`
   - `test_validate_response_recursive/`
     - `__init__.py`

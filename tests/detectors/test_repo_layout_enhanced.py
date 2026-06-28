@@ -168,11 +168,16 @@ class TestEnhancedRepoLayout:
         assert rules[0].stats["project_description"] == "A library for data processing"
 
     def test_depth_limit(self, tmp_path: Path):
-        """Recursion stops at max_depth (3 levels from root)."""
+        """Recursion stops at max_depth (8 levels from root)."""
         (tmp_path / "src").mkdir()
         (tmp_path / "src" / "a").mkdir()
         (tmp_path / "src" / "a" / "b").mkdir()
-        (tmp_path / "src" / "a" / "b" / "c").mkdir()  # depth 4 — should not appear
+        (tmp_path / "src" / "a" / "b" / "c").mkdir()
+        (tmp_path / "src" / "a" / "b" / "c" / "d").mkdir()
+        (tmp_path / "src" / "a" / "b" / "c" / "d" / "e").mkdir()
+        (tmp_path / "src" / "a" / "b" / "c" / "d" / "e" / "f").mkdir()
+        (tmp_path / "src" / "a" / "b" / "c" / "d" / "e" / "f" / "g").mkdir()
+        (tmp_path / "src" / "a" / "b" / "c" / "d" / "e" / "f" / "g" / "h").mkdir()  # depth 9 — should not appear
 
         ctx = DetectorContext(
             repo_root=tmp_path,
@@ -183,7 +188,7 @@ class TestEnhancedRepoLayout:
 
         rules = [r for r in result.rules if r.id == "generic.conventions.repo_layout"]
         tree = rules[0].stats["directory_tree"]
-        # src (depth 1) -> a (depth 2) -> b (depth 3) should exist
-        assert "b" in tree["src"]["children"]["a"]["children"]
-        # b -> c (depth 4) should be empty
-        assert tree["src"]["children"]["a"]["children"]["b"]["children"] == {}
+        
+        # Verify depth 8 (g) is present
+        g_node = tree["src"]["children"]["a"]["children"]["b"]["children"]["c"]["children"]["d"]["children"]["e"]["children"]["f"]["children"]["g"]
+        assert "h" not in g_node["children"]

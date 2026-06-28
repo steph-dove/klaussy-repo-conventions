@@ -78,7 +78,7 @@ class GenericRepoLayoutDetector(BaseDetector):
                 or common_dirs.get(name, "")
                 or source_dirs.get(name, "")
             )
-            subtree = self._scan_tree(child, ctx.repo_root, ws_descriptions, max_depth=3, current_depth=1)
+            subtree = self._scan_tree(child, ctx.repo_root, ws_descriptions, max_depth=8, current_depth=1)
             tree[name] = {"purpose": purpose, "children": subtree}
 
         if found_dirs:
@@ -164,7 +164,7 @@ class GenericRepoLayoutDetector(BaseDetector):
         directory: Path,
         repo_root: Path,
         ws_descriptions: dict[str, str],
-        max_depth: int = 3,
+        max_depth: int = 8,
         current_depth: int = 0,
     ) -> dict:
         """Recursively scan directory tree, returning nested dict.
