@@ -2,11 +2,30 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 
 from ..base import DetectorContext, DetectorResult, PythonDetector
 from ..registry import DetectorRegistry
 from .index import make_evidence
+
+# Function names that signal server-side password *storage* — the case where
+# `hashlib` is genuinely the wrong tool and argon2/bcrypt should be used. This
+# deliberately excludes generic crypto/auth tokens (hash, verify, authenticate,
+# login, digest) that collide with HTTP digest auth, SSL verification and
+# `__hash__`, which previously caused HTTP clients (e.g. httpx) to be flagged as
+# using weak password hashing when they only use `hashlib` for digest auth.
+_PASSWORD_STORAGE_FUNC_RE = re.compile(
+    r"(?:hash|set|make|check|verify|update|change|reset|encode)_?(?:password|passwd|pwd)"
+    r"|(?:password|passwd|pwd)_?hash",
+    re.IGNORECASE,
+)
+
+# Dedicated password-hashing libraries are unambiguous on their own — importing
+# them is sufficient evidence that the project hashes passwords.
+_DEDICATED_PASSWORD_LIBS = frozenset(
+    {"argon2", "bcrypt", "passlib", "passlib_cryptcontext"}
+)
 
 
 @DetectorRegistry.register
@@ -444,20 +463,13 @@ class PythonSecurityConventionsDetector(PythonDetector):
         index,
         result: DetectorResult,
     ) -> None:
-        """Detect password hashing libraries (only if auth patterns exist)."""
-        # First check if this project has authentication
-        auth_indicators = 0
-        for rel_path, imp in index.get_all_imports():
-            if any(x in imp.module for x in ["jwt", "jose", "oauth", "passlib", "bcrypt", "argon2"]):
-                auth_indicators += 1
+        """Detect password hashing libraries.
 
-        for rel_path, func in index.get_all_functions():
-            if any(x in func.name.lower() for x in ["password", "hash", "verify", "authenticate", "login"]):
-                auth_indicators += 1
-
-        if auth_indicators < 2:
-            return  # No significant auth usage, password hashing not relevant
-
+        Dedicated libraries (argon2/bcrypt/passlib) are reported on sight. A
+        bare ``hashlib`` import is only reported as weak password hashing when
+        the codebase also has an explicit password-storage function, so HTTP
+        clients that use ``hashlib`` for digest auth are not misreported.
+        """
         hash_libs: Counter[str] = Counter()
         hash_examples: dict[str, list[tuple[str, int]]] = {}
 
@@ -500,6 +512,20 @@ class PythonSecurityConventionsDetector(PythonDetector):
 
         if not hash_libs:
             return  # No password hashing detected
+
+        # Domain guard: `hashlib` has many legitimate non-password uses (digest
+        # auth, checksums, cache keys). Only treat it as password hashing when a
+        # dedicated lib is also present or the codebase has an explicit
+        # password-storage function. This prevents false positives on HTTP
+        # clients/libraries that use `hashlib` outside of credential storage.
+        uses_dedicated_lib = any(lib in hash_libs for lib in _DEDICATED_PASSWORD_LIBS)
+        if not uses_dedicated_lib:
+            has_password_storage = any(
+                _PASSWORD_STORAGE_FUNC_RE.search(func.name)
+                for _, func in index.get_all_functions()
+            )
+            if not has_password_storage:
+                return
 
         # Determine primary and quality
         primary, primary_count = hash_libs.most_common(1)[0]
