@@ -821,11 +821,8 @@ def _build_conventions_section(
 
     lines = ["## Conventions\n"]
     for rule in project_wide:
-        summary = _summarize_rule(rule)
-        if summary.lower() == rule.title.lower():
-            lines.append(f"- **{rule.title}**")
-        else:
-            lines.append(f"- **{rule.title}**: {summary}")
+        prescriptive = _render_prescriptive_summary(rule)
+        lines.append(f"- **{rule.title}**: {prescriptive}")
 
     lines.append("")
     lines.append("[TODO: Add project-specific conventions]")
@@ -1018,6 +1015,82 @@ def _summarize_rule(rule: ConventionRule) -> str:
     return desc
 
 
+def _make_prescriptive(rule: ConventionRule, summary: str) -> str:
+    """Convert a descriptive rule summary into a prescriptive instruction for agents."""
+    import re
+
+    # 1. Clean up count and percentage metadata first (e.g. "snake_case (95%)" -> "snake_case")
+    summary = re.sub(r"\s*\(\d+/\d+\)", "", summary)
+    summary = re.sub(r"\s*\(\d+%\)", "", summary)
+    summary = re.sub(r"\s*\d+%", "", summary)
+    summary = summary.strip()
+
+    # 2. Apply general heuristic conversions to convert descriptions to imperatives
+    # e.g., "Uses X" -> "Use X"
+    summary = re.sub(r"^Uses\s+", "Use ", summary)
+    summary = re.sub(r"^Rarely uses\s+", "Prefer using ", summary)
+    summary = re.sub(r"^Primarily uses\s+", "Prefer using ", summary)
+    
+    if "are centralized" in summary:
+        summary = summary.replace("are centralized", "")
+        summary = "Centralize " + summary
+        
+    summary = summary.strip()
+
+    suffix = _get_suffix(rule)
+    
+    # 3. Apply common mappings for specific suffixes
+    if suffix == "file_naming":
+        return f"Use {summary} file naming style throughout the project."
+    if suffix == "test_file_naming":
+        return f"Name test files using the pattern `{summary}`."
+    if suffix == "naming":
+        if "snake_case" in rule.title.lower() or "snake_case" in summary.lower():
+            return "Name functions, variables, and modules using snake_case style."
+        if "camelcase" in rule.title.lower() or "camelcase" in summary.lower():
+            return "Name functions, variables, and modules using camelCase style."
+        return f"Name functions, variables, and modules using {summary} style."
+    if suffix == "constant_naming":
+        if "uppercase" in rule.title.lower() or "uppercase" in summary.lower():
+            return "Name constants using UPPERCASE style."
+        if "lowercase" in rule.title.lower() or "lowercase" in summary.lower():
+            return "Name constants using lowercase style."
+        return f"Name constants using {summary} style."
+    if suffix == "test_naming":
+        return f"Use {summary} naming style for all test functions."
+    if suffix == "async_style":
+        return f"Use `{summary}` for asynchronous/concurrency logic."
+    if suffix in ("typing_coverage", "type_coverage", "typescript"):
+        return f"Standardize on typing: {summary}."
+    if suffix == "config_access":
+        return f"Manage environment configuration: {summary}."
+    if suffix == "logging_library":
+        return f"Use standard logging approach: {summary}."
+    if suffix == "testing_framework":
+        return f"Write tests using the `{summary}` framework."
+    if suffix == "exception_chaining":
+        return "Preserve exception context: use `raise X from Y` or `raise X from None`."
+    if suffix == "context_managers":
+        return f"Manage resource lifecycles using context managers (e.g., {summary})."
+    if suffix == "validation_style":
+        return f"Validate inputs and parameters: {summary}."
+
+    # Heuristic conversion using regex
+    prescriptive = summary
+    prescriptive = prescriptive.strip().rstrip(".").strip()
+    
+    if not prescriptive.endswith((".", "!", "?")):
+        prescriptive += "."
+        
+    return prescriptive
+
+
+def _render_prescriptive_summary(rule: ConventionRule) -> str:
+    """Generate a prescriptive instruction from a rule."""
+    summary = _summarize_rule(rule)
+    return _make_prescriptive(rule, summary)
+
+
 def _build_generated_code_section(include_rules: list[ConventionRule]) -> str:
     """Build the Generated Code warning section."""
     gen_rule = None
@@ -1122,6 +1195,70 @@ def _build_deployment_section(
     return "\n".join(lines)
 
 
+def _build_api_mermaid_diagram(routes_by_file: dict[str, list[dict]], chains: list[dict]) -> str:
+    """Build a Mermaid flowchart representing the API data flow."""
+    if not chains:
+        return ""
+
+    lines = ["\n#### Data Flow Map\n", "```mermaid", "graph TD"]
+    
+    edges = set()
+    node_labels = {}
+    
+    def sanitize(name: str) -> str:
+        import re
+        return re.sub(r'[^a-zA-Z0-9]', '_', name)
+
+    seen_endpoints = set()
+    for chain in chains:
+        endpoint_file = chain.get("endpoint", "")
+        if not endpoint_file or endpoint_file in seen_endpoints:
+            continue
+        seen_endpoints.add(endpoint_file)
+        if len(seen_endpoints) > 10:  # Cap at 10 chains to avoid clutter
+            break
+
+        ep_id = sanitize(endpoint_file)
+        ep_label = _short_path(endpoint_file)
+        node_labels[ep_id] = ep_label
+
+        # Filter out barrel export/index files
+        services = [
+            s for s in chain.get("services", [])
+            if not (s.rsplit("/", 1)[-1] if "/" in s else s).startswith("index.")
+        ]
+        stores = [
+            s for s in chain.get("stores", [])
+            if not (s.rsplit("/", 1)[-1] if "/" in s else s).startswith("index.")
+        ]
+
+        last_id = ep_id
+        if services:
+            svc_file = services[0]
+            svc_id = sanitize(svc_file)
+            node_labels[svc_id] = _short_path(svc_file)
+            edges.add((last_id, svc_id))
+            last_id = svc_id
+            
+        if stores:
+            store_file = stores[0]
+            store_id = sanitize(store_file)
+            node_labels[store_id] = _short_path(store_file)
+            edges.add((last_id, store_id))
+
+    if not edges:
+        return ""
+
+    for nid, label in sorted(node_labels.items()):
+        lines.append(f'    {nid}["{label}"]')
+
+    for src, dst in sorted(edges):
+        lines.append(f"    {src} --> {dst}")
+
+    lines.append("```\n")
+    return "\n".join(lines)
+
+
 def _build_api_chains_section(include_rules: list[ConventionRule]) -> str:
     """Build API route reference grouped by route file."""
     # Collect routes and chains
@@ -1209,6 +1346,10 @@ def _build_api_chains_section(include_rules: list[ConventionRule]) -> str:
             lines.append(f"- {entry}")
         if len(connected) > 8:
             lines.append(f"- ... and {len(connected) - 8} more chains")
+
+    diagram = _build_api_mermaid_diagram(routes_by_file, chains)
+    if diagram:
+        lines.append(diagram)
 
     lines.append("")
     return "\n".join(lines)
@@ -1427,11 +1568,34 @@ def _resolve_rule_filenames(globs: list[str]) -> dict[str, str]:
 
 
 def _render_rule_for_rules_file(rule: ConventionRule) -> str:
-    """Render a single rule line for a `.claude/rules/<name>.md` file."""
-    summary = _summarize_rule(rule)
-    if summary.lower() == rule.title.lower():
-        return f"- **{rule.title}**"
-    return f"- **{rule.title}**: {summary}"
+    """Render a single rule line/block for a `.claude/rules/<name>.md` file."""
+    prescriptive = _render_prescriptive_summary(rule)
+    body = f"- **{rule.title}**: {prescriptive}"
+    
+    # Append few-shot evidence code block if evidence is present
+    if rule.evidence:
+        # Limit to 1 evidence snippet to avoid massive rule file size
+        ev = rule.evidence[0]
+        # Determine language for syntax highlighting
+        ext = ev.file_path.split(".")[-1] if "." in ev.file_path else ""
+        if ext == "py":
+            lang = "python"
+        elif ext in ("js", "ts", "jsx", "tsx"):
+            lang = "javascript"
+        elif ext == "go":
+            lang = "go"
+        elif ext == "rs":
+            lang = "rust"
+        else:
+            lang = ""
+            
+        body += f"\n  *Example context from `{ev.file_path}` (lines {ev.line_start}-{ev.line_end}):*\n"
+        body += f"  ```{lang}\n"
+        for line in ev.excerpt.splitlines():
+            body += f"  {line}\n"
+        body += "  ```"
+        
+    return body
 
 
 def write_claude_rules(

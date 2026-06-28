@@ -929,3 +929,100 @@ class TestWriteClaudeMd:
         content = existing.read_text()
         assert "old content" not in content
         assert "# CLAUDE.md" in content
+
+
+class TestAgentCompatibilityFeatures:
+    """Tests for new agent compatibility enhancements (prescriptive rules, evidence snippets, Mermaid)."""
+
+    def test_prescriptive_rule_transformation(self):
+        """Rules are transformed from descriptive stats to prescriptive instructions."""
+        from conventions.outputs.claude import _render_prescriptive_summary
+
+        # Test file naming rule
+        rule_naming = _make_rule(
+            "file_naming",
+            title="File naming",
+            stats={"dominant_style": "snake_case", "dominant_percentage": 95},
+        )
+        presc_naming = _render_prescriptive_summary(rule_naming)
+        assert "Use snake_case file naming style throughout the project." in presc_naming
+
+        # Test general heuristic transformation (Uses -> Use)
+        rule_generic = _make_rule(
+            "generic_style",
+            title="Generic Rule",
+            description="Uses custom validator patterns.",
+        )
+        presc_generic = _render_prescriptive_summary(rule_generic)
+        assert presc_generic == "Use custom validator patterns."
+
+    def test_rules_file_includes_code_evidence(self):
+        """Rules files render code evidence snippets as few-shot examples for agents."""
+        from conventions.outputs.claude import _render_rule_for_rules_file
+        from conventions.schemas import EvidenceSnippet
+
+        rule = _make_rule(
+            "exception_chaining",
+            title="Exception chaining",
+            description="Rarely uses exception chaining.",
+        )
+        rule.evidence = [
+            EvidenceSnippet(
+                file_path="src/utils.py",
+                line_start=10,
+                line_end=12,
+                excerpt="raise ValueError('error') from err",
+            )
+        ]
+
+        rendered = _render_rule_for_rules_file(rule)
+
+        # Check rule text is prescriptive
+        assert "Preserve exception context" in rendered
+        # Check code evidence block is appended
+        assert "Example context from `src/utils.py`" in rendered
+        assert "```python" in rendered
+        assert "raise ValueError('error') from err" in rendered
+
+    def test_mermaid_diagram_generation(self):
+        """API route chains are rendered as Mermaid flowcharts in CLAUDE.md."""
+        rules = [
+            _make_rule(
+                "api_routes",
+                title="API routes",
+                stats={
+                    "routes": [
+                        {"method": "GET", "path": "/api/users", "file": "src/api/users.py", "line": 5},
+                    ],
+                    "total_routes": 1,
+                    "methods": {"GET": 1},
+                },
+            ),
+            _make_rule(
+                "endpoint_chains",
+                title="Endpoint chains",
+                stats={
+                    "chain_count": 1,
+                    "chains": [
+                        {
+                            "endpoint": "src/api/users.py",
+                            "services": ["src/services/userService.py"],
+                            "stores": ["src/db/userRepo.py"],
+                            "depth": 3,
+                        },
+                    ],
+                },
+            ),
+        ]
+        output = _make_output(rules)
+        result = generate_claude_md(output)
+
+        # Verify Mermaid diagram structure
+        assert "```mermaid" in result
+        assert "graph TD" in result
+        assert 'src_api_users_py["api/users.py"]' in result
+        assert 'src_services_userService_py["services/userService.py"]' in result
+        assert 'src_db_userRepo_py["db/userRepo.py"]' in result
+        assert "src_api_users_py --> src_services_userService_py" in result
+        assert "src_services_userService_py --> src_db_userRepo_py" in result
+

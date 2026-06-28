@@ -1,6 +1,6 @@
 # Conventions Review Report
 
-*Generated: 2026-02-03 21:12:12*
+*Generated: 2026-06-28 12:15:04*
 
 ## Score Legend
 
@@ -14,13 +14,13 @@
 
 ## Summary
 
-- **Conventions Reviewed:** 65
-- **Average Score:** 3.5/5 (Good)
-- **Excellent (5):** 16
-- **Good (4):** 14
-- **Average (3):** 27
-- **Below Average (2):** 4
-- **Poor (1):** 4
+- **Conventions Reviewed:** 64
+- **Average Score:** 3.6/5 (Good)
+- **Excellent (5):** 15
+- **Good (4):** 17
+- **Average (3):** 26
+- **Below Average (2):** 3
+- **Poor (1):** 3
 
 ## Scores Overview
 
@@ -33,63 +33,62 @@
 | CLI framework: Typer | 5/5 | Excellent |
 | Data class style: Pydantic for API + dataclasses for internal | 5/5 | Excellent |
 | Dependency management: uv | 5/5 | Excellent |
-| GraphQL: Strawberry | 5/5 | Excellent |
 | Import organization: Ruff with grouping | 5/5 | Excellent |
 | Linters: Ruff, mypy | 5/5 | Excellent |
 | Lock file: uv.lock | 5/5 | Excellent |
 | PEP 8 snake_case naming | 5/5 | Excellent |
-| OpenAPI with FastAPI (customized) | 5/5 | Excellent |
+| Structured configuration with Pydantic Settings | 5/5 | Excellent |
 | pytest-based testing | 5/5 | Excellent |
 | Type checker: mypy (strict mode) | 5/5 | Excellent |
 | High type annotation coverage | 5/5 | Excellent |
 | CI/CD best practices | 4/5 | Good |
-| Partial JSDoc coverage | 4/5 | Good |
-| JavaScript codebase | 4/5 | Good |
-| JWT-based authentication | 4/5 | Good |
+| Standard repository layout | 4/5 | Good |
+| Runtime prerequisites | 4/5 | Good |
+| API routes | 4/5 | Good |
+| OAuth2 authentication | 4/5 | Good |
 | Caching: functools.lru_cache | 4/5 | Good |
 | Context manager usage | 4/5 | Good |
 | Caching decorator pattern | 4/5 | Good |
 | Environment separation: Pydantic Settings | 4/5 | Good |
+| Semi-centralized exception handling | 4/5 | Good |
+| OpenAPI with FastAPI (default) | 4/5 | Good |
 | Modern pathlib for path handling | 4/5 | Good |
 | Primary schema library: Pydantic | 4/5 | Good |
-| Structured configuration with Pydantic Settings | 4/5 | Good |
+| Import dependency graph | 4/5 | Good |
 | pytest fixtures for test setup | 4/5 | Good |
-| Mocking with unittest.mock / Mock | 4/5 | Good |
+| Mocking with pytest monkeypatch fixture | 4/5 | Good |
 | Parametrized tests | 4/5 | Good |
 | CI/CD: GitHub Actions | 3/5 | Average |
-| Standard repository layout | 3/5 | Average |
+| Config access patterns | 3/5 | Average |
 | URL-based API versioning | 3/5 | Average |
 | Background jobs with FastAPI BackgroundTasks | 3/5 | Average |
 | Data classes: Pydantic models | 3/5 | Average |
 | lowercase constant naming | 3/5 | Average |
+| File I/O with context managers | 3/5 | Average |
+| Custom decorator pattern: @deprecated | 3/5 | Average |
 | Default connection pooling | 3/5 | Average |
-| SQLAlchemy 2.0 select() style | 3/5 | Average |
 | FastAPI-style session dependency injection | 3/5 | Average |
+| Dependency health | 3/5 | Average |
 | Enum usage: Enum | 3/5 | Average |
 | Mixed exception naming conventions | 3/5 | Average |
 | Error wrapper pattern: time.sleep | 3/5 | Average |
+| Python import path (flat-layout) | 3/5 | Average |
 | Absolute imports preferred | 3/5 | Average |
 | JSON library: mixed | 3/5 | Average |
 | Uses Python standard logging | 3/5 | Average |
-| Optional type annotations | 3/5 | Average |
 | Cursor-based pagination | 3/5 | Average |
 | Pre-commit hooks configured | 3/5 | Average |
 | Response envelope classes | 3/5 | Average |
 | Modern f-string formatting | 3/5 | Average |
 | Test naming: Simple style (test_feature) | 3/5 | Average |
 | Distributed test files | 3/5 | Average |
-| Pydantic validation | 3/5 | Average |
-| Snippet-style examples | 3/5 | Average |
-| Examples with main() entry point | 3/5 | Average |
-| Tutorial-style documentation | 3/5 | Average |
+| Mixed validation approaches | 3/5 | Average |
 | Plain assert statements | 3/5 | Average |
 | Standard repository files | 2/5 | Below Average |
-| Implicit transaction management | 2/5 | Below Average |
 | Limited exception chaining | 2/5 | Below Average |
 | Health check functions | 2/5 | Below Average |
 | Low docstring coverage | 1/5 | Poor |
 | HTTP errors raised in service layer | 1/5 | Poor |
-| Distributed exception handling | 1/5 | Poor |
 | Infrequent timeout specification | 1/5 | Poor |
 
 ## Detailed Reviews
@@ -159,15 +158,6 @@
 
 ---
 
-#### GraphQL: Strawberry
-
-**ID:** `python.conventions.graphql`  
-**Score:** 5/5 (Excellent)
-
-**Assessment:** GraphQL: strawberry
-
----
-
 #### Import organization: Ruff with grouping
 
 **ID:** `python.conventions.import_sorting`  
@@ -204,12 +194,12 @@
 
 ---
 
-#### OpenAPI with FastAPI (customized)
+#### Structured configuration with Pydantic Settings
 
-**ID:** `python.conventions.openapi_docs`  
+**ID:** `python.conventions.secrets_access_style`  
 **Score:** 5/5 (Excellent)
 
-**Assessment:** OpenAPI docs via FastAPI (customized)
+**Assessment:** Uses Pydantic Settings for configuration (os.environ: 0 direct accesses)
 
 ---
 
@@ -218,7 +208,7 @@
 **ID:** `python.conventions.testing_framework`  
 **Score:** 5/5 (Excellent)
 
-**Assessment:** Uses pytest with 465 test file(s)
+**Assessment:** Uses pytest with 496 test file(s)
 
 ---
 
@@ -251,32 +241,39 @@
 
 ---
 
-#### Partial JSDoc coverage
+#### Standard repository layout
 
-**ID:** `node.conventions.jsdoc`  
-**Score:** 4/5 (Good)
-
-**Assessment:** JSDoc coverage: 12 blocks, 18 @param tags
-
-**Suggestion:** Add JSDoc comments with @param and @returns for better documentation.
-
----
-
-#### JavaScript codebase
-
-**ID:** `node.conventions.typescript`  
+**ID:** `generic.conventions.repo_layout`  
 **Score:** 4/5 (Good)
 
 **Assessment:** Convention detected with 90% confidence
 
 ---
 
-#### JWT-based authentication
+#### Runtime prerequisites
+
+**ID:** `generic.conventions.runtime_prerequisites`  
+**Score:** 4/5 (Good)
+
+**Assessment:** Convention detected with 90% confidence
+
+---
+
+#### API routes
+
+**ID:** `python.conventions.api_routes`  
+**Score:** 4/5 (Good)
+
+**Assessment:** Convention detected with 90% confidence
+
+---
+
+#### OAuth2 authentication
 
 **ID:** `python.conventions.auth_pattern`  
 **Score:** 4/5 (Good)
 
-**Assessment:** Authentication uses JWT, OAuth2, dependency injection
+**Assessment:** Authentication uses OAuth2, dependency injection
 
 **Suggestion:** Use a dedicated password hashing library (passlib or bcrypt) for secure credential storage.
 
@@ -320,12 +317,34 @@
 
 ---
 
+#### Semi-centralized exception handling
+
+**ID:** `python.conventions.exception_handlers`  
+**Score:** 4/5 (Good)
+
+**Assessment:** Exception handlers spread across 2 module(s) (17 handlers)
+
+**Suggestion:** Consider centralizing exception handlers for easier maintenance.
+
+---
+
+#### OpenAPI with FastAPI (default)
+
+**ID:** `python.conventions.openapi_docs`  
+**Score:** 4/5 (Good)
+
+**Assessment:** OpenAPI docs via FastAPI (default)
+
+**Suggestion:** Customize OpenAPI metadata with tags, descriptions, and examples for better docs.
+
+---
+
 #### Modern pathlib for path handling
 
 **ID:** `python.conventions.path_handling`  
 **Score:** 4/5 (Good)
 
-**Assessment:** Convention detected with 95% confidence
+**Assessment:** Convention detected with 92% confidence
 
 ---
 
@@ -340,14 +359,12 @@
 
 ---
 
-#### Structured configuration with Pydantic Settings
+#### Import dependency graph
 
-**ID:** `python.conventions.secrets_access_style`  
+**ID:** `python.data_flow.import_graph`  
 **Score:** 4/5 (Good)
 
-**Assessment:** Uses Pydantic Settings for configuration (os.environ: 1 direct accesses)
-
-**Suggestion:** Replace remaining os.environ accesses with Settings class properties.
+**Assessment:** Convention detected with 90% confidence
 
 ---
 
@@ -360,7 +377,7 @@
 
 ---
 
-#### Mocking with unittest.mock / Mock
+#### Mocking with pytest monkeypatch fixture
 
 **ID:** `python.test_conventions.mocking`  
 **Score:** 4/5 (Good)
@@ -391,12 +408,12 @@
 
 ---
 
-#### Standard repository layout
+#### Config access patterns
 
-**ID:** `generic.conventions.repo_layout`  
+**ID:** `generic.conventions.config_access`  
 **Score:** 3/5 (Average)
 
-**Assessment:** Convention detected with 70% confidence
+**Assessment:** Convention detected with 88% confidence
 
 **Suggestion:** Review this convention and consider industry best practices for improvement.
 
@@ -429,7 +446,7 @@
 **ID:** `python.conventions.class_style`  
 **Score:** 3/5 (Average)
 
-**Assessment:** Convention detected with 86% confidence
+**Assessment:** Convention detected with 85% confidence
 
 **Suggestion:** Review this convention and consider industry best practices for improvement.
 
@@ -438,6 +455,28 @@
 #### lowercase constant naming
 
 **ID:** `python.conventions.constant_naming`  
+**Score:** 3/5 (Average)
+
+**Assessment:** Convention detected with 70% confidence
+
+**Suggestion:** Review this convention and consider industry best practices for improvement.
+
+---
+
+#### File I/O with context managers
+
+**ID:** `python.conventions.context_file_io`  
+**Score:** 3/5 (Average)
+
+**Assessment:** Convention detected with 70% confidence
+
+**Suggestion:** Review this convention and consider industry best practices for improvement.
+
+---
+
+#### Custom decorator pattern: @deprecated
+
+**ID:** `python.conventions.custom_decorators`  
 **Score:** 3/5 (Average)
 
 **Assessment:** Convention detected with 70% confidence
@@ -457,17 +496,6 @@
 
 ---
 
-#### SQLAlchemy 2.0 select() style
-
-**ID:** `python.conventions.db_query_style`  
-**Score:** 3/5 (Average)
-
-**Assessment:** Convention detected with 90% confidence
-
-**Suggestion:** Review this convention and consider industry best practices for improvement.
-
----
-
 #### FastAPI-style session dependency injection
 
 **ID:** `python.conventions.db_session_lifecycle`  
@@ -476,6 +504,17 @@
 **Assessment:** Convention detected with 85% confidence
 
 **Suggestion:** Review this convention and consider industry best practices for improvement.
+
+---
+
+#### Dependency health
+
+**ID:** `python.conventions.dependency_health`  
+**Score:** 3/5 (Average)
+
+**Assessment:** Convention detected with 85% confidence
+
+**Suggestion:** Add automated testing, linting, and deployment steps to your CI/CD pipeline.
 
 ---
 
@@ -495,7 +534,7 @@
 **ID:** `python.conventions.error_taxonomy`  
 **Score:** 3/5 (Average)
 
-**Assessment:** Exception naming is 77% consistent across 22 custom exceptions
+**Assessment:** Exception naming is 79% consistent across 14 custom exceptions
 
 **Suggestion:** Standardize exception naming to use *Error suffix consistently.
 
@@ -506,9 +545,20 @@
 **ID:** `python.conventions.error_wrapper`  
 **Score:** 3/5 (Average)
 
-**Assessment:** Error wrapper 'time.sleep' used in 6/28 handlers (21%)
+**Assessment:** Error wrapper 'time.sleep' used in 7/40 handlers (18%)
 
 **Suggestion:** Consider using 'time.sleep' more consistently across all exception handlers.
+
+---
+
+#### Python import path (flat-layout)
+
+**ID:** `python.conventions.import_aliases`  
+**Score:** 3/5 (Average)
+
+**Assessment:** Convention detected with 85% confidence
+
+**Suggestion:** Review this convention and consider industry best practices for improvement.
 
 ---
 
@@ -528,7 +578,7 @@
 **ID:** `python.conventions.json_library`  
 **Score:** 3/5 (Average)
 
-**Assessment:** Uses stdlib json (41 usages)
+**Assessment:** Uses stdlib json (47 usages)
 
 **Suggestion:** Consider orjson for 10x faster JSON serialization with minimal API changes.
 
@@ -542,17 +592,6 @@
 **Assessment:** Uses stdlib logging as primary logging library
 
 **Suggestion:** Consider adopting structlog or Loguru for structured logging with better context propagation.
-
----
-
-#### Optional type annotations
-
-**ID:** `python.conventions.optional_usage`  
-**Score:** 3/5 (Average)
-
-**Assessment:** Convention detected with 80% confidence
-
-**Suggestion:** Add type annotations to function parameters and return types. Start with public APIs.
 
 ---
 
@@ -572,7 +611,7 @@
 **ID:** `python.conventions.pre_commit_hooks`  
 **Score:** 3/5 (Average)
 
-**Assessment:** 13 pre-commit hooks configured
+**Assessment:** 18 pre-commit hooks configured
 
 **Suggestion:** Add ruff to pre-commit for fast linting and formatting.
 
@@ -622,47 +661,14 @@
 
 ---
 
-#### Pydantic validation
+#### Mixed validation approaches
 
 **ID:** `python.conventions.validation_style`  
 **Score:** 3/5 (Average)
 
-**Assessment:** Convention detected with 78% confidence
-
-**Suggestion:** Review this convention and consider industry best practices for improvement.
-
----
-
-#### Snippet-style examples
-
-**ID:** `python.docs_conventions.example_completeness`  
-**Score:** 3/5 (Average)
-
 **Assessment:** Convention detected with 70% confidence
 
-**Suggestion:** Add docstrings to public functions and classes explaining purpose and parameters.
-
----
-
-#### Examples with main() entry point
-
-**ID:** `python.docs_conventions.example_structure`  
-**Score:** 3/5 (Average)
-
-**Assessment:** Convention detected with 80% confidence
-
-**Suggestion:** Add docstrings to public functions and classes explaining purpose and parameters.
-
----
-
-#### Tutorial-style documentation
-
-**ID:** `python.docs_conventions.organization`  
-**Score:** 3/5 (Average)
-
-**Assessment:** Convention detected with 80% confidence
-
-**Suggestion:** Add docstrings to public functions and classes explaining purpose and parameters.
+**Suggestion:** Review this convention and consider industry best practices for improvement.
 
 ---
 
@@ -682,17 +688,6 @@
 #### Standard repository files
 
 **ID:** `generic.conventions.standard_files`  
-**Score:** 2/5 (Below Average)
-
-**Assessment:** Convention detected with 65% confidence
-
-**Suggestion:** Review this convention and consider industry best practices for improvement.
-
----
-
-#### Implicit transaction management
-
-**ID:** `python.conventions.db_transactions`  
 **Score:** 2/5 (Below Average)
 
 **Assessment:** Convention detected with 60% confidence
@@ -730,7 +725,7 @@
 **ID:** `python.conventions.docstrings`  
 **Score:** 1/5 (Poor)
 
-**Assessment:** Docstring coverage is 20% of public functions
+**Assessment:** Docstring coverage is 19% of public functions
 
 **Suggestion:** Add docstrings to public functions and classes. Focus on explaining the 'why' and documenting parameters/return values.
 
@@ -747,25 +742,14 @@
 
 ---
 
-#### Distributed exception handling
-
-**ID:** `python.conventions.exception_handlers`  
-**Score:** 1/5 (Poor)
-
-**Assessment:** Exception handlers spread across 6 module(s) (31 handlers)
-
-**Suggestion:** Consolidate exception handlers into a single module (currently in 6 files).
-
----
-
 #### Infrequent timeout specification
 
 **ID:** `python.conventions.timeouts`  
 **Score:** 1/5 (Poor)
 
-**Assessment:** Timeout coverage is 2% (4 with, 207 without)
+**Assessment:** Timeout coverage is 2% (6 with, 275 without)
 
-**Suggestion:** Add explicit timeouts to HTTP client calls. Found 207 calls without timeouts.
+**Suggestion:** Add explicit timeouts to HTTP client calls. Found 275 calls without timeouts.
 
 ---
 
@@ -779,50 +763,50 @@ Conventions sorted by priority (lowest scores first):
 2. **HTTP errors raised in service layer** (Score: 1/5)
    - Ensure HTTP errors are raised only at the API boundary layer.
 
-3. **Distributed exception handling** (Score: 1/5)
-   - Consolidate exception handlers into a single module (currently in 6 files).
+3. **Infrequent timeout specification** (Score: 1/5)
+   - Add explicit timeouts to HTTP client calls. Found 275 calls without timeouts.
 
-4. **Infrequent timeout specification** (Score: 1/5)
-   - Add explicit timeouts to HTTP client calls. Found 207 calls without timeouts.
-
-5. **Standard repository files** (Score: 2/5)
+4. **Standard repository files** (Score: 2/5)
    - Review this convention and consider industry best practices for improvement.
 
-6. **Implicit transaction management** (Score: 2/5)
-   - Review this convention and consider industry best practices for improvement.
-
-7. **Limited exception chaining** (Score: 2/5)
+5. **Limited exception chaining** (Score: 2/5)
    - Use 'raise X from Y' for context or 'raise X from None' to suppress chain.
 
-8. **Health check functions** (Score: 2/5)
+6. **Health check functions** (Score: 2/5)
    - Add a /ready endpoint to signal when the service is ready to accept traffic.
 
-9. **CI/CD: GitHub Actions** (Score: 3/5)
+7. **CI/CD: GitHub Actions** (Score: 3/5)
    - Add automated testing, linting, and deployment steps to your CI/CD pipeline.
 
-10. **Standard repository layout** (Score: 3/5)
+8. **Config access patterns** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-11. **URL-based API versioning** (Score: 3/5)
+9. **URL-based API versioning** (Score: 3/5)
    - Apply consistent versioning across all API routes.
 
-12. **Background jobs with FastAPI BackgroundTasks** (Score: 3/5)
+10. **Background jobs with FastAPI BackgroundTasks** (Score: 3/5)
    - Use appropriate synchronization primitives and handle async errors properly.
 
-13. **Data classes: Pydantic models** (Score: 3/5)
+11. **Data classes: Pydantic models** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-14. **lowercase constant naming** (Score: 3/5)
+12. **lowercase constant naming** (Score: 3/5)
+   - Review this convention and consider industry best practices for improvement.
+
+13. **File I/O with context managers** (Score: 3/5)
+   - Review this convention and consider industry best practices for improvement.
+
+14. **Custom decorator pattern: @deprecated** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
 15. **Default connection pooling** (Score: 3/5)
    - Configure pool_size, max_overflow, and pool_pre_ping for production reliability.
 
-16. **SQLAlchemy 2.0 select() style** (Score: 3/5)
+16. **FastAPI-style session dependency injection** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-17. **FastAPI-style session dependency injection** (Score: 3/5)
-   - Review this convention and consider industry best practices for improvement.
+17. **Dependency health** (Score: 3/5)
+   - Add automated testing, linting, and deployment steps to your CI/CD pipeline.
 
 18. **Enum usage: Enum** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
@@ -833,17 +817,17 @@ Conventions sorted by priority (lowest scores first):
 20. **Error wrapper pattern: time.sleep** (Score: 3/5)
    - Consider using 'time.sleep' more consistently across all exception handlers.
 
-21. **Absolute imports preferred** (Score: 3/5)
+21. **Python import path (flat-layout)** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-22. **JSON library: mixed** (Score: 3/5)
+22. **Absolute imports preferred** (Score: 3/5)
+   - Review this convention and consider industry best practices for improvement.
+
+23. **JSON library: mixed** (Score: 3/5)
    - Consider orjson for 10x faster JSON serialization with minimal API changes.
 
-23. **Uses Python standard logging** (Score: 3/5)
+24. **Uses Python standard logging** (Score: 3/5)
    - Consider adopting structlog or Loguru for structured logging with better context propagation.
-
-24. **Optional type annotations** (Score: 3/5)
-   - Add type annotations to function parameters and return types. Start with public APIs.
 
 25. **Cursor-based pagination** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
@@ -863,32 +847,23 @@ Conventions sorted by priority (lowest scores first):
 30. **Distributed test files** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-31. **Pydantic validation** (Score: 3/5)
+31. **Mixed validation approaches** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-32. **Snippet-style examples** (Score: 3/5)
-   - Add docstrings to public functions and classes explaining purpose and parameters.
-
-33. **Examples with main() entry point** (Score: 3/5)
-   - Add docstrings to public functions and classes explaining purpose and parameters.
-
-34. **Tutorial-style documentation** (Score: 3/5)
-   - Add docstrings to public functions and classes explaining purpose and parameters.
-
-35. **Plain assert statements** (Score: 3/5)
+32. **Plain assert statements** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-36. **Partial JSDoc coverage** (Score: 4/5)
-   - Add JSDoc comments with @param and @returns for better documentation.
-
-37. **JWT-based authentication** (Score: 4/5)
+33. **OAuth2 authentication** (Score: 4/5)
    - Use a dedicated password hashing library (passlib or bcrypt) for secure credential storage.
 
-38. **Caching: functools.lru_cache** (Score: 4/5)
+34. **Caching: functools.lru_cache** (Score: 4/5)
    - Consider Redis for distributed caching in production environments.
 
-39. **Primary schema library: Pydantic** (Score: 4/5)
-   - Ensure consistent schema library usage across the codebase.
+35. **Semi-centralized exception handling** (Score: 4/5)
+   - Consider centralizing exception handlers for easier maintenance.
 
-40. **Structured configuration with Pydantic Settings** (Score: 4/5)
-   - Replace remaining os.environ accesses with Settings class properties.
+36. **OpenAPI with FastAPI (default)** (Score: 4/5)
+   - Customize OpenAPI metadata with tags, descriptions, and examples for better docs.
+
+37. **Primary schema library: Pydantic** (Score: 4/5)
+   - Ensure consistent schema library usage across the codebase.

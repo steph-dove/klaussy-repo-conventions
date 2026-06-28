@@ -21,23 +21,32 @@ def detect_languages(repo_root: Path, exclude_patterns: Optional[list[str]] = No
 
     languages: set[str] = set()
 
+    # Avoid scanning test and fixture directories for language auto-detection
+    # to prevent mock files/fixtures from triggering false positive language matches.
+    detection_excludes = (exclude_patterns or []) + [
+        "**/tests/**",
+        "**/test/**",
+        "**/__tests__/**",
+        "**/fixtures/**",
+    ]
+
     # Check for Python files
-    py_files = list(walk_files(repo_root, {".py"}, max_files=5, exclude_patterns=exclude_patterns))
+    py_files = list(walk_files(repo_root, {".py"}, max_files=5, exclude_patterns=detection_excludes))
     if py_files:
         languages.add("python")
 
     # Check for Go files
-    go_files = list(walk_files(repo_root, {".go"}, max_files=5, exclude_patterns=exclude_patterns))
+    go_files = list(walk_files(repo_root, {".go"}, max_files=5, exclude_patterns=detection_excludes))
     if go_files:
         languages.add("go")
 
     # Check for Node.js files (JavaScript/TypeScript)
-    node_files = list(walk_files(repo_root, {".js", ".ts", ".jsx", ".tsx"}, max_files=5, exclude_patterns=exclude_patterns))
+    node_files = list(walk_files(repo_root, {".js", ".ts", ".jsx", ".tsx"}, max_files=5, exclude_patterns=detection_excludes))
     if node_files:
         languages.add("node")
 
     # Check for Rust files
-    rust_files = list(walk_files(repo_root, {".rs"}, max_files=5, exclude_patterns=exclude_patterns))
+    rust_files = list(walk_files(repo_root, {".rs"}, max_files=5, exclude_patterns=detection_excludes))
     if rust_files:
         languages.add("rust")
 
