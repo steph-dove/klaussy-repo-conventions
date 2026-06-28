@@ -648,6 +648,8 @@ class TestGenerateClaudeMd:
 
     def test_directory_map_renders(self):
         """Directory map section renders from repo_layout rule."""
+        from conventions.outputs.claude import generate_directory_map_md
+
         rules = [
             _make_rule("repo_layout", stats={
                 "found_directories": ["src", "tests"],
@@ -667,13 +669,19 @@ class TestGenerateClaudeMd:
             }),
         ]
         output = _make_output(rules)
-        result = generate_claude_md(output)
+        
+        # Verify directory-map.md renders the tree
+        map_result = generate_directory_map_md(output)
+        assert "## Directory Structure" in map_result
+        assert "`src/` — source code" in map_result
+        assert "`routes/`" in map_result
+        assert "`services/`" in map_result
+        assert "`tests/` — tests" in map_result
 
-        assert "## Directory Structure" in result
-        assert "`src/` — source code" in result
-        assert "`routes/`" in result
-        assert "`services/`" in result
-        assert "`tests/` — tests" in result
+        # Verify CLAUDE.md renders the reference link
+        claude_result = generate_claude_md(output)
+        assert "## Directory Structure" in claude_result
+        assert "For the repository directory map and file layout, see [.claude/directory-map.md](.claude/directory-map.md)." in claude_result
 
     def test_repo_layout_no_longer_excluded(self):
         """repo_layout with high confidence is classified as include."""
@@ -1055,7 +1063,9 @@ class TestAgentCompatibilityFeatures:
         assert "src_services_userService_py --> src_db_userRepo_py" in result
 
     def test_directory_structure_rendering(self):
-        """Directory structure in CLAUDE.md renders subdirectories and files."""
+        """Directory structure in directory-map.md renders subdirectories and files."""
+        from conventions.outputs.claude import generate_directory_map_md
+
         rules = [
             _make_rule(
                 "repo_layout",
@@ -1081,13 +1091,20 @@ class TestAgentCompatibilityFeatures:
             )
         ]
         output = _make_output(rules)
-        result = generate_claude_md(output)
+        
+        # Verify directory-map.md contains the full tree
+        map_result = generate_directory_map_md(output)
+        assert "## Directory Structure" in map_result
+        assert "- `src/` — source code" in map_result
+        assert "  - `services/`" in map_result
+        assert "    - `user.py`" in map_result
+        assert "  - `main.py` — entrypoint" in map_result
+        assert "  - `utils.py`" in map_result
 
-        assert "## Directory Structure" in result
-        assert "- `src/` — source code" in result
-        assert "  - `services/`" in result
-        assert "    - `user.py`" in result
-        assert "  - `main.py` — entrypoint" in result
-        assert "  - `utils.py`" in result
+        # Verify CLAUDE.md only contains the reference link
+        claude_result = generate_claude_md(output)
+        assert "## Directory Structure" in claude_result
+        assert "For the repository directory map and file layout, see [.claude/directory-map.md](.claude/directory-map.md)." in claude_result
+        assert "- `src/`" not in claude_result
 
 

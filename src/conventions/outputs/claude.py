@@ -280,7 +280,7 @@ def _build_project_overview(output: ConventionsOutput, include_rules: list[Conve
 
 
 def _build_directory_map_section(include_rules: list[ConventionRule]) -> str:
-    """Build annotated directory map section."""
+    """Build annotated directory map section reference."""
     layout_rule = None
     for rule in include_rules:
         if _get_suffix(rule) == "repo_layout":
@@ -289,15 +289,7 @@ def _build_directory_map_section(include_rules: list[ConventionRule]) -> str:
     if not layout_rule:
         return ""
 
-    tree = _get_stat(layout_rule, "directory_tree", {})
-    if not tree:
-        return ""
-
-    lines = ["## Directory Structure\n"]
-    lines.append("For the complete, uncollapsed directory structure, see [.claude/directory-map.md](.claude/directory-map.md).\n")
-    _render_tree(tree, lines, indent=0, collapse_all=True)
-    lines.append("")
-    return "\n".join(lines)
+    return "## Directory Structure\n\nFor the repository directory map and file layout, see [.claude/directory-map.md](.claude/directory-map.md).\n"
 
 
 # Directories whose internals are test infrastructure — don't recurse
