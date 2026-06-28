@@ -9,7 +9,7 @@ from .schemas import (
     RepoMetadata,
 )
 
-__version__ = "0.1.0"
+__version__ = "1.5.0"
 
 __all__ = [
     "ConventionRule",
