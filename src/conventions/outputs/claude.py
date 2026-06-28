@@ -1,7 +1,10 @@
 """CLAUDE.md generator for conventions detection.
 
-Generates a structured CLAUDE.md file optimized for Claude Code,
-filtering conventions by signal quality rather than score.
+Generates a structured CLAUDE.md file optimized for Claude Code. Conventions are
+gated by their 1-5 review score: well-followed conventions (score >= 3) are
+emitted as patterns to mirror, while low-scoring ones (score <= 2) are surfaced
+separately as anti-patterns present in the codebase, so an agent never mistakes
+existing tech debt for a convention to imitate.
 """
 
 from __future__ import annotations
@@ -9,7 +12,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from ..ratings import rate_convention
 from ..schemas import ConventionRule, ConventionsOutput
+
+# Conventions whose review score is at or below this threshold are treated as
+# anti-patterns present in the codebase rather than patterns to mirror.
+_ANTIPATTERN_MAX_SCORE = 2
 
 # --- Rule classification ---
 
@@ -230,6 +238,15 @@ _CONVENTION_SUFFIXES = frozenset({
 })
 
 
+# Structural artifacts that describe the whole repository. Even when their
+# evidence happens to sit under one package directory, they belong in the root
+# CLAUDE.md rather than a path-scoped rules file.
+_ALWAYS_PROJECT_WIDE_SUFFIXES = frozenset({
+    "import_graph", "endpoint_chains", "service_dependencies",
+    "api_routes", "monorepo", "db_entities",
+})
+
+
 def _bucket_rules_by_path(
     rules: list[ConventionRule],
 ) -> tuple[dict[str, list[ConventionRule]], list[ConventionRule]]:
@@ -237,6 +254,9 @@ def _bucket_rules_by_path(
     buckets: dict[str, list[ConventionRule]] = {}
     project_wide: list[ConventionRule] = []
     for rule in rules:
+        if _get_suffix(rule) in _ALWAYS_PROJECT_WIDE_SUFFIXES:
+            project_wide.append(rule)
+            continue
         glob = _infer_path_glob(rule)
         if glob is None:
             project_wide.append(rule)
@@ -378,7 +398,13 @@ def _render_tree(
 
 
 def _build_architecture_section(include_rules: list[ConventionRule]) -> str:
-    """Build the Architecture section from pattern/structure rules."""
+    """Build the Architecture section from pattern/structure rules.
+
+    Emits a "Key Patterns" subsection (layering, routes, circular deps, ...) and,
+    for any repo with an import graph, a "Core Modules" map. The latter gives
+    libraries and CLIs — which have no API routes to anchor an architecture
+    summary — a useful orientation derived from internal import structure.
+    """
     arch_rules = [r for r in include_rules if _get_suffix(r) in _ARCHITECTURE_SUFFIXES]
     if not arch_rules:
         return ""
@@ -389,14 +415,53 @@ def _build_architecture_section(include_rules: list[ConventionRule]) -> str:
     if not project_wide:
         return ""
 
-    lines = ["## Architecture\n", "### Key Patterns\n"]
-    for rule in project_wide:
-        rendered = _render_arch_rule(rule, _get_suffix(rule))
-        if rendered:
-            lines.append(rendered)
-    lines.append("")
+    pattern_lines = [
+        rendered for rule in project_wide
+        if (rendered := _render_arch_rule(rule, _get_suffix(rule)))
+    ]
+    core_module_lines = _build_core_modules_lines(project_wide)
+
+    if not pattern_lines and not core_module_lines:
+        return ""
+
+    lines = ["## Architecture\n"]
+    if core_module_lines:
+        lines.extend(core_module_lines)
+    if pattern_lines:
+        lines.append("### Key Patterns\n")
+        lines.extend(pattern_lines)
+        lines.append("")
 
     return "\n".join(lines)
+
+
+def _build_core_modules_lines(arch_rules: list[ConventionRule]) -> list[str]:
+    """Render the Core Modules subsection from the import graph's core modules."""
+    import_graph = next(
+        (r for r in arch_rules if _get_suffix(r) == "import_graph"), None
+    )
+    if import_graph is None:
+        return []
+
+    core_modules = import_graph.stats.get("core_modules", [])
+    if not core_modules:
+        return []
+
+    lines = [
+        "### Core Modules\n",
+        "> The most-imported internal modules — the foundation other code builds on.\n",
+    ]
+    for mod in core_modules:
+        path = mod.get("path", "?")
+        responsibility = mod.get("responsibility", "")
+        dependents = mod.get("dependents")
+        suffix = f" ({dependents} dependents)" if dependents else ""
+        if responsibility:
+            lines.append(f"- `{path}` — {responsibility}{suffix}")
+        else:
+            lines.append(f"- `{path}`{suffix}")
+    lines.append("")
+    return lines
 
 
 def _render_arch_rule(rule: ConventionRule, suffix: str) -> str:
@@ -431,12 +496,7 @@ def _render_arch_rule(rule: ConventionRule, suffix: str) -> str:
         return f"- **API routes**: {total} endpoints ({method_str})"
 
     if suffix == "import_graph":
-        cycles = stats.get("cycle_count", 0)
-        cycle_examples = stats.get("cycles", [])
-        if cycles and cycle_examples:
-            example = cycle_examples[0]
-            parts = " -> ".join(_short_path(f) for f in example[:3])
-            return f"- **Circular dependencies**: {cycles} found (e.g. {parts})"
+        # Circular dependencies are surfaced under Known Pitfalls, not here.
         return ""
 
     if suffix == "endpoint_chains":
@@ -867,14 +927,19 @@ def _build_commands_inferred(
     return "\n".join(lines)
 
 
-def _build_conventions_section(
+def _select_project_wide_conventions(
     include_rules: list[ConventionRule],
     tech_rules: list[ConventionRule] | None = None,
-) -> str:
-    """Build the Conventions section from naming, module, async rules."""
+) -> list[ConventionRule]:
+    """Return project-wide convention rules eligible for CLAUDE.md.
+
+    Path-scoped rules are emitted as `.claude/rules/<glob>.md` files via
+    `write_claude_rules`; only project-wide rules belong in CLAUDE.md so the
+    root file stays focused on what applies everywhere.
+    """
     conv_rules = [r for r in include_rules if _get_suffix(r) in _CONVENTION_SUFFIXES]
     if not conv_rules:
-        return ""
+        return []
 
     # Suppress structured_logging (console.log) when a real logging library is detected
     has_logging_library = any(
@@ -886,17 +951,63 @@ def _build_conventions_section(
         if not (_get_suffix(r) == "structured_logging" and has_logging_library)
     ]
 
-    # Path-scoped rules are emitted as `.claude/rules/<glob>.md` files via
-    # `write_claude_rules`. Only project-wide rules belong in CLAUDE.md so the
-    # root file stays focused on what applies everywhere.
     _, project_wide = _bucket_rules_by_path(visible_rules)
-    if not project_wide:
+    return project_wide
+
+
+def _build_conventions_section(
+    include_rules: list[ConventionRule],
+    tech_rules: list[ConventionRule] | None = None,
+) -> str:
+    """Build the Conventions section from well-followed convention rules.
+
+    Only conventions scoring above :data:`_ANTIPATTERN_MAX_SCORE` are emitted
+    here as patterns to mirror; low-scoring ones are surfaced separately by
+    :func:`_build_antipatterns_section`.
+    """
+    project_wide = _select_project_wide_conventions(include_rules, tech_rules)
+    follow = [r for r in project_wide if rate_convention(r)[0] > _ANTIPATTERN_MAX_SCORE]
+    if not follow:
         return ""
 
     lines = ["## Conventions\n"]
-    for rule in project_wide:
+    for rule in follow:
         prescriptive = _render_prescriptive_summary(rule)
         lines.append(f"- **{rule.title}**: {prescriptive}")
+
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _build_antipatterns_section(
+    include_rules: list[ConventionRule],
+    tech_rules: list[ConventionRule] | None = None,
+) -> str:
+    """Build the Anti-patterns Present section from low-scoring conventions.
+
+    These are patterns the scan detected in the codebase that score at or below
+    :data:`_ANTIPATTERN_MAX_SCORE`. They are reported so an agent treats them as
+    existing tech debt to avoid in new code, not as conventions to imitate.
+    """
+    project_wide = _select_project_wide_conventions(include_rules, tech_rules)
+
+    flagged: list[tuple[ConventionRule, str | None]] = []
+    for rule in project_wide:
+        score, _, suggestion = rate_convention(rule)
+        if score <= _ANTIPATTERN_MAX_SCORE:
+            flagged.append((rule, suggestion))
+
+    if not flagged:
+        return ""
+
+    lines = [
+        "## Anti-patterns Present\n",
+        "> Detected in the codebase but **not** conventions to imitate. Avoid "
+        "these in new code; fix on touch where practical.\n",
+    ]
+    for rule, suggestion in flagged:
+        fix = f" {suggestion}" if suggestion else ""
+        lines.append(f"- **{rule.title}**:{fix}".rstrip())
 
     lines.append("")
     return "\n".join(lines)
@@ -1474,6 +1585,39 @@ def _short_path(filepath: str) -> str:
 # --- Main generators ---
 
 
+def _collect_pitfalls(output: ConventionsOutput) -> list[str]:
+    """Aggregate Known Pitfalls from every available signal, not just history.
+
+    Sources: structural smells from the import graph (circular dependencies) and
+    the history detector's findings (flaky CI, changelog gotchas, workarounds).
+    Low-scoring code conventions are intentionally excluded — those are surfaced
+    in the dedicated "Anti-patterns Present" section instead.
+    """
+    pitfalls: list[str] = []
+
+    # Structural: circular import dependencies are a concrete code-level gotcha.
+    import_graph = next(
+        (r for r in output.rules if _get_suffix(r) == "import_graph"), None
+    )
+    if import_graph:
+        cycles = import_graph.stats.get("cycle_count", 0)
+        if cycles:
+            pitfalls.append(
+                f"{cycles} circular import dependencies detected — watch import "
+                "order and avoid introducing new cross-module import cycles."
+            )
+
+    # History: flaky-CI, changelog gotchas, workarounds.
+    history = next(
+        (r for r in output.rules if _get_suffix(r) == "history"), None
+    )
+    if history:
+        pitfalls.extend(history.stats.get("detected_pitfalls", []))
+
+    # De-duplicate while preserving order.
+    return list(dict.fromkeys(pitfalls))
+
+
 def generate_claude_md(output: ConventionsOutput) -> str:
     """Generate a CLAUDE.md from conventions output.
 
@@ -1536,6 +1680,11 @@ def generate_claude_md(output: ConventionsOutput) -> str:
     if conv:
         sections.append(conv)
 
+    # Anti-patterns present (low-scoring conventions to avoid, not mirror)
+    antipatterns = _build_antipatterns_section(include_rules, tech_rules)
+    if antipatterns:
+        sections.append(antipatterns)
+
     # Generated Code warning
     gen_code = _build_generated_code_section(include_rules)
     if gen_code:
@@ -1554,7 +1703,7 @@ def generate_claude_md(output: ConventionsOutput) -> str:
             break
 
     detected_decisions = history_rule.stats.get("detected_decisions", []) if history_rule else []
-    detected_pitfalls = history_rule.stats.get("detected_pitfalls", []) if history_rule else []
+    detected_pitfalls = _collect_pitfalls(output)
 
     # Skeleton sections
     sections.append("## Decision Log\n")
@@ -1566,7 +1715,7 @@ def generate_claude_md(output: ConventionsOutput) -> str:
 
     sections.append("## Known Pitfalls\n")
     if detected_pitfalls:
-        for pit in detected_pitfalls[:5]:
+        for pit in detected_pitfalls[:7]:
             sections.append(f"- {pit}\n")
     else:
         sections.append("- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*\n")

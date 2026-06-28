@@ -372,6 +372,130 @@ class TestGenerateClaudeMd:
         assert "camelCase" in result
         assert "async/await" in result
 
+    def test_low_score_convention_moves_to_antipatterns(self):
+        """A low-scoring convention is surfaced as an anti-pattern, not a convention."""
+        good = ConventionRule(
+            id="python.conventions.naming",
+            category="style",
+            title="PEP 8 snake_case naming",
+            description="snake_case naming",
+            confidence=0.95,
+            language="python",
+            stats={"snake_case_ratio": 1.0},
+        )
+        bad = ConventionRule(
+            id="python.conventions.password_hashing",
+            category="security",
+            title="Password hashing: hashlib (not recommended)",
+            description="Uses hashlib for hashing",
+            confidence=0.75,
+            language="python",
+            stats={"primary_library": "hashlib"},
+        )
+        output = _make_output([good, bad])
+        result = generate_claude_md(output)
+
+        conv_idx = result.index("## Conventions")
+        anti_idx = result.index("## Anti-patterns Present")
+
+        # Well-followed convention stays under Conventions.
+        assert result.index("PEP 8 snake_case naming") < anti_idx
+        # Low-scoring convention is listed only under Anti-patterns, with its fix.
+        hashlib_idx = result.index("Password hashing: hashlib")
+        assert hashlib_idx > anti_idx
+        assert result.count("Password hashing: hashlib") == 1
+        assert "argon2" in result[anti_idx:] or "bcrypt" in result[anti_idx:]
+        assert conv_idx < anti_idx
+
+    def test_no_antipatterns_section_when_all_high_scoring(self):
+        """The Anti-patterns section is omitted when no convention scores low."""
+        good = ConventionRule(
+            id="python.conventions.naming",
+            category="style",
+            title="PEP 8 snake_case naming",
+            description="snake_case naming",
+            confidence=0.95,
+            language="python",
+            stats={"snake_case_ratio": 1.0},
+        )
+        output = _make_output([good])
+        result = generate_claude_md(output)
+
+        assert "## Conventions" in result
+        assert "## Anti-patterns Present" not in result
+
+    def test_core_modules_section_for_library(self):
+        """An import graph with core modules renders an Architecture/Core Modules map."""
+        ig = ConventionRule(
+            id="python.data_flow.import_graph",
+            category="data_flow",
+            title="Import dependency graph",
+            description="Import graph",
+            confidence=0.85,
+            language="python",
+            # Evidence sits under one package dir — must still be project-wide.
+            stats={
+                "total_files": 60,
+                "total_edges": 112,
+                "cycle_count": 16,
+                "core_modules": [
+                    {"path": "httpx/_models.py", "dependents": 8,
+                     "responsibility": "Request and response models."},
+                    {"path": "httpx/_client.py", "dependents": 5,
+                     "responsibility": "client"},
+                ],
+            },
+        )
+        output = _make_output([ig])
+        result = generate_claude_md(output)
+
+        assert "## Architecture" in result
+        assert "### Core Modules" in result
+        assert "`httpx/_models.py` — Request and response models. (8 dependents)" in result
+        # Circular dependencies surface under Known Pitfalls, not Architecture.
+        assert "16 circular import dependencies detected" in result
+
+    def test_known_pitfalls_aggregates_multiple_sources(self):
+        """Pitfalls combine structural smells (circular deps) with history findings."""
+        ig = ConventionRule(
+            id="python.data_flow.import_graph",
+            category="data_flow",
+            title="Import dependency graph",
+            description="Import graph",
+            confidence=0.85,
+            language="python",
+            stats={"total_files": 60, "total_edges": 112, "cycle_count": 16},
+        )
+        history = ConventionRule(
+            id="generic.conventions.history",
+            category="documentation",
+            title="Project history",
+            description="history",
+            confidence=0.8,
+            language="generic",
+            stats={
+                "detected_decisions": [],
+                "detected_pitfalls": [
+                    "CI workflow `ci.yml` contains steps allowed to fail (`continue-on-error: true`).",
+                ],
+            },
+        )
+        output = _make_output([ig, history])
+        result = generate_claude_md(output)
+
+        pitfalls_section = result[result.index("## Known Pitfalls"):]
+        assert "16 circular import dependencies detected" in pitfalls_section
+        assert "continue-on-error: true" in pitfalls_section
+        # The empty placeholder must be gone once real pitfalls exist.
+        assert "No project gotchas" not in pitfalls_section
+
+    def test_known_pitfalls_placeholder_when_none(self):
+        """With no pitfall signals, the guidance placeholder remains."""
+        output = _make_output([_make_rule("file_naming", stats={"dominant_style": "snake_case"})])
+        result = generate_claude_md(output)
+        assert "## Known Pitfalls" in result
+        assert "No project gotchas" in result
+
     def test_auto_generated_header(self):
         """Output includes auto-generated notice."""
         output = _make_output([])

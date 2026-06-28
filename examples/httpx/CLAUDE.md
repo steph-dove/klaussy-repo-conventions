@@ -12,6 +12,19 @@ The next generation HTTP client.
 
 For the repository directory map and file layout, see [.claude/directory-map.md](.claude/directory-map.md).
 
+## Architecture
+
+### Core Modules
+
+> The most-imported internal modules — the foundation other code builds on.
+
+- `httpx/_types.py` — Type definitions for type checking purposes. (9 dependents)
+- `httpx/_exceptions.py` — Our exception hierarchy: (8 dependents)
+- `httpx/_models.py` — models (8 dependents)
+- `httpx/_urls.py` — urls (7 dependents)
+- `httpx/_utils.py` — utils (6 dependents)
+- `httpx/_transports/base.py` — base (6 dependents)
+
 ## Tech Stack
 
 - **Runtime**: python
@@ -31,7 +44,6 @@ For the repository directory map and file layout, see [.claude/directory-map.md]
 - **PR template**: PR template present.
 - **Python import path (flat-layout)**: flat-layout: `import httpx`.
 - **PEP 8 snake_case naming**: Name functions, variables, and modules using snake_case style.
-- **Password hashing: hashlib (not recommended)**: Use hashlib for password hashing. Consider using argon2 or bcrypt for better security.
 - **Single test directory: tests/**: All tests in 'tests/' directory.
 
 ## Deployment
@@ -40,16 +52,16 @@ For the repository directory map and file layout, see [.claude/directory-map.md]
 
 ## Decision Log
 
-- Changelog breaking change: For users of the standard `verify=True` or `verify=False` cases, or `verify=<ssl_context>` case this should require no changes. The following cases have been deprecated...*
+- v0.28.0 (28th November, 2024): For users of the standard verify=True or verify=False cases, or verify=<ssl_context> case this should require no changes.
 
-- Changelog breaking change: The `verify` argument as a string argument is now deprecated and will raise warnings.
+- v0.28.0 (28th November, 2024): The verify argument as a string argument is now deprecated and will raise warnings.
 
-- Changelog breaking change: The `cert` argument is now deprecated and will raise warnings.
+- v0.28.0 (28th November, 2024): The cert argument is now deprecated and will raise warnings.
 
-- Changelog breaking change: The deprecated `proxies` argument has now been removed.
+- v0.28.0 (28th November, 2024): The deprecated proxies argument has now been removed.
 
-- Changelog breaking change: The deprecated `app` argument has now been removed.
+- v0.28.0 (28th November, 2024): The deprecated app argument has now been removed.
 
 ## Known Pitfalls
 
-- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*
+- 16 circular import dependencies detected — watch import order and avoid introducing new cross-module import cycles.

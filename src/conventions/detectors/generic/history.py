@@ -2,12 +2,57 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
 from ...fs import read_file_safe
 from ..base import BaseDetector, DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
+
+# A changelog/release-notes heading that names a version, e.g.
+# "## 0.27.0 (21st February, 2024)" or "### v1.2.0".
+_VERSION_HEADER_RE = re.compile(r"^#{1,6}\s+v?(\d+\.\d+(?:\.\d+)?(?:[.\-][a-z0-9]+)?)\b")
+# A date in parentheses on the same heading line, e.g. "(21st February, 2024)".
+_DATE_IN_PARENS_RE = re.compile(r"\(([^)]*\b\d{4}\b[^)]*)\)")
+# A markdown link: capture the visible text, drop the URL.
+_MD_LINK_RE = re.compile(r"\[([^\]]+)\]\([^)]*\)")
+# Minimum length (chars) for a cleaned decision/pitfall to be worth recording.
+_MIN_ENTRY_LEN = 15
+# Cap a single entry so a long paragraph does not bloat the decision log.
+_MAX_ENTRY_LEN = 200
+
+
+def _clean_changelog_text(text: str) -> str:
+    """Normalize a changelog bullet into clean prose.
+
+    Converts markdown links to their text, strips emphasis/code markers and
+    trailing ellipsis artifacts (the source of mid-sentence ``...*`` fragments).
+    """
+    text = _MD_LINK_RE.sub(r"\1", text)
+    text = text.replace("`", "").replace("**", "").replace("__", "")
+    text = text.strip().strip("*").strip()
+    # Drop trailing ellipsis ("...", "…") left by truncated changelog prose.
+    text = re.sub(r"(?:\.\.\.|…)\s*$", "", text).strip()
+    return text
+
+
+def _first_complete_sentence(text: str) -> str:
+    """Return the first complete sentence, length-capped at a word boundary.
+
+    Avoids emitting mid-word fragments: an over-long sentence is cut at the last
+    whole word within the cap and terminated with a period.
+    """
+    match = re.search(r"(.+?[.!?])(?:\s|$)", text)
+    sentence = (match.group(1) if match else text).strip()
+    if len(sentence) > _MAX_ENTRY_LEN:
+        sentence = sentence[:_MAX_ENTRY_LEN].rsplit(" ", 1)[0].rstrip(",;:") + "."
+    return sentence
+
+
+def _format_decision(version: str | None, text: str) -> str:
+    """Format a decision-log entry, prefixing the version/date context if known."""
+    return f"v{version}: {text}" if version else text
 
 
 @DetectorRegistry.register
@@ -120,19 +165,44 @@ class HistoryDetector(BaseDetector):
                 continue
 
             lines = content.splitlines()
-            for line in lines[:300]:  # Limit scan to first 300 lines (recent releases)
+            current_version: str | None = None
+            for line in lines[:400]:  # Limit scan to recent releases
                 line_strip = line.strip()
                 if not line_strip:
                     continue
+
+                # Track the version/date heading so entries carry "as of" context.
+                if line_strip.startswith("#"):
+                    version = self._parse_version_header(line_strip)
+                    if version:
+                        current_version = version
+                    continue
+
                 # Look for bullet points with breaking changes / migrations / deprecations
                 if line_strip.startswith(("-", "*", "1.")):
                     lower_line = line_strip.lower()
+                    cleaned = _clean_changelog_text(line_strip.lstrip("-*1. ").strip())
+
                     if any(kw in lower_line for kw in ["breaking change", "migration", "migrate", "deprecated", "removed"]):
-                        cleaned = line_strip.lstrip("-*1. ").strip()
-                        decisions.append(f"Changelog breaking change: {cleaned}")
+                        entry = _first_complete_sentence(cleaned)
+                        if len(entry) >= _MIN_ENTRY_LEN:
+                            decisions.append(_format_decision(current_version, entry))
                     if any(kw in lower_line for kw in ["fix flaky", "workaround", "pitfall", "gotcha", "known issue"]):
-                        cleaned = line_strip.lstrip("-*1. ").strip()
-                        pitfalls.append(f"Changelog noted issue: {cleaned}")
+                        entry = _first_complete_sentence(cleaned)
+                        if len(entry) >= _MIN_ENTRY_LEN:
+                            pitfalls.append(_format_decision(current_version, entry))
+
+    @staticmethod
+    def _parse_version_header(line: str) -> str | None:
+        """Extract a version (with date, if present) from a changelog heading."""
+        match = _VERSION_HEADER_RE.match(line)
+        if not match:
+            return None
+        version = match.group(1)
+        date_match = _DATE_IN_PARENS_RE.search(line)
+        if date_match:
+            return f"{version} ({date_match.group(1).strip()})"
+        return version
 
     def _scan_ci_configs(
         self,

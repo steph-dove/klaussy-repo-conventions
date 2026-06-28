@@ -119,6 +119,3 @@ paths:
                       expected = allowed[key].__name__
                       seen = type(value).__name__
   ```
-
-## Architecture
-
