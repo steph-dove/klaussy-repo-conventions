@@ -52,13 +52,15 @@ conventions discover --format claude
 
 ### 🧠 Few-Shot Agent Optimization
 
-Path-scoped rule files in `.claude/rules/*.md` are optimized specifically for LLM context windows:
+Path-scoped rule files in `.claude/rules/*.md` and configuration files are optimized specifically for LLM context windows:
 *   **Prescriptive Directives:** Observational metrics are converted into imperative instructions (e.g., *"Name functions using snake_case style"*).
 *   **Few-Shot Code Examples:** If a convention is detected, the CLI appends the best real-world code snippet from the scanned files, showing the agent exactly how your conventions are implemented.
+*   **Token-Optimized Directory Map:** To avoid bloating the main `CLAUDE.md`, the full repository file layout is written to `.claude/directory-map.md` and referenced via a link. It keeps production code folders uncollapsed while collapsing non-essential directories (tests, docs, workflows) to keep token usage optimal.
+*   **Dynamic Decision Log & Pitfalls:** Automatically scans git logs, changelogs, release notes, and CI configurations to populate your repository gotchas and architectural decisions, minimizing the need for manual placeholders.
 
 ### 🔄 Enhanced via `--init`
 
-Add the `--init` flag to enrich the generated `CLAUDE.md` using the Claude Code CLI. This pipes the static-analysis output through Claude to populate exact runnable tasks, gotchas, and decision history:
+Add the `--init` flag to further enrich the generated `CLAUDE.md` using the Claude Code CLI. This pipes the static-analysis output through Claude to populate additional custom gotchas and decision history:
 
 ```bash
 conventions discover --claude --init
