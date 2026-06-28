@@ -150,6 +150,9 @@ class FileIndex:
     is_test_file: bool = False  # True for test_*.py or *_test.py files
     is_conftest: bool = False  # True for conftest.py files
 
+    # Module-level docstring (first statement), if any.
+    module_docstring: Optional[str] = None
+
     # Collected data
     imports: list[ImportInfo] = field(default_factory=list)
     functions: list[FunctionInfo] = field(default_factory=list)
@@ -251,6 +254,8 @@ class PythonIndex:
         except Exception as e:
             file_index.parse_error = f"Parse error: {e}"
             return file_index
+
+        file_index.module_docstring = ast.get_docstring(tree)
 
         # Extract information from AST
         visitor = _ASTVisitor(file_index)

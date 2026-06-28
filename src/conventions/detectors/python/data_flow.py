@@ -6,6 +6,8 @@ Builds import graph, traces endpoint chains, and maps service dependencies.
 from __future__ import annotations
 
 import os
+import re
+from collections import Counter
 from pathlib import Path
 
 from ..base import DetectorContext, DetectorResult, PythonDetector
@@ -22,6 +24,31 @@ from .index import PythonIndex, make_evidence
 # Extensions to try when resolving Python imports
 _PYTHON_EXTENSIONS = (".py",)
 _INIT_FILES = ("__init__.py",)
+
+# Top-level directories whose files are not part of the production architecture
+# and should not appear as (or inflate the centrality of) core modules.
+_NONPROD_DIRS = frozenset({
+    "scripts", "script", "benchmarks", "benchmark", "bench",
+    "tools", "tooling", "ci", "e2e",
+})
+
+
+def _module_responsibility(docstring: str | None, filename: str) -> str:
+    """Summarize a module's responsibility from its docstring, else its name.
+
+    Returns the first sentence of the docstring (single-line, length-capped), or
+    a humanized form of the filename (`_models.py` -> "models") as a fallback.
+    """
+    if docstring:
+        first = docstring.strip().split("\n\n")[0].replace("\n", " ").strip()
+        match = re.search(r"(.+?[.!?])(?:\s|$)", first)
+        summary = (match.group(1) if match else first).strip()
+        if len(summary) > 120:
+            summary = summary[:120].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+        if summary:
+            return summary
+    stem = filename.rsplit(".", 1)[0].lstrip("_").replace("_", " ").strip()
+    return stem or filename
 
 
 def _resolve_import(
@@ -204,8 +231,58 @@ class PythonDataFlowDetector(PythonDetector):
                 "cluster_count": cluster_count,
                 "top_fan_in": summary.top_fan_in[:5],
                 "top_fan_out": summary.top_fan_out[:5],
+                "core_modules": self._build_core_modules(index, adj),
             },
         ))
+
+    @staticmethod
+    def _is_production_module(index: PythonIndex, path: str) -> bool:
+        """True if a module is production code (not a test, doc, or script)."""
+        file_idx = index.files.get(path)
+        if file_idx is not None and (
+            file_idx.role in ("test", "docs")
+            or file_idx.is_test_file
+            or file_idx.is_conftest
+        ):
+            return False
+        return not any(part in _NONPROD_DIRS for part in path.lower().split("/"))
+
+    @classmethod
+    def _build_core_modules(
+        cls,
+        index: PythonIndex,
+        adj: dict[str, list[str]],
+    ) -> list[dict[str, object]]:
+        """Describe the most-depended-upon production modules for the arch map.
+
+        Fan-in is counted from production importers only, so test/script imports
+        don't masquerade as architectural centrality (e.g. an HTTP test client
+        imported by every test). Package facades (`__init__.py`) are excluded as
+        re-export hubs. Each entry carries the first sentence of the module
+        docstring as a responsibility hint, falling back to a humanized filename.
+        """
+        prod_fan_in: Counter[str] = Counter()
+        for source, targets in adj.items():
+            if not cls._is_production_module(index, source):
+                continue
+            for target in targets:
+                prod_fan_in[target] += 1
+
+        core: list[dict[str, object]] = []
+        for path, fan_in in prod_fan_in.most_common():
+            filename = path.rsplit("/", 1)[-1]
+            if filename == "__init__.py" or not cls._is_production_module(index, path):
+                continue
+            file_idx = index.files.get(path)
+            doc = file_idx.module_docstring if file_idx else None
+            core.append({
+                "path": path,
+                "dependents": fan_in,
+                "responsibility": _module_responsibility(doc, filename),
+            })
+            if len(core) >= 6:
+                break
+        return core
 
     def _emit_endpoint_chains_rule(
         self,

@@ -143,6 +143,52 @@ class TestPythonDataFlowDetector:
         assert rule.stats["total_files"] >= 6
         assert rule.stats["total_edges"] >= 4
 
+    def test_core_modules_with_responsibilities(self, tmp_path: Path):
+        """Core modules are ranked by fan-in with docstring-derived responsibilities."""
+        pkg = tmp_path / "mylib"
+        pkg.mkdir()
+        (pkg / "__init__.py").write_text(
+            "from mylib.models import Model\nfrom mylib.client import Client\n"
+        )
+        (pkg / "models.py").write_text(
+            '"""Data models for requests and responses."""\nclass Model: pass\n'
+        )
+        (pkg / "errors.py").write_text(
+            '"""Exception hierarchy for the library."""\nclass Err(Exception): pass\n'
+        )
+        # No module docstring -> responsibility falls back to a humanized name.
+        (pkg / "client.py").write_text(
+            "from mylib.models import Model\n"
+            "from mylib.errors import Err\n"
+            "class Client: ...\n"
+        )
+        (pkg / "api.py").write_text(
+            "from mylib.models import Model\n"
+            "from mylib.client import Client\n"
+            "def request(): ...\n"
+        )
+
+        ctx = DetectorContext(
+            repo_root=tmp_path, selected_languages={"python"}, max_files=100
+        )
+        rule = next(
+            r for r in PythonDataFlowDetector().detect(ctx).rules
+            if r.id == "python.data_flow.import_graph"
+        )
+
+        core = rule.stats["core_modules"]
+        assert core, "expected core modules to be populated"
+        # Package facades are excluded.
+        assert all(not m["path"].endswith("__init__.py") for m in core)
+
+        by_path = {m["path"]: m for m in core}
+        # Most-depended-upon module ranks first, with its docstring summary.
+        assert core[0]["path"] == "mylib/models.py"
+        assert core[0]["responsibility"] == "Data models for requests and responses."
+        assert core[0]["dependents"] == 3
+        # Undocumented module falls back to a humanized filename.
+        assert by_path["mylib/client.py"]["responsibility"] == "client"
+
     def test_detects_endpoint_chains(self, python_repo: Path):
         """Traces endpoint chains from API to stores."""
         ctx = DetectorContext(

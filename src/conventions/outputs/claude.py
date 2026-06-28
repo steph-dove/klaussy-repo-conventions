@@ -238,6 +238,15 @@ _CONVENTION_SUFFIXES = frozenset({
 })
 
 
+# Structural artifacts that describe the whole repository. Even when their
+# evidence happens to sit under one package directory, they belong in the root
+# CLAUDE.md rather than a path-scoped rules file.
+_ALWAYS_PROJECT_WIDE_SUFFIXES = frozenset({
+    "import_graph", "endpoint_chains", "service_dependencies",
+    "api_routes", "monorepo", "db_entities",
+})
+
+
 def _bucket_rules_by_path(
     rules: list[ConventionRule],
 ) -> tuple[dict[str, list[ConventionRule]], list[ConventionRule]]:
@@ -245,6 +254,9 @@ def _bucket_rules_by_path(
     buckets: dict[str, list[ConventionRule]] = {}
     project_wide: list[ConventionRule] = []
     for rule in rules:
+        if _get_suffix(rule) in _ALWAYS_PROJECT_WIDE_SUFFIXES:
+            project_wide.append(rule)
+            continue
         glob = _infer_path_glob(rule)
         if glob is None:
             project_wide.append(rule)
@@ -386,7 +398,13 @@ def _render_tree(
 
 
 def _build_architecture_section(include_rules: list[ConventionRule]) -> str:
-    """Build the Architecture section from pattern/structure rules."""
+    """Build the Architecture section from pattern/structure rules.
+
+    Emits a "Key Patterns" subsection (layering, routes, circular deps, ...) and,
+    for any repo with an import graph, a "Core Modules" map. The latter gives
+    libraries and CLIs — which have no API routes to anchor an architecture
+    summary — a useful orientation derived from internal import structure.
+    """
     arch_rules = [r for r in include_rules if _get_suffix(r) in _ARCHITECTURE_SUFFIXES]
     if not arch_rules:
         return ""
@@ -397,14 +415,53 @@ def _build_architecture_section(include_rules: list[ConventionRule]) -> str:
     if not project_wide:
         return ""
 
-    lines = ["## Architecture\n", "### Key Patterns\n"]
-    for rule in project_wide:
-        rendered = _render_arch_rule(rule, _get_suffix(rule))
-        if rendered:
-            lines.append(rendered)
-    lines.append("")
+    pattern_lines = [
+        rendered for rule in project_wide
+        if (rendered := _render_arch_rule(rule, _get_suffix(rule)))
+    ]
+    core_module_lines = _build_core_modules_lines(project_wide)
+
+    if not pattern_lines and not core_module_lines:
+        return ""
+
+    lines = ["## Architecture\n"]
+    if core_module_lines:
+        lines.extend(core_module_lines)
+    if pattern_lines:
+        lines.append("### Key Patterns\n")
+        lines.extend(pattern_lines)
+        lines.append("")
 
     return "\n".join(lines)
+
+
+def _build_core_modules_lines(arch_rules: list[ConventionRule]) -> list[str]:
+    """Render the Core Modules subsection from the import graph's core modules."""
+    import_graph = next(
+        (r for r in arch_rules if _get_suffix(r) == "import_graph"), None
+    )
+    if import_graph is None:
+        return []
+
+    core_modules = import_graph.stats.get("core_modules", [])
+    if not core_modules:
+        return []
+
+    lines = [
+        "### Core Modules\n",
+        "> The most-imported internal modules — the foundation other code builds on.\n",
+    ]
+    for mod in core_modules:
+        path = mod.get("path", "?")
+        responsibility = mod.get("responsibility", "")
+        dependents = mod.get("dependents")
+        suffix = f" ({dependents} dependents)" if dependents else ""
+        if responsibility:
+            lines.append(f"- `{path}` — {responsibility}{suffix}")
+        else:
+            lines.append(f"- `{path}`{suffix}")
+    lines.append("")
+    return lines
 
 
 def _render_arch_rule(rule: ConventionRule, suffix: str) -> str:
