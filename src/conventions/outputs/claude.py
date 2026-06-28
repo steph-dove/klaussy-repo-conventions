@@ -1030,15 +1030,15 @@ def _make_prescriptive(rule: ConventionRule, summary: str) -> str:
     summary = re.sub(r"^Uses\s+", "Use ", summary)
     summary = re.sub(r"^Rarely uses\s+", "Prefer using ", summary)
     summary = re.sub(r"^Primarily uses\s+", "Prefer using ", summary)
-    
+
     if "are centralized" in summary:
         summary = summary.replace("are centralized", "")
         summary = "Centralize " + summary
-        
+
     summary = summary.strip()
 
     suffix = _get_suffix(rule)
-    
+
     # 3. Apply common mappings for specific suffixes
     if suffix == "file_naming":
         return f"Use {summary} file naming style throughout the project."
@@ -1078,10 +1078,10 @@ def _make_prescriptive(rule: ConventionRule, summary: str) -> str:
     # Heuristic conversion using regex
     prescriptive = summary
     prescriptive = prescriptive.strip().rstrip(".").strip()
-    
+
     if not prescriptive.endswith((".", "!", "?")):
         prescriptive += "."
-        
+
     return prescriptive
 
 
@@ -1201,10 +1201,10 @@ def _build_api_mermaid_diagram(routes_by_file: dict[str, list[dict]], chains: li
         return ""
 
     lines = ["\n#### Data Flow Map\n", "```mermaid", "graph TD"]
-    
+
     edges = set()
     node_labels = {}
-    
+
     def sanitize(name: str) -> str:
         import re
         return re.sub(r'[^a-zA-Z0-9]', '_', name)
@@ -1239,7 +1239,7 @@ def _build_api_mermaid_diagram(routes_by_file: dict[str, list[dict]], chains: li
             node_labels[svc_id] = _short_path(svc_file)
             edges.add((last_id, svc_id))
             last_id = svc_id
-            
+
         if stores:
             store_file = stores[0]
             store_id = sanitize(store_file)
@@ -1571,7 +1571,7 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
     """Render a single rule line/block for a `.claude/rules/<name>.md` file."""
     prescriptive = _render_prescriptive_summary(rule)
     body = f"- **{rule.title}**: {prescriptive}"
-    
+
     # Append few-shot evidence code block if evidence is present
     if rule.evidence:
         # Limit to 1 evidence snippet to avoid massive rule file size
@@ -1588,13 +1588,13 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "rust"
         else:
             lang = ""
-            
+
         body += f"\n  *Example context from `{ev.file_path}` (lines {ev.line_start}-{ev.line_end}):*\n"
         body += f"  ```{lang}\n"
         for line in ev.excerpt.splitlines():
             body += f"  {line}\n"
         body += "  ```"
-        
+
     return body
 
 

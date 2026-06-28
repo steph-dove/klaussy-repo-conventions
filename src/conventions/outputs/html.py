@@ -335,7 +335,7 @@ def _html_header(timestamp: str, repo_path: str) -> str:
 def _html_summary(output: ConventionsOutput, avg_score: float, score_counts: dict) -> str:
     """Generate summary section."""
     languages = ", ".join(output.metadata.detected_languages) or "None"
-    
+
     desc_html = ""
     if output.metadata.description:
         desc_html = f'<p class="project-description" style="margin-bottom: 20px; font-size: 1.1em; color: #adb5bd; font-style: italic;">{_escape(output.metadata.description)}</p>'
