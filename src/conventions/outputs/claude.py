@@ -295,7 +295,7 @@ def _build_directory_map_section(include_rules: list[ConventionRule]) -> str:
 
     lines = ["## Directory Structure\n"]
     lines.append("For the complete, uncollapsed directory structure, see [.claude/directory-map.md](.claude/directory-map.md).\n")
-    _render_tree(tree, lines, indent=0, collapse=True)
+    _render_tree(tree, lines, indent=0, collapse_all=True)
     lines.append("")
     return "\n".join(lines)
 
@@ -307,10 +307,16 @@ _TEST_TOOL_DIRS = frozenset({
 })
 
 
-def _render_tree(tree: dict, lines: list[str], indent: int, collapse: bool = True) -> None:
+def _render_tree(
+    tree: dict,
+    lines: list[str],
+    indent: int,
+    collapse_all: bool = False,
+    is_source_subtree: bool = False,
+) -> None:
     """Recursively render a directory tree into markdown lines.
 
-    Renders subdirectories first, then files (with key files summarized if numerous).
+    Renders subdirectories first, then files (collapsing non-source subtrees or all files if collapse_all).
     """
     prefix = "  " * indent
 
@@ -341,11 +347,25 @@ def _render_tree(tree: dict, lines: list[str], indent: int, collapse: bool = Tru
             continue
 
         if children:
-            _render_tree(children, lines, indent + 1, collapse)
+            # Determine if this child subdirectory is a source code subtree
+            is_src = (
+                name in ("src", "lib")
+                or "source code" in purpose.lower()
+                or "workspace member" in purpose.lower()
+                or is_source_subtree
+            )
+            _render_tree(children, lines, indent + 1, collapse_all, is_src)
 
     # 2. Render files
+    # When generating directory-map.md, completely skip files in non-source directories to save tokens
+    if not collapse_all and not is_source_subtree:
+        return
+
     sorted_files = sorted(files.keys())
-    if not collapse or len(sorted_files) <= 10:
+    # We collapse files if collapse_all is True, or if it is a non-source subtree.
+    should_collapse = collapse_all or not is_source_subtree
+
+    if not should_collapse or len(sorted_files) <= 10:
         for name in sorted_files:
             node = files[name]
             purpose = node.get("purpose", "")
@@ -1516,7 +1536,7 @@ def generate_claude_md(output: ConventionsOutput) -> str:
 
 
 def generate_directory_map_md(output: ConventionsOutput) -> str:
-    """Generate the full, uncollapsed directory map markdown."""
+    """Generate the directory map markdown."""
     layout_rule = None
     for rule in output.rules:
         if _get_suffix(rule) == "repo_layout":
@@ -1532,10 +1552,10 @@ def generate_directory_map_md(output: ConventionsOutput) -> str:
 
     lines = [
         "# Directory Map\n",
-        "> This file contains the full, uncollapsed directory structure of the repository.\n",
+        "> This file contains the directory structure of the repository. Source files are uncollapsed, while non-essential directories (tests, workflows, etc.) are collapsed to keep token usage optimal.\n",
         "## Directory Structure\n",
     ]
-    _render_tree(tree, lines, indent=0, collapse=False)
+    _render_tree(tree, lines, indent=0, collapse_all=False)
     lines.append("")
     return "\n".join(lines)
 
