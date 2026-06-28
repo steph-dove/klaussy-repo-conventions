@@ -10,6 +10,7 @@ from .editor_config import EditorConfigDetector
 from .environment_setup import EnvironmentSetupDetector
 from .generated_code import GeneratedCodeDetector
 from .git_conventions import GitConventionsDetector
+from .history import HistoryDetector
 from .repo_layout import GenericRepoLayoutDetector
 from .task_runners import TaskRunnerDetector
 
@@ -26,4 +27,5 @@ __all__ = [
     "EnvironmentSetupDetector",
     "GeneratedCodeDetector",
     "TaskRunnerDetector",
+    "HistoryDetector",
 ]

@@ -47,6 +47,7 @@ _EXCLUDE_SUFFIXES = frozenset({
     "coverage_thresholds",
     "coverage_config",
     "env_separation",
+    "history",
 })
 
 # Suffixes that get a one-liner in Tech Stack (tools, not patterns)
@@ -1545,11 +1546,30 @@ def generate_claude_md(output: ConventionsOutput) -> str:
     if deploy:
         sections.append(deploy)
 
+    # Find history rule if any
+    history_rule = None
+    for rule in output.rules:
+        if _get_suffix(rule) == "history":
+            history_rule = rule
+            break
+
+    detected_decisions = history_rule.stats.get("detected_decisions", []) if history_rule else []
+    detected_pitfalls = history_rule.stats.get("detected_pitfalls", []) if history_rule else []
+
     # Skeleton sections
     sections.append("## Decision Log\n")
-    sections.append("- *No architectural decisions recorded yet. Add major design and library choices here.*\n")
+    if detected_decisions:
+        for dec in detected_decisions[:5]:
+            sections.append(f"- {dec}\n")
+    else:
+        sections.append("- *No architectural decisions recorded yet. Add major design and library choices here.*\n")
+
     sections.append("## Known Pitfalls\n")
-    sections.append("- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*\n")
+    if detected_pitfalls:
+        for pit in detected_pitfalls[:5]:
+            sections.append(f"- {pit}\n")
+    else:
+        sections.append("- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*\n")
 
     return "\n".join(sections)
 

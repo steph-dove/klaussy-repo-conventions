@@ -1,6 +1,6 @@
 # Code Conventions Report
 
-*Generated: 2026-06-28 12:30:45*
+*Generated: 2026-06-28 12:33:36*
 
 ## Summary
 
@@ -9,7 +9,7 @@
 - **Repository:** `/Users/stephaniedover/projects/klaussy-repo-conventions/fastapi_repo`
 - **Languages:** python
 - **Files scanned:** 668
-- **Conventions detected:** 64
+- **Conventions detected:** 65
 
 ## Detected Conventions
 
@@ -53,6 +53,7 @@
 | `python.conventions.test_naming` | Test naming: Simple style (test_feature) | 84% | 3 | [docs](https://docs.pytest.org/) |
 | `python.conventions.schema_library` | Primary schema library: Pydantic | 84% | 5 | [docs](https://docs.pydantic.dev/) |
 | `python.conventions.api_framework` | Primary API framework: FastAPI | 83% | 5 | [docs](https://fastapi.tiangolo.com/) |
+| `generic.conventions.history` | Project history | 80% | 0 |  |
 | `python.conventions.caching` | Caching: functools.lru_cache | 80% | 2 | [docs](https://redis.io/docs/) |
 | `python.conventions.enum_usage` | Enum usage: Enum | 80% | 4 | [docs](https://docs.python.org/3/library/enum.html) |
 | `python.conventions.pagination_pattern` | Cursor-based pagination | 80% | 0 | [docs](https://fastapi.tiangolo.com/) |
@@ -1768,6 +1769,22 @@ from fastapi.testclient import TestClient
 
 def test_upload_file_invalid_pydantic_v2():
 ```
+
+---
+
+### Project history
+
+**ID:** `generic.conventions.history`  
+**Category:** documentation  
+**Language:** generic  
+**Confidence:** 80%
+
+Detected 2 decision log items and 1 pitfalls.
+
+**Statistics:**
+
+- detected_decisions: `['Changelog breaking change: 🔥 Remove slim package stub, deprecated for a while. PR [#15649](https://github.com/fastapi/fastapi/pull/15649) by [@tiangolo](https://github.com/tiangolo).', 'Changelog breaking change: 🔧 Migrate docs from MkDocs to Zensical. PR [#15563](https://github.com/fastapi/fastapi/pull/15563) by [@tiangolo](https://github.com/tiangolo).']`
+- detected_pitfalls: `['CI workflow `pre-commit.yml` contains steps allowed to fail (`continue-on-error: true`).']`
 
 ---
 

@@ -178,6 +178,34 @@
               }
             },
             {
+              "id": "generic.conventions.history",
+              "name": "Project history",
+              "shortDescription": {
+                "text": "Project history"
+              },
+              "fullDescription": {
+                "text": "Detected 2 decision log items and 1 pitfalls."
+              },
+              "helpUri": "https://github.com/steph-dove/klaussy-repo-conventions#rules",
+              "properties": {
+                "category": "documentation",
+                "language": "generic",
+                "score": 3,
+                "scoreLabel": "Average",
+                "precision": "high",
+                "docsUrl": null,
+                "tags": []
+              },
+              "help": {
+                "text": "Assessment: Convention detected with 80% confidence\n\nSuggestion: Add docstrings to public functions and classes explaining purpose and parameters.",
+                "markdown": "**Assessment:** Convention detected with 80% confidence\n\n**Suggestion:** Add docstrings to public functions and classes explaining purpose and parameters."
+              },
+              "defaultConfiguration": {
+                "level": "warning",
+                "enabled": true
+              }
+            },
+            {
               "id": "generic.conventions.repo_layout",
               "name": "Standard repository layout",
               "shortDescription": {
@@ -2055,8 +2083,49 @@
           ]
         },
         {
-          "ruleId": "generic.conventions.repo_layout",
+          "ruleId": "generic.conventions.history",
           "ruleIndex": 6,
+          "level": "warning",
+          "kind": "review",
+          "message": {
+            "text": "Project history: Convention detected with 80% confidence"
+          },
+          "properties": {
+            "confidence": 0.8,
+            "score": 3,
+            "scoreLabel": "Average",
+            "stats": {
+              "detected_decisions": [
+                "Changelog breaking change: \ud83d\udd25 Remove slim package stub, deprecated for a while. PR [#15649](https://github.com/fastapi/fastapi/pull/15649) by [@tiangolo](https://github.com/tiangolo).",
+                "Changelog breaking change: \ud83d\udd27 Migrate docs from MkDocs to Zensical. PR [#15563](https://github.com/fastapi/fastapi/pull/15563) by [@tiangolo](https://github.com/tiangolo)."
+              ],
+              "detected_pitfalls": [
+                "CI workflow `pre-commit.yml` contains steps allowed to fail (`continue-on-error: true`)."
+              ]
+            }
+          },
+          "fixes": [
+            {
+              "description": {
+                "text": "Add docstrings to public functions and classes explaining purpose and parameters."
+              },
+              "changes": []
+            }
+          ],
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": ".",
+                  "uriBaseId": "%SRCROOT%"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "generic.conventions.repo_layout",
+          "ruleIndex": 7,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -13088,7 +13157,7 @@
         },
         {
           "ruleId": "generic.conventions.standard_files",
-          "ruleIndex": 7,
+          "ruleIndex": 8,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -13128,7 +13197,7 @@
         },
         {
           "ruleId": "python.conventions.response_envelope",
-          "ruleIndex": 8,
+          "ruleIndex": 9,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -13235,7 +13304,7 @@
         },
         {
           "ruleId": "python.conventions.pagination_pattern",
-          "ruleIndex": 9,
+          "ruleIndex": 10,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -13273,7 +13342,7 @@
         },
         {
           "ruleId": "python.conventions.api_routes",
-          "ruleIndex": 10,
+          "ruleIndex": 11,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -13490,7 +13559,7 @@
         },
         {
           "ruleId": "python.conventions.api_framework",
-          "ruleIndex": 11,
+          "ruleIndex": 12,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -13588,7 +13657,7 @@
         },
         {
           "ruleId": "python.conventions.schema_library",
-          "ruleIndex": 12,
+          "ruleIndex": 13,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -13694,7 +13763,7 @@
         },
         {
           "ruleId": "python.conventions.api_versioning",
-          "ruleIndex": 13,
+          "ruleIndex": 14,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -13801,7 +13870,7 @@
         },
         {
           "ruleId": "python.conventions.openapi_docs",
-          "ruleIndex": 14,
+          "ruleIndex": 15,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -13839,7 +13908,7 @@
         },
         {
           "ruleId": "python.conventions.data_class_style",
-          "ruleIndex": 15,
+          "ruleIndex": 16,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -13938,7 +14007,7 @@
         },
         {
           "ruleId": "python.conventions.background_jobs",
-          "ruleIndex": 16,
+          "ruleIndex": 17,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -14029,7 +14098,7 @@
         },
         {
           "ruleId": "python.conventions.caching",
-          "ruleIndex": 17,
+          "ruleIndex": 18,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -14095,7 +14164,7 @@
         },
         {
           "ruleId": "python.conventions.class_style",
-          "ruleIndex": 18,
+          "ruleIndex": 19,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -14202,7 +14271,7 @@
         },
         {
           "ruleId": "python.conventions.cli_framework",
-          "ruleIndex": 19,
+          "ruleIndex": 20,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -14305,7 +14374,7 @@
         },
         {
           "ruleId": "python.conventions.string_formatting",
-          "ruleIndex": 20,
+          "ruleIndex": 21,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -14412,7 +14481,7 @@
         },
         {
           "ruleId": "python.conventions.path_handling",
-          "ruleIndex": 21,
+          "ruleIndex": 22,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -14509,7 +14578,7 @@
         },
         {
           "ruleId": "python.conventions.import_style",
-          "ruleIndex": 22,
+          "ruleIndex": 23,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -14614,7 +14683,7 @@
         },
         {
           "ruleId": "python.conventions.constant_naming",
-          "ruleIndex": 23,
+          "ruleIndex": 24,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -14719,7 +14788,7 @@
         },
         {
           "ruleId": "python.conventions.enum_usage",
-          "ruleIndex": 24,
+          "ruleIndex": 25,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -14815,7 +14884,7 @@
         },
         {
           "ruleId": "python.data_flow.import_graph",
-          "ruleIndex": 25,
+          "ruleIndex": 26,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -14956,7 +15025,7 @@
         },
         {
           "ruleId": "python.conventions.db_session_lifecycle",
-          "ruleIndex": 26,
+          "ruleIndex": 27,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -14999,7 +15068,7 @@
         },
         {
           "ruleId": "python.conventions.db_connection_pooling",
-          "ruleIndex": 27,
+          "ruleIndex": 28,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -15034,7 +15103,7 @@
         },
         {
           "ruleId": "python.conventions.decorator_caching",
-          "ruleIndex": 28,
+          "ruleIndex": 29,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -15130,7 +15199,7 @@
         },
         {
           "ruleId": "python.conventions.custom_decorators",
-          "ruleIndex": 29,
+          "ruleIndex": 30,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -15221,7 +15290,7 @@
         },
         {
           "ruleId": "python.conventions.dependency_management",
-          "ruleIndex": 30,
+          "ruleIndex": 31,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -15257,7 +15326,7 @@
         },
         {
           "ruleId": "python.conventions.lock_file",
-          "ruleIndex": 31,
+          "ruleIndex": 32,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -15289,7 +15358,7 @@
         },
         {
           "ruleId": "python.conventions.dependency_health",
-          "ruleIndex": 32,
+          "ruleIndex": 33,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -15330,7 +15399,7 @@
         },
         {
           "ruleId": "python.conventions.import_aliases",
-          "ruleIndex": 33,
+          "ruleIndex": 34,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -15366,7 +15435,7 @@
         },
         {
           "ruleId": "python.conventions.docstrings",
-          "ruleIndex": 34,
+          "ruleIndex": 35,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -15458,7 +15527,7 @@
         },
         {
           "ruleId": "python.conventions.naming",
-          "ruleIndex": 35,
+          "ruleIndex": 36,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -15488,7 +15557,7 @@
         },
         {
           "ruleId": "python.conventions.error_handling_boundary",
-          "ruleIndex": 36,
+          "ruleIndex": 37,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -15595,7 +15664,7 @@
         },
         {
           "ruleId": "python.conventions.error_taxonomy",
-          "ruleIndex": 37,
+          "ruleIndex": 38,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -15716,7 +15785,7 @@
         },
         {
           "ruleId": "python.conventions.exception_handlers",
-          "ruleIndex": 38,
+          "ruleIndex": 39,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -15824,7 +15893,7 @@
         },
         {
           "ruleId": "python.conventions.error_wrapper",
-          "ruleIndex": 39,
+          "ruleIndex": 40,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -15930,7 +15999,7 @@
         },
         {
           "ruleId": "python.conventions.exception_chaining",
-          "ruleIndex": 40,
+          "ruleIndex": 41,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -16020,7 +16089,7 @@
         },
         {
           "ruleId": "python.conventions.logging_library",
-          "ruleIndex": 41,
+          "ruleIndex": 42,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -16126,7 +16195,7 @@
         },
         {
           "ruleId": "python.conventions.async_http_client",
-          "ruleIndex": 42,
+          "ruleIndex": 43,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -16225,7 +16294,7 @@
         },
         {
           "ruleId": "python.conventions.timeouts",
-          "ruleIndex": 43,
+          "ruleIndex": 44,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -16329,7 +16398,7 @@
         },
         {
           "ruleId": "python.conventions.health_checks",
-          "ruleIndex": 44,
+          "ruleIndex": 45,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -16374,7 +16443,7 @@
         },
         {
           "ruleId": "python.conventions.context_managers",
-          "ruleIndex": 45,
+          "ruleIndex": 46,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -16458,7 +16527,7 @@
         },
         {
           "ruleId": "python.conventions.context_file_io",
-          "ruleIndex": 46,
+          "ruleIndex": 47,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -16546,7 +16615,7 @@
         },
         {
           "ruleId": "python.conventions.auth_pattern",
-          "ruleIndex": 47,
+          "ruleIndex": 48,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -16649,7 +16718,7 @@
         },
         {
           "ruleId": "python.conventions.secrets_access_style",
-          "ruleIndex": 48,
+          "ruleIndex": 49,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -16743,7 +16812,7 @@
         },
         {
           "ruleId": "python.conventions.env_separation",
-          "ruleIndex": 49,
+          "ruleIndex": 50,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -16839,7 +16908,7 @@
         },
         {
           "ruleId": "python.conventions.json_library",
-          "ruleIndex": 50,
+          "ruleIndex": 51,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -16932,7 +17001,7 @@
         },
         {
           "ruleId": "python.conventions.testing_framework",
-          "ruleIndex": 51,
+          "ruleIndex": 52,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17031,7 +17100,7 @@
         },
         {
           "ruleId": "python.test_conventions.fixtures",
-          "ruleIndex": 52,
+          "ruleIndex": 53,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17129,7 +17198,7 @@
         },
         {
           "ruleId": "python.test_conventions.assertions",
-          "ruleIndex": 53,
+          "ruleIndex": 54,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -17236,7 +17305,7 @@
         },
         {
           "ruleId": "python.test_conventions.mocking",
-          "ruleIndex": 54,
+          "ruleIndex": 55,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17335,7 +17404,7 @@
         },
         {
           "ruleId": "python.test_conventions.parametrized",
-          "ruleIndex": 55,
+          "ruleIndex": 56,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17429,7 +17498,7 @@
         },
         {
           "ruleId": "python.conventions.test_structure",
-          "ruleIndex": 56,
+          "ruleIndex": 57,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -17473,7 +17542,7 @@
         },
         {
           "ruleId": "python.conventions.test_naming",
-          "ruleIndex": 57,
+          "ruleIndex": 58,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -17551,7 +17620,7 @@
         },
         {
           "ruleId": "python.conventions.linter",
-          "ruleIndex": 58,
+          "ruleIndex": 59,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17596,7 +17665,7 @@
         },
         {
           "ruleId": "python.conventions.import_sorting",
-          "ruleIndex": 59,
+          "ruleIndex": 60,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17638,7 +17707,7 @@
         },
         {
           "ruleId": "python.conventions.type_checker_strictness",
-          "ruleIndex": 60,
+          "ruleIndex": 61,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17670,7 +17739,7 @@
         },
         {
           "ruleId": "python.conventions.pre_commit_hooks",
-          "ruleIndex": 61,
+          "ruleIndex": 62,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -17732,7 +17801,7 @@
         },
         {
           "ruleId": "python.conventions.typing_coverage",
-          "ruleIndex": 62,
+          "ruleIndex": 63,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -17815,7 +17884,7 @@
         },
         {
           "ruleId": "python.conventions.validation_style",
-          "ruleIndex": 63,
+          "ruleIndex": 64,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -17925,7 +17994,7 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "startTimeUtc": "2026-06-28T19:30:45.568510+00:00",
+          "startTimeUtc": "2026-06-28T19:33:36.222794+00:00",
           "workingDirectory": {
             "uri": "/Users/stephaniedover/projects/klaussy-repo-conventions/fastapi_repo"
           }

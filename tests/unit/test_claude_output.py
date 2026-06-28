@@ -1108,4 +1108,26 @@ class TestAgentCompatibilityFeatures:
         assert "For the repository directory map and file layout, see [.claude/directory-map.md](.claude/directory-map.md)." in claude_result
         assert "- `src/`" not in claude_result
 
+    def test_history_populates_decision_log_and_pitfalls(self):
+        """History rule stats successfully populate Decision Log and Known Pitfalls in CLAUDE.md."""
+        rules = [
+            _make_rule(
+                "history",
+                stats={
+                    "detected_decisions": ["Migrated database schema", "Switched from pip to uv"],
+                    "detected_pitfalls": ["CI workflow ci.yml has steps allowed to fail", "Test flakiness fix"],
+                }
+            )
+        ]
+        output = _make_output(rules)
+        result = generate_claude_md(output)
+
+        assert "## Decision Log" in result
+        assert "- Migrated database schema" in result
+        assert "- Switched from pip to uv" in result
+
+        assert "## Known Pitfalls" in result
+        assert "- CI workflow ci.yml has steps allowed to fail" in result
+        assert "- Test flakiness fix" in result
+
 

@@ -156,6 +156,26 @@
       "tags": []
     },
     {
+      "id": "generic.conventions.history",
+      "category": "documentation",
+      "title": "Project history",
+      "description": "Detected 2 decision log items and 1 pitfalls.",
+      "confidence": 0.8,
+      "language": "generic",
+      "evidence": [],
+      "stats": {
+        "detected_decisions": [
+          "Changelog breaking change: 🔥 Remove slim package stub, deprecated for a while. PR [#15649](https://github.com/fastapi/fastapi/pull/15649) by [@tiangolo](https://github.com/tiangolo).",
+          "Changelog breaking change: 🔧 Migrate docs from MkDocs to Zensical. PR [#15563](https://github.com/fastapi/fastapi/pull/15563) by [@tiangolo](https://github.com/tiangolo)."
+        ],
+        "detected_pitfalls": [
+          "CI workflow `pre-commit.yml` contains steps allowed to fail (`continue-on-error: true`)."
+        ]
+      },
+      "docs_url": null,
+      "tags": []
+    },
+    {
       "id": "generic.conventions.repo_layout",
       "category": "structure",
       "title": "Standard repository layout",

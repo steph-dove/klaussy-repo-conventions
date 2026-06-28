@@ -1,6 +1,6 @@
 # Conventions Review Report
 
-*Generated: 2026-06-28 12:30:45*
+*Generated: 2026-06-28 12:33:36*
 
 ## Score Legend
 
@@ -14,11 +14,11 @@
 
 ## Summary
 
-- **Conventions Reviewed:** 64
+- **Conventions Reviewed:** 65
 - **Average Score:** 3.6/5 (Good)
 - **Excellent (5):** 15
 - **Good (4):** 17
-- **Average (3):** 26
+- **Average (3):** 27
 - **Below Average (2):** 3
 - **Poor (1):** 3
 
@@ -60,6 +60,7 @@
 | Parametrized tests | 4/5 | Good |
 | CI/CD: GitHub Actions | 3/5 | Average |
 | Config access patterns | 3/5 | Average |
+| Project history | 3/5 | Average |
 | URL-based API versioning | 3/5 | Average |
 | Background jobs with FastAPI BackgroundTasks | 3/5 | Average |
 | Data classes: Pydantic models | 3/5 | Average |
@@ -416,6 +417,17 @@
 **Assessment:** Convention detected with 88% confidence
 
 **Suggestion:** Review this convention and consider industry best practices for improvement.
+
+---
+
+#### Project history
+
+**ID:** `generic.conventions.history`  
+**Score:** 3/5 (Average)
+
+**Assessment:** Convention detected with 80% confidence
+
+**Suggestion:** Add docstrings to public functions and classes explaining purpose and parameters.
 
 ---
 
@@ -781,89 +793,92 @@ Conventions sorted by priority (lowest scores first):
 8. **Config access patterns** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-9. **URL-based API versioning** (Score: 3/5)
+9. **Project history** (Score: 3/5)
+   - Add docstrings to public functions and classes explaining purpose and parameters.
+
+10. **URL-based API versioning** (Score: 3/5)
    - Apply consistent versioning across all API routes.
 
-10. **Background jobs with FastAPI BackgroundTasks** (Score: 3/5)
+11. **Background jobs with FastAPI BackgroundTasks** (Score: 3/5)
    - Use appropriate synchronization primitives and handle async errors properly.
 
-11. **Data classes: Pydantic models** (Score: 3/5)
+12. **Data classes: Pydantic models** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-12. **lowercase constant naming** (Score: 3/5)
+13. **lowercase constant naming** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-13. **File I/O with context managers** (Score: 3/5)
+14. **File I/O with context managers** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-14. **Custom decorator pattern: @deprecated** (Score: 3/5)
+15. **Custom decorator pattern: @deprecated** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-15. **Default connection pooling** (Score: 3/5)
+16. **Default connection pooling** (Score: 3/5)
    - Configure pool_size, max_overflow, and pool_pre_ping for production reliability.
 
-16. **FastAPI-style session dependency injection** (Score: 3/5)
+17. **FastAPI-style session dependency injection** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-17. **Dependency health** (Score: 3/5)
+18. **Dependency health** (Score: 3/5)
    - Add automated testing, linting, and deployment steps to your CI/CD pipeline.
 
-18. **Enum usage: Enum** (Score: 3/5)
+19. **Enum usage: Enum** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-19. **Mixed exception naming conventions** (Score: 3/5)
+20. **Mixed exception naming conventions** (Score: 3/5)
    - Standardize exception naming to use *Error suffix consistently.
 
-20. **Error wrapper pattern: time.sleep** (Score: 3/5)
+21. **Error wrapper pattern: time.sleep** (Score: 3/5)
    - Consider using 'time.sleep' more consistently across all exception handlers.
 
-21. **Python import path (flat-layout)** (Score: 3/5)
+22. **Python import path (flat-layout)** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-22. **Absolute imports preferred** (Score: 3/5)
+23. **Absolute imports preferred** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-23. **JSON library: mixed** (Score: 3/5)
+24. **JSON library: mixed** (Score: 3/5)
    - Consider orjson for 10x faster JSON serialization with minimal API changes.
 
-24. **Uses Python standard logging** (Score: 3/5)
+25. **Uses Python standard logging** (Score: 3/5)
    - Consider adopting structlog or Loguru for structured logging with better context propagation.
 
-25. **Cursor-based pagination** (Score: 3/5)
+26. **Cursor-based pagination** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-26. **Pre-commit hooks configured** (Score: 3/5)
+27. **Pre-commit hooks configured** (Score: 3/5)
    - Add ruff to pre-commit for fast linting and formatting.
 
-27. **Response envelope classes** (Score: 3/5)
+28. **Response envelope classes** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-28. **Modern f-string formatting** (Score: 3/5)
+29. **Modern f-string formatting** (Score: 3/5)
    - Prefer f-strings for readability and performance over .format() or %.
 
-29. **Test naming: Simple style (test_feature)** (Score: 3/5)
+30. **Test naming: Simple style (test_feature)** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-30. **Distributed test files** (Score: 3/5)
+31. **Distributed test files** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-31. **Mixed validation approaches** (Score: 3/5)
+32. **Mixed validation approaches** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-32. **Plain assert statements** (Score: 3/5)
+33. **Plain assert statements** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-33. **OAuth2 authentication** (Score: 4/5)
+34. **OAuth2 authentication** (Score: 4/5)
    - Use a dedicated password hashing library (passlib or bcrypt) for secure credential storage.
 
-34. **Caching: functools.lru_cache** (Score: 4/5)
+35. **Caching: functools.lru_cache** (Score: 4/5)
    - Consider Redis for distributed caching in production environments.
 
-35. **Semi-centralized exception handling** (Score: 4/5)
+36. **Semi-centralized exception handling** (Score: 4/5)
    - Consider centralizing exception handlers for easier maintenance.
 
-36. **OpenAPI with FastAPI (default)** (Score: 4/5)
+37. **OpenAPI with FastAPI (default)** (Score: 4/5)
    - Customize OpenAPI metadata with tags, descriptions, and examples for better docs.
 
-37. **Primary schema library: Pydantic** (Score: 4/5)
+38. **Primary schema library: Pydantic** (Score: 4/5)
    - Ensure consistent schema library usage across the codebase.

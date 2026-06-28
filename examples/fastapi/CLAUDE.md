@@ -69,8 +69,10 @@ For the repository directory map and file layout, see [.claude/directory-map.md]
 
 ## Decision Log
 
-- *No architectural decisions recorded yet. Add major design and library choices here.*
+- Changelog breaking change: 🔥 Remove slim package stub, deprecated for a while. PR [#15649](https://github.com/fastapi/fastapi/pull/15649) by [@tiangolo](https://github.com/tiangolo).
+
+- Changelog breaking change: 🔧 Migrate docs from MkDocs to Zensical. PR [#15563](https://github.com/fastapi/fastapi/pull/15563) by [@tiangolo](https://github.com/tiangolo).
 
 ## Known Pitfalls
 
-- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*
+- CI workflow `pre-commit.yml` contains steps allowed to fail (`continue-on-error: true`).

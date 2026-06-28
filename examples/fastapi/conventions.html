@@ -251,7 +251,7 @@
     <div class="header">
         <div>
             <h1>Conventions Report</h1>
-            <p class="meta">Generated: 2026-06-28 12:30:45 | Repository: <code>/Users/stephaniedover/projects/klaussy-repo-conventions/fastapi_repo</code></p>
+            <p class="meta">Generated: 2026-06-28 12:33:36 | Repository: <code>/Users/stephaniedover/projects/klaussy-repo-conventions/fastapi_repo</code></p>
         </div>
         <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
     </div>
@@ -262,7 +262,7 @@
         <p class="project-description" style="margin-bottom: 20px; font-size: 1.1em; color: #adb5bd; font-style: italic;">FastAPI framework, high performance, easy to learn, fast to code, ready for production</p>
         <div class="summary-cards">
             <div class="card">
-                <div class="card-value">64</div>
+                <div class="card-value">65</div>
                 <div class="card-label">Conventions Detected</div>
             </div>
             <div class="card">
@@ -288,7 +288,7 @@
                 <div class="card-label">Good (4)</div>
             </div>
             <div class="card">
-                <div class="card-value" style="color: #ffc107;">26</div>
+                <div class="card-value" style="color: #ffc107;">27</div>
                 <div class="card-label">Average (3)</div>
             </div>
             <div class="card">
@@ -677,6 +677,16 @@
                 <td>configuration</td>
                 <td><span class="badge" style="background-color: #ffc107;">3/5 - Average</span></td>
                 <td>88%</td>
+                <td></td>
+            </tr>
+        
+            <tr data-language="generic" data-category="documentation" data-score="3">
+                <td><code>generic.conventions.history</code></td>
+                <td>Project history</td>
+                <td>generic</td>
+                <td>documentation</td>
+                <td><span class="badge" style="background-color: #ffc107;">3/5 - Average</span></td>
+                <td>80%</td>
                 <td></td>
             </tr>
         
@@ -3293,6 +3303,42 @@ from fastapi.openapi.models import Schema, SchemaType
                 <div>
                     <strong>Statistics:</strong>
                     <ul><li><code>access_style</code>: library (pydantic_settings)</li><li><code>env_access_counts</code>: {&#x27;python_os_environ&#x27;: 2}</li><li><code>libraries</code>: {&#x27;pydantic_settings&#x27;: 21}</li><li><code>secrets_managers</code>: {}</li><li><code>total_env_accesses</code>: 2</li></ul>
+                </div>
+            
+                    
+                </div>
+            </div>
+        
+            <div class="rule-detail" id="rule-generic-conventions-history">
+                <div class="rule-header" onclick="toggleRule(this)">
+                    <div>
+                        <strong>Project history</strong>
+                        <span class="meta" style="margin-left: 10px;"><code>generic.conventions.history</code></span>
+                    </div>
+                    <div>
+                        <span class="badge" style="background-color: #ffc107;">3/5 - Average</span>
+                        <span class="expand-icon">&#9654;</span>
+                    </div>
+                </div>
+                <div class="rule-body">
+                    <div class="rule-meta">
+                        <span><strong>Category:</strong> documentation</span>
+                        <span><strong>Language:</strong> generic</span>
+                        <span><strong>Confidence:</strong> 80%</span>
+                        
+                        
+                    </div>
+                    <p>Detected 2 decision log items and 1 pitfalls.</p>
+                    <p><strong>Assessment:</strong> Convention detected with 80% confidence</p>
+                    
+                <div class="suggestion">
+                    <strong>Suggestion:</strong> Add docstrings to public functions and classes explaining purpose and parameters.
+                </div>
+            
+                    
+                <div>
+                    <strong>Statistics:</strong>
+                    <ul><li><code>detected_decisions</code>: [&#x27;Changelog breaking change: 🔥 Remove slim package stub, deprecated for a while. PR [#15649](https://github.com/fastapi/fastapi/pull/15649) by [@tiangolo](https://github.com/tiangolo).&#x27;, &#x27;Changelog breaking change: 🔧 Migrate docs from MkDocs to Zensical. PR [#15563](https://github.com/fastapi/fastapi/pull/15563) by [@tiangolo](https://github.com/tiangolo).&#x27;]</li><li><code>detected_pitfalls</code>: [&#x27;CI workflow `pre-commit.yml` contains steps allowed to fail (`continue-on-error: true`).&#x27;]</li></ul>
                 </div>
             
                     
