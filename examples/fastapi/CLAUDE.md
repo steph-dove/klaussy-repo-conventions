@@ -10,6 +10,8 @@ FastAPI framework, high performance, easy to learn, fast to code, ready for prod
 
 ## Directory Structure
 
+For the complete, uncollapsed directory structure, see [.claude/directory-map.md](.claude/directory-map.md).
+
 - `.github/` — GitHub configuration
   - `DISCUSSION_TEMPLATE/`
     - `questions.yml`

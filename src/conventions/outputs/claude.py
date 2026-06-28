@@ -294,7 +294,8 @@ def _build_directory_map_section(include_rules: list[ConventionRule]) -> str:
         return ""
 
     lines = ["## Directory Structure\n"]
-    _render_tree(tree, lines, indent=0)
+    lines.append("For the complete, uncollapsed directory structure, see [.claude/directory-map.md](.claude/directory-map.md).\n")
+    _render_tree(tree, lines, indent=0, collapse=True)
     lines.append("")
     return "\n".join(lines)
 
@@ -306,7 +307,7 @@ _TEST_TOOL_DIRS = frozenset({
 })
 
 
-def _render_tree(tree: dict, lines: list[str], indent: int) -> None:
+def _render_tree(tree: dict, lines: list[str], indent: int, collapse: bool = True) -> None:
     """Recursively render a directory tree into markdown lines.
 
     Renders subdirectories first, then files (with key files summarized if numerous).
@@ -340,11 +341,11 @@ def _render_tree(tree: dict, lines: list[str], indent: int) -> None:
             continue
 
         if children:
-            _render_tree(children, lines, indent + 1)
+            _render_tree(children, lines, indent + 1, collapse)
 
     # 2. Render files
     sorted_files = sorted(files.keys())
-    if len(sorted_files) <= 10:
+    if not collapse or len(sorted_files) <= 10:
         for name in sorted_files:
             node = files[name]
             purpose = node.get("purpose", "")
@@ -1514,6 +1515,31 @@ def generate_claude_md(output: ConventionsOutput) -> str:
     return "\n".join(sections)
 
 
+def generate_directory_map_md(output: ConventionsOutput) -> str:
+    """Generate the full, uncollapsed directory map markdown."""
+    layout_rule = None
+    for rule in output.rules:
+        if _get_suffix(rule) == "repo_layout":
+            layout_rule = rule
+            break
+
+    if not layout_rule:
+        return "# Directory Map\n\nNo directory structure detected.\n"
+
+    tree = _get_stat(layout_rule, "directory_tree", {})
+    if not tree:
+        return "# Directory Map\n\nNo directory structure detected.\n"
+
+    lines = [
+        "# Directory Map\n",
+        "> This file contains the full, uncollapsed directory structure of the repository.\n",
+        "## Directory Structure\n",
+    ]
+    _render_tree(tree, lines, indent=0, collapse=False)
+    lines.append("")
+    return "\n".join(lines)
+
+
 def write_claude_md(
     output: ConventionsOutput,
     repo_root: Path,
@@ -1539,10 +1565,15 @@ def write_claude_md(
     """
     content = generate_claude_md(output)
 
+    # Always generate and write the full directory map to .claude/directory-map.md
+    claude_dir = repo_root / ".claude"
+    claude_dir.mkdir(exist_ok=True)
+    dir_map_path = claude_dir / "directory-map.md"
+    dir_map_content = generate_directory_map_md(output)
+    dir_map_path.write_text(dir_map_content, encoding="utf-8")
+
     if personal:
-        target_dir = repo_root / ".claude"
-        target_dir.mkdir(exist_ok=True)
-        target_path = target_dir / "CLAUDE.md"
+        target_path = claude_dir / "CLAUDE.md"
     else:
         target_path = repo_root / "CLAUDE.md"
 

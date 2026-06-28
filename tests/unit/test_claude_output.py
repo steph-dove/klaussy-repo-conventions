@@ -909,6 +909,34 @@ class TestWriteClaudeMd:
         assert path.exists()
         assert (tmp_path / ".claude").is_dir()
 
+    def test_writes_directory_map_file(self, tmp_path):
+        """write_claude_md always writes .claude/directory-map.md."""
+        output = _make_output([
+            _make_rule(
+                "repo_layout",
+                title="Standard repository layout",
+                stats={
+                    "directory_tree": {
+                        "src": {
+                            "type": "dir",
+                            "children": {
+                                "main.py": {"type": "file"}
+                            }
+                        }
+                    }
+                }
+            )
+        ])
+
+        write_claude_md(output, tmp_path)
+
+        map_path = tmp_path / ".claude" / "directory-map.md"
+        assert map_path.exists()
+        content = map_path.read_text()
+        assert "# Directory Map" in content
+        assert "- `src/`" in content
+        assert "  - `main.py`" in content
+
     def test_creates_claude_dir_if_missing(self, tmp_path):
         """.claude/ directory is created if it doesn't exist."""
         output = _make_output([])
