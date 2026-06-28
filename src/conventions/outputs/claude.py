@@ -309,27 +309,58 @@ _TEST_TOOL_DIRS = frozenset({
 def _render_tree(tree: dict, lines: list[str], indent: int) -> None:
     """Recursively render a directory tree into markdown lines.
 
-    Skips recursing into:
-    - directories with more than 10 children (collections of similar items)
-    - known test tool directories (cypress, e2e, etc.)
+    Renders subdirectories first, then files (with key files summarized if numerous).
     """
     prefix = "  " * indent
-    for name in sorted(tree.keys()):
-        node = tree[name]
+
+    # Split into directories and files
+    dirs = {}
+    files = {}
+    for name, node in tree.items():
+        node_type = node.get("type", "dir")
+        if node_type == "dir" or "children" in node:
+            dirs[name] = node
+        else:
+            files[name] = node
+
+    # 1. Render directories
+    for name in sorted(dirs.keys()):
+        node = dirs[name]
         purpose = node.get("purpose", "")
         children = node.get("children", {})
+
         if purpose:
-            # Truncate long descriptions (often from package.json)
             if len(purpose) > 80:
                 purpose = purpose[:77] + "..."
             lines.append(f"{prefix}- `{name}/` — {purpose}")
         else:
             lines.append(f"{prefix}- `{name}/`")
-        # Skip recursing into test tool dirs and large collections
+
         if name in _TEST_TOOL_DIRS:
             continue
-        if len(children) <= 10:
+
+        if children:
             _render_tree(children, lines, indent + 1)
+
+    # 2. Render files
+    sorted_files = sorted(files.keys())
+    if len(sorted_files) <= 10:
+        for name in sorted_files:
+            node = files[name]
+            purpose = node.get("purpose", "")
+            if purpose:
+                lines.append(f"{prefix}- `{name}` — {purpose}")
+            else:
+                lines.append(f"{prefix}- `{name}`")
+    elif len(sorted_files) > 10:
+        for name in sorted_files[:5]:
+            node = files[name]
+            purpose = node.get("purpose", "")
+            if purpose:
+                lines.append(f"{prefix}- `{name}` — {purpose}")
+            else:
+                lines.append(f"{prefix}- `{name}`")
+        lines.append(f"{prefix}- ... and {len(sorted_files) - 5} more files")
 
 
 def _build_architecture_section(include_rules: list[ConventionRule]) -> str:

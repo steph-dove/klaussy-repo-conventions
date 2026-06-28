@@ -12,23 +12,120 @@ FastAPI framework, high performance, easy to learn, fast to code, ready for prod
 
 - `.github/` — GitHub configuration
   - `DISCUSSION_TEMPLATE/`
+    - `questions.yml`
+    - `translations.yml`
   - `ISSUE_TEMPLATE/`
+    - `config.yml`
+    - `privileged.yml`
   - `workflows/`
+    - `add-to-project.yml`
+    - `build-docs.yml`
+    - `contributors.yml`
+    - `create-draft-release.yml`
+    - `deploy-docs.yml`
+    - ... and 18 more files
+  - `dependabot.yml`
+  - `labeler.yml`
 - `docs/` — documentation
+  - `de/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `en/`
+    - `data/`
+    - `docs/`
+    - `overrides/`
+    - `mkdocs.yml`
+  - `es/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `fr/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `hi/`
+    - `docs/`
+    - `llm-prompt.md`
+    - `mkdocs.yml`
+  - `ja/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `ko/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `pt/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `ru/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `tr/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `uk/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `zh/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `zh-hant/`
+    - `docs/`
+    - `llm-prompt.md`
+  - `language_names.yml`
+  - `missing-translation.md`
 - `fastapi/` — source code
   - `_compat/`
+    - `__init__.py`
+    - `shared.py`
+    - `v2.py`
   - `dependencies/`
+    - `__init__.py`
+    - `models.py`
+    - `utils.py`
   - `middleware/`
+    - `__init__.py`
+    - `asyncexitstack.py`
+    - `cors.py`
+    - `gzip.py`
+    - `httpsredirect.py`
+    - `trustedhost.py`
+    - `wsgi.py`
   - `openapi/`
+    - `__init__.py`
+    - `constants.py`
+    - `docs.py`
+    - `models.py`
+    - `utils.py`
   - `security/`
+    - `__init__.py`
+    - `api_key.py`
+    - `base.py`
+    - `http.py`
+    - `oauth2.py`
+    - `open_id_connect_url.py`
+    - `utils.py`
+  - `__init__.py`
+  - `__main__.py`
+  - `applications.py`
+  - `background.py`
+  - `cli.py`
+  - ... and 19 more files
 - `scripts/` — scripts
   - `playwright/`
   - `tests/`
     - `test_translation_fixer/`
+  - `add_latest_release_date.py`
+  - `contributors.py`
+  - `deploy_docs_status.py`
+  - `doc_parsing_utils.py`
+  - `docs.py`
+  - ... and 14 more files
 - `tests/` — tests
   - `benchmarks/`
+    - `__init__.py`
+    - `test_general_performance.py`
   - `test_modules_same_name_body/`
     - `app/`
+    - `__init__.py`
+    - `test_main.py`
   - `test_request_params/`
     - `test_body/`
     - `test_cookie/`
@@ -37,8 +134,94 @@ FastAPI framework, high performance, easy to learn, fast to code, ready for prod
     - `test_header/`
     - `test_path/`
     - `test_query/`
+    - `__init__.py`
   - `test_tutorial/`
+    - `test_additional_responses/`
+    - `test_additional_status_codes/`
+    - `test_advanced_middleware/`
+    - `test_async_tests/`
+    - `test_authentication_error_status_code/`
+    - `test_background_tasks/`
+    - `test_behind_a_proxy/`
+    - `test_bigger_applications/`
+    - `test_body/`
+    - `test_body_fields/`
+    - `test_body_multiple_params/`
+    - `test_body_nested_models/`
+    - `test_body_updates/`
+    - `test_conditional_openapi/`
+    - `test_configure_swagger_ui/`
+    - `test_cookie_param_models/`
+    - `test_cookie_params/`
+    - `test_cors/`
+    - `test_custom_docs_ui/`
+    - `test_custom_request_and_route/`
+    - `test_custom_response/`
+    - `test_dataclasses/`
+    - `test_debugging/`
+    - `test_dependencies/`
+    - `test_encoder/`
+    - `test_events/`
+    - `test_extending_openapi/`
+    - `test_extra_data_types/`
+    - `test_extra_models/`
+    - `test_first_steps/`
+    - `test_generate_clients/`
+    - `test_graphql/`
+    - `test_handling_errors/`
+    - `test_header_param_models/`
+    - `test_header_params/`
+    - `test_json_base64_bytes/`
+    - `test_metadata/`
+    - `test_middleware/`
+    - `test_openapi_callbacks/`
+    - `test_openapi_webhooks/`
+    - `test_path_operation_advanced_configurations/`
+    - `test_path_operation_configurations/`
+    - `test_path_params/`
+    - `test_path_params_numeric_validations/`
+    - `test_python_types/`
+    - `test_query_param_models/`
+    - `test_query_params/`
+    - `test_query_params_str_validations/`
+    - `test_request_files/`
+    - `test_request_form_models/`
+    - `test_request_forms/`
+    - `test_request_forms_and_files/`
+    - `test_response_change_status_code/`
+    - `test_response_cookies/`
+    - `test_response_directly/`
+    - `test_response_headers/`
+    - `test_response_model/`
+    - `test_response_status_code/`
+    - `test_schema_extra_example/`
+    - `test_security/`
+    - `test_separate_openapi_schemas/`
+    - `test_server_sent_events/`
+    - `test_settings/`
+    - `test_sql_databases/`
+    - `test_static_files/`
+    - `test_stream_data/`
+    - `test_stream_json_lines/`
+    - `test_strict_content_type/`
+    - `test_sub_applications/`
+    - `test_templates/`
+    - `test_testing/`
+    - `test_testing_dependencies/`
+    - `test_using_request_directly/`
+    - `test_websockets/`
+    - `test_wsgi/`
+    - `__init__.py`
   - `test_validate_response_recursive/`
+    - `__init__.py`
+    - `app.py`
+    - `test_validate_response_recursive.py`
+  - `__init__.py`
+  - `forward_reference_type.py`
+  - `main.py`
+  - `test_additional_properties.py`
+  - `test_additional_properties_bool.py`
+  - ... and 204 more files
 
 ## Architecture
 

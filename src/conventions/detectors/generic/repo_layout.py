@@ -169,7 +169,7 @@ class GenericRepoLayoutDetector(BaseDetector):
     ) -> dict:
         """Recursively scan directory tree, returning nested dict.
 
-        Returns: {child_name: {"purpose": str, "children": {nested...}}}
+        Returns: {child_name: {"type": "dir"|"file", "purpose": str, "children": {nested...}}}
         """
         if current_depth >= max_depth:
             return {}
@@ -181,16 +181,30 @@ class GenericRepoLayoutDetector(BaseDetector):
             return {}
 
         for child in children:
-            if not child.is_dir():
-                continue
             name = child.name
-            if name in _SKIP_DIRS or (name.startswith(".") and current_depth > 0):
+            if name in _SKIP_DIRS:
+                continue
+            if name.startswith(".") and current_depth > 0:
                 continue
 
             rel = str(child.relative_to(repo_root))
             purpose = ws_descriptions.get(rel, "")
-            subtree = cls._scan_tree(child, repo_root, ws_descriptions, max_depth, current_depth + 1)
-            result[name] = {"purpose": purpose, "children": subtree}
+
+            if child.is_dir():
+                subtree = cls._scan_tree(child, repo_root, ws_descriptions, max_depth, current_depth + 1)
+                result[name] = {"type": "dir", "purpose": purpose, "children": subtree}
+            else:
+                # Skip compiled, transient, binary and image files
+                ext = child.suffix.lower()
+                if ext in (
+                    ".pyc", ".pyo", ".pyd", ".so", ".dll", ".dylib", ".exe",
+                    ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg",
+                    ".zip", ".tar", ".gz", ".db", ".sqlite", ".DS_Store"
+                ):
+                    continue
+                if name.startswith("."):
+                    continue
+                result[name] = {"type": "file", "purpose": purpose}
 
         return result
 

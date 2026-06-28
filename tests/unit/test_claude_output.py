@@ -1026,3 +1026,40 @@ class TestAgentCompatibilityFeatures:
         assert "src_api_users_py --> src_services_userService_py" in result
         assert "src_services_userService_py --> src_db_userRepo_py" in result
 
+    def test_directory_structure_rendering(self):
+        """Directory structure in CLAUDE.md renders subdirectories and files."""
+        rules = [
+            _make_rule(
+                "repo_layout",
+                title="Standard repository layout",
+                stats={
+                    "directory_tree": {
+                        "src": {
+                            "type": "dir",
+                            "purpose": "source code",
+                            "children": {
+                                "main.py": {"type": "file", "purpose": "entrypoint"},
+                                "utils.py": {"type": "file"},
+                                "services": {
+                                    "type": "dir",
+                                    "children": {
+                                        "user.py": {"type": "file"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        ]
+        output = _make_output(rules)
+        result = generate_claude_md(output)
+
+        assert "## Directory Structure" in result
+        assert "- `src/` — source code" in result
+        assert "  - `services/`" in result
+        assert "    - `user.py`" in result
+        assert "  - `main.py` — entrypoint" in result
+        assert "  - `utils.py`" in result
+
+

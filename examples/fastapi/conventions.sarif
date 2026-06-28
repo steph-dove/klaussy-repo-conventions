@@ -2079,16 +2079,138 @@
                   "purpose": "GitHub configuration",
                   "children": {
                     "DISCUSSION_TEMPLATE": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "questions.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "translations.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
                     },
                     "ISSUE_TEMPLATE": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "config.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "privileged.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
+                    },
+                    "dependabot.yml": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "labeler.yml": {
+                      "type": "file",
+                      "purpose": ""
                     },
                     "workflows": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "add-to-project.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "build-docs.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "contributors.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "create-draft-release.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "deploy-docs.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "detect-conflicts.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "guard-dependencies.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "issue-manager.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "label-approved.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "labeler.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "latest-changes.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "notify-translations.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "people.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "pre-commit.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "prepare-release.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "publish.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "smokeshow.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "sponsors.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "test-redistribute.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "test.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "topic-repos.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "translate.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "zizmor.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
                     }
                   }
                 },
@@ -2096,127 +2218,219 @@
                   "purpose": "documentation",
                   "children": {
                     "de": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "en": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "data": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
+                        "mkdocs.yml": {
+                          "type": "file",
+                          "purpose": ""
+                        },
                         "overrides": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         }
                       }
                     },
                     "es": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "fr": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "hi": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "mkdocs.yml": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "ja": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "ko": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
+                    "language_names.yml": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "missing-translation.md": {
+                      "type": "file",
+                      "purpose": ""
+                    },
                     "pt": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "ru": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "tr": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "uk": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "zh": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
                     "zh-hant": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "docs": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
+                        },
+                        "llm-prompt.md": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     }
@@ -2225,432 +2439,1686 @@
                 "fastapi": {
                   "purpose": "source code",
                   "children": {
+                    "__init__.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "__main__.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
                     "_compat": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "shared.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "v2.py": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
+                    },
+                    "applications.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "background.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "cli.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "concurrency.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "datastructures.py": {
+                      "type": "file",
+                      "purpose": ""
                     },
                     "dependencies": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "models.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "utils.py": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
+                    },
+                    "encoders.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "exception_handlers.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "exceptions.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "logger.py": {
+                      "type": "file",
+                      "purpose": ""
                     },
                     "middleware": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "asyncexitstack.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "cors.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "gzip.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "httpsredirect.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "trustedhost.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "wsgi.py": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
                     },
                     "openapi": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "constants.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "docs.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "models.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "utils.py": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
+                    },
+                    "param_functions.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "params.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "py.typed": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "requests.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "responses.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "routing.py": {
+                      "type": "file",
+                      "purpose": ""
                     },
                     "security": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "api_key.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "base.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "http.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "oauth2.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "open_id_connect_url.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "utils.py": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
+                    },
+                    "sse.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "staticfiles.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "templating.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "testclient.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "types.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "utils.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "websockets.py": {
+                      "type": "file",
+                      "purpose": ""
                     }
                   }
                 },
                 "scripts": {
                   "purpose": "scripts",
                   "children": {
+                    "add_latest_release_date.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "contributors.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "deploy_docs_status.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "doc_parsing_utils.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "docs.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "format.sh": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "general-llm-prompt.md": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "label_approved.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "lint.sh": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "notify_translations.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "people.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
                     "playwright": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "cookie_param_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "header_param_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "json_base64_bytes": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "query_param_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "request_form_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "separate_openapi_schemas": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "sql_databases": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         }
                       }
                     },
+                    "prepare_release.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "sponsors.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test-cov-html.sh": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test-cov.sh": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test.sh": {
+                      "type": "file",
+                      "purpose": ""
+                    },
                     "tests": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
                         "test_translation_fixer": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         }
                       }
+                    },
+                    "topic_repos.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "translate.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "translation_fixer.py": {
+                      "type": "file",
+                      "purpose": ""
                     }
                   }
                 },
                 "tests": {
                   "purpose": "tests",
                   "children": {
-                    "benchmarks": {
-                      "purpose": "",
-                      "children": {}
+                    "__init__.py": {
+                      "type": "file",
+                      "purpose": ""
                     },
-                    "test_modules_same_name_body": {
+                    "benchmarks": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
-                        "app": {
-                          "purpose": "",
-                          "children": {}
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "test_general_performance.py": {
+                          "type": "file",
+                          "purpose": ""
                         }
                       }
                     },
-                    "test_request_params": {
+                    "forward_reference_type.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "main.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_properties.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_properties_bool.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_response_extra.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_responses_bad.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_responses_custom_model_in_callback.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_responses_custom_validationerror.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_responses_default_validationerror.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_responses_response_class.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_responses_router.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_additional_responses_union_duplicate_anyof.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_allow_inf_nan_in_enforcing.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_ambiguous_params.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_annotated.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_application.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_arbitrary_types.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_callable_endpoint.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_compat.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_computed_fields.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_custom_middleware_exception.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_custom_route_class.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_custom_schema_fields.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_custom_swagger_ui_redirect.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_datastructures.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_datetime_custom_encoder.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_default_response_class.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_default_response_class_router.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependencies_utils.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_after_yield_raise.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_after_yield_streaming.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_after_yield_websockets.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_cache.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_class.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_contextmanager.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_contextvars.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_duplicates.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_overrides.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_paramless.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_partial.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_pep695.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_security_overrides.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_wrapped.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_yield_except_httpexception.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_yield_scope.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dependency_yield_scope_websockets.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_depends_hashable.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_deprecated_openapi_prefix.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_deprecated_responses.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_dump_json_fast_path.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_duplicate_models_openapi.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_empty_router.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_enforce_once_required_parameter.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_exception_handlers.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_extra_routes.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_fastapi_cli.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_file_and_form_order_issue_9116.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_filter_pydantic_sub_model_pv2.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_form_default.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_forms_from_non_typing_sequences.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_forms_single_model.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_forms_single_param.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_frontend.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_generate_unique_id_function.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_generic_parameterless_depends.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_get_model_definitions_formfeed_escape.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_get_request_body.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_http_connection_injection.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_include_route.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_include_router_defaults_overrides.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_infer_param_optionality.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_inherited_custom_class.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_invalid_path_param.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_invalid_sequence_param.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_json_type.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_jsonable_encoder.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_list_bytes_file_order_preserved_issue_14811.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_local_docs.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_modules_same_name_body": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "app": {
+                          "type": "dir",
+                          "purpose": "",
+                          "children": {}
+                        },
+                        "test_main.py": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
+                    },
+                    "test_multi_body_errors.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_multi_query_errors.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_multipart_installation.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_no_schema_split.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_no_swagger_ui_redirect.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_cache_root_path.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_examples.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_model_description_trim_on_formfeed.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_query_parameter_extension.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_route_extensions.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_schema_type.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_separate_input_output_schemas.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_openapi_servers.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_operations_signatures.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_optional_file_list.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_orjson_response_class.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_param_class.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_param_in_path_and_dependency.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_param_include_in_schema.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_params_repr.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_path.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_prepare_release.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_put_no_body.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_pydantic_v1_error.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_pydanticv2_dataclasses_uuid_stringified_annotations.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_query.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_query_cookie_header_model_extra_params.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_read_with_orm_mode.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_regex_deprecated_body.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_regex_deprecated_params.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_repeated_cookie_headers.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_repeated_dependency_schema.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_repeated_parameter_alias.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_request_body_parameters_media_type.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_request_param_model_by_alias.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_request_params": {
+                      "type": "dir",
+                      "purpose": "",
+                      "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
                         "test_body": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_cookie": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_file": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_form": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_header": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_path": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_query": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         }
                       }
                     },
+                    "test_required_noneable.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_by_alias.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_change_status_code.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_class_no_mediatype.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_code_no_body.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_dependency.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_model_as_return_annotation.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_model_data_filter.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_model_data_filter_no_inheritance.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_model_default_factory.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_model_include_exclude.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_model_invalid.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_model_sub_types.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_response_set_response_code_empty.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_return_none_stringified_annotations.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_route_scope.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_router_circular_import.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_router_events.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_router_include_context.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_router_prefix_with_template.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_router_redirect_slashes.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_schema_compat_pydantic_v2.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_schema_extra_examples.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_schema_ref_pydantic_v2.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_cookie.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_cookie_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_cookie_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_header.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_header_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_header_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_query.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_query_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_api_key_query_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_base.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_base_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_base_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_basic_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_basic_realm.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_basic_realm_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_bearer.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_bearer_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_bearer_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_digest.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_digest_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_http_digest_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_authorization_code_bearer.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_authorization_code_bearer_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_authorization_code_bearer_scopes_openapi.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_authorization_code_bearer_scopes_openapi_simple.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_optional_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_password_bearer_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_oauth2_password_bearer_optional_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_openid_connect.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_openid_connect_description.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_openid_connect_optional.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_scopes.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_scopes_dont_propagate.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_security_scopes_sub_dependency.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_serialize_response.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_serialize_response_dataclass.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_serialize_response_model.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_skip_defaults.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_sse.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_starlette_exception.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_starlette_urlconvertors.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_stream_bare_type.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_stream_cancellation.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_stream_json_validation_error.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_strict_content_type_app_level.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_strict_content_type_nested.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_strict_content_type_router_level.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_stringified_annotation_dependency.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_stringified_annotation_dependency_py314.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_stringified_annotations_simple.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_sub_callbacks.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_swagger_ui_escape.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_swagger_ui_init_oauth.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_top_level_security_scheme_in_openapi.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_tuples.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
                     "test_tutorial": {
+                      "type": "dir",
                       "purpose": "",
                       "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
                         "test_additional_responses": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_additional_status_codes": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_advanced_middleware": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_async_tests": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_authentication_error_status_code": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_background_tasks": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_behind_a_proxy": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_bigger_applications": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_body": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_body_fields": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_body_multiple_params": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_body_nested_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_body_updates": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_conditional_openapi": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_configure_swagger_ui": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_cookie_param_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_cookie_params": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_cors": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_custom_docs_ui": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_custom_request_and_route": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_custom_response": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_dataclasses": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_debugging": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_dependencies": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_encoder": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_events": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_extending_openapi": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_extra_data_types": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_extra_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_first_steps": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_generate_clients": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_graphql": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_handling_errors": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_header_param_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_header_params": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_json_base64_bytes": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_metadata": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_middleware": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_openapi_callbacks": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_openapi_webhooks": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_path_operation_advanced_configurations": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_path_operation_configurations": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_path_params": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_path_params_numeric_validations": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_python_types": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_query_param_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_query_params": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_query_params_str_validations": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_request_files": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_request_form_models": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_request_forms": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_request_forms_and_files": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_response_change_status_code": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_response_cookies": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_response_directly": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_response_headers": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_response_model": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_response_status_code": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_schema_extra_example": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_security": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_separate_openapi_schemas": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_server_sent_events": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_settings": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_sql_databases": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_static_files": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_stream_data": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_stream_json_lines": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_strict_content_type": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_sub_applications": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_templates": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_testing": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_testing_dependencies": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_using_request_directly": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_websockets": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         },
                         "test_wsgi": {
+                          "type": "dir",
                           "purpose": "",
                           "children": {}
                         }
                       }
                     },
+                    "test_typing_python39.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_union_body.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_union_body_discriminator.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_union_body_discriminator_annotated.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_union_forms.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_union_inherited_body.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_validate_response.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_validate_response_dataclass.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
                     "test_validate_response_recursive": {
+                      "type": "dir",
                       "purpose": "",
-                      "children": {}
+                      "children": {
+                        "__init__.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "app.py": {
+                          "type": "file",
+                          "purpose": ""
+                        },
+                        "test_validate_response_recursive.py": {
+                          "type": "file",
+                          "purpose": ""
+                        }
+                      }
+                    },
+                    "test_validation_error_context.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_webhooks_security.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_wrapped_method_forward_reference.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_ws_dependencies.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "test_ws_router.py": {
+                      "type": "file",
+                      "purpose": ""
+                    },
+                    "utils.py": {
+                      "type": "file",
+                      "purpose": ""
                     }
                   }
                 }
@@ -7508,7 +8976,7 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "startTimeUtc": "2026-06-28T19:15:04.598081+00:00",
+          "startTimeUtc": "2026-06-28T19:19:42.329453+00:00",
           "workingDirectory": {
             "uri": "/Users/stephaniedover/projects/klaussy-repo-conventions/fastapi_repo"
           }
