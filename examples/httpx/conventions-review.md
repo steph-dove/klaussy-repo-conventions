@@ -1,6 +1,6 @@
 # Conventions Review Report
 
-*Generated: 2026-06-28 12:35:12*
+*Generated: 2026-06-28 15:19:52*
 
 ## Score Legend
 
@@ -14,13 +14,13 @@
 
 ## Summary
 
-- **Conventions Reviewed:** 48
-- **Average Score:** 3.2/5 (Average)
+- **Conventions Reviewed:** 47
+- **Average Score:** 3.3/5 (Average)
 - **Excellent (5):** 8
 - **Good (4):** 6
 - **Average (3):** 25
 - **Below Average (2):** 7
-- **Poor (1):** 2
+- **Poor (1):** 1
 
 ## Scores Overview
 
@@ -72,7 +72,6 @@
 | Error wrapper pattern: str | 2/5 | Below Average |
 | Limited exception chaining | 2/5 | Below Average |
 | Mocking with pytest monkeypatch fixture | 2/5 | Below Average |
-| Password hashing: hashlib (not recommended) | 1/5 | Poor |
 | Infrequent timeout specification | 1/5 | Poor |
 
 ## Detailed Reviews
@@ -569,17 +568,6 @@
 
 ### Poor (1/5)
 
-#### Password hashing: hashlib (not recommended)
-
-**ID:** `python.conventions.password_hashing`  
-**Score:** 1/5 (Poor)
-
-**Assessment:** Uses hashlib for password hashing
-
-**Suggestion:** CRITICAL: hashlib is not suitable for passwords. Use argon2-cffi or bcrypt immediately.
-
----
-
 #### Infrequent timeout specification
 
 **ID:** `python.conventions.timeouts`  
@@ -595,110 +583,107 @@
 
 Conventions sorted by priority (lowest scores first):
 
-1. **Password hashing: hashlib (not recommended)** (Score: 1/5)
-   - CRITICAL: hashlib is not suitable for passwords. Use argon2-cffi or bcrypt immediately.
-
-2. **Infrequent timeout specification** (Score: 1/5)
+1. **Infrequent timeout specification** (Score: 1/5)
    - Add explicit timeouts to HTTP client calls. Found 445 calls without timeouts.
 
-3. **Standard repository files** (Score: 2/5)
+2. **Standard repository files** (Score: 2/5)
    - Review this convention and consider industry best practices for improvement.
 
-4. **Partial docstring coverage** (Score: 2/5)
+3. **Partial docstring coverage** (Score: 2/5)
    - Add docstrings to public functions and classes. Focus on explaining the 'why' and documenting parameters/return values.
 
-5. **Environment config: raw os.environ** (Score: 2/5)
+4. **Environment config: raw os.environ** (Score: 2/5)
    - Use Pydantic Settings or Dynaconf for type-safe, validated configuration.
 
-6. **Mixed exception naming conventions** (Score: 2/5)
+5. **Mixed exception naming conventions** (Score: 2/5)
    - Standardize exception naming to use *Error suffix consistently.
 
-7. **Error wrapper pattern: str** (Score: 2/5)
+6. **Error wrapper pattern: str** (Score: 2/5)
    - Consider using 'str' more consistently across all exception handlers.
 
-8. **Limited exception chaining** (Score: 2/5)
+7. **Limited exception chaining** (Score: 2/5)
    - Use 'raise X from Y' for context or 'raise X from None' to suppress chain.
 
-9. **Mocking with pytest monkeypatch fixture** (Score: 2/5)
+8. **Mocking with pytest monkeypatch fixture** (Score: 2/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-10. **CI/CD: GitHub Actions** (Score: 3/5)
+9. **CI/CD: GitHub Actions** (Score: 3/5)
    - Add automated testing, linting, and deployment steps to your CI/CD pipeline.
 
-11. **CI/CD best practices** (Score: 3/5)
+10. **CI/CD best practices** (Score: 3/5)
    - Add automated testing, linting, and deployment steps to your CI/CD pipeline.
 
-12. **Config access patterns** (Score: 3/5)
+11. **Config access patterns** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-13. **Project history** (Score: 3/5)
+12. **Project history** (Score: 3/5)
    - Add docstrings to public functions and classes explaining purpose and parameters.
 
-14. **Data classes: NamedTuple** (Score: 3/5)
+13. **Data classes: NamedTuple** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-15. **lowercase constant naming** (Score: 3/5)
+14. **lowercase constant naming** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-16. **HTTP clients with context managers** (Score: 3/5)
+15. **HTTP clients with context managers** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-17. **Custom decorator pattern: @click.option** (Score: 3/5)
+16. **Custom decorator pattern: @click.option** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-18. **Dependency health** (Score: 3/5)
+17. **Dependency health** (Score: 3/5)
    - Add automated testing, linting, and deployment steps to your CI/CD pipeline.
 
-19. **Mixed docstring styles** (Score: 3/5)
+18. **Mixed docstring styles** (Score: 3/5)
    - Standardize remaining docstrings to follow the primary style consistently.
 
-20. **Enum usage: Enum** (Score: 3/5)
+19. **Enum usage: Enum** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-21. **Python import path (flat-layout)** (Score: 3/5)
+20. **Python import path (flat-layout)** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-22. **Absolute imports preferred** (Score: 3/5)
+21. **Absolute imports preferred** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-23. **JSON library: stdlib json** (Score: 3/5)
+22. **JSON library: stdlib json** (Score: 3/5)
    - Consider orjson for 10x faster JSON serialization with minimal API changes.
 
-24. **Lock file: requirements.txt (pinned)** (Score: 3/5)
+23. **Lock file: requirements.txt (pinned)** (Score: 3/5)
    - Consider uv or poetry for better dependency resolution and lock file management.
 
-25. **Uses Python standard logging** (Score: 3/5)
+24. **Uses Python standard logging** (Score: 3/5)
    - Consider adopting structlog or Loguru for structured logging with better context propagation.
 
-26. **Mixed path handling (pathlib and os.path)** (Score: 3/5)
+25. **Mixed path handling (pathlib and os.path)** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-27. **Configuration via os.environ direct access** (Score: 3/5)
+26. **Configuration via os.environ direct access** (Score: 3/5)
    - Adopt Pydantic BaseSettings for type-safe configuration with validation and environment variable parsing.
 
-28. **Modern f-string formatting** (Score: 3/5)
+27. **Modern f-string formatting** (Score: 3/5)
    - Prefer f-strings for readability and performance over .format() or %.
 
-29. **Test naming: Simple style (test_feature)** (Score: 3/5)
+28. **Test naming: Simple style (test_feature)** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-30. **Single test directory: tests/** (Score: 3/5)
+29. **Single test directory: tests/** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-31. **Manual validation (ValueError/TypeError)** (Score: 3/5)
+30. **Manual validation (ValueError/TypeError)** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-32. **Import dependency graph** (Score: 3/5)
+31. **Import dependency graph** (Score: 3/5)
    - Review this convention and consider industry best practices for improvement.
 
-33. **Plain assert statements** (Score: 3/5)
+32. **Plain assert statements** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-34. **pytest fixtures for test setup** (Score: 3/5)
+33. **pytest fixtures for test setup** (Score: 3/5)
    - Add more test cases and increase coverage of edge cases and error paths.
 
-35. **Dependency management: pip (requirements.txt)** (Score: 4/5)
+34. **Dependency management: pip (requirements.txt)** (Score: 4/5)
    - Consider Poetry, uv, or PDM for modern dependency management.
 
-36. **Import sorting: Ruff (isort rules)** (Score: 4/5)
+35. **Import sorting: Ruff (isort rules)** (Score: 4/5)
    - Configure known-first-party in ruff/isort for proper import grouping.

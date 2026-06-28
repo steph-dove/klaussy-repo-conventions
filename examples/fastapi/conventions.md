@@ -1,6 +1,6 @@
 # Code Conventions Report
 
-*Generated: 2026-06-28 12:36:48*
+*Generated: 2026-06-28 15:19:56*
 
 ## Summary
 
@@ -815,6 +815,7 @@ Import graph: 668 files, 1012 internal imports. 3 dependency clusters. Circular 
 - cluster_count: `3`
 - top_fan_in: `[('fastapi/testclient.py', 436), ('fastapi/__init__.py', 239), ('fastapi/exceptions.py', 35), ('tests/utils.py', 34), ('fastapi/security/__init__.py', 34)]`
 - top_fan_out: `[('fastapi/openapi/utils.py', 14), ('fastapi/applications.py', 11), ('fastapi/routing.py', 10), ('fastapi/dependencies/utils.py', 10), ('fastapi/__init__.py', 9)]`
+- core_modules: `[{'path': 'fastapi/exceptions.py', 'dependents': 12, 'responsibility': 'exceptions'}, {'path': 'fastapi/openapi/models.py', 'dependents': 8, 'responsibility': 'models'}, {'path': 'fastapi/types.py', 'dependents': 8, 'responsibility': 'types'}, {'path': 'fastapi/datastructures.py', 'dependents': 7, 'responsibility': 'datastructures'}, {'path': 'fastapi/utils.py', 'dependents': 5, 'responsibility': 'utils'}, {'path': 'fastapi/security/base.py', 'dependents': 5, 'responsibility': 'base'}]`
 
 **Evidence:**
 
@@ -1783,7 +1784,7 @@ Detected 2 decision log items and 1 pitfalls.
 
 **Statistics:**
 
-- detected_decisions: `['Changelog breaking change: 🔥 Remove slim package stub, deprecated for a while. PR [#15649](https://github.com/fastapi/fastapi/pull/15649) by [@tiangolo](https://github.com/tiangolo).', 'Changelog breaking change: 🔧 Migrate docs from MkDocs to Zensical. PR [#15563](https://github.com/fastapi/fastapi/pull/15563) by [@tiangolo](https://github.com/tiangolo).']`
+- detected_decisions: `['v0.137.0 (2026-06-14): 🔥 Remove slim package stub, deprecated for a while.', 'v0.136.2 (2026-05-23): 🔧 Migrate docs from MkDocs to Zensical.']`
 - detected_pitfalls: `['CI workflow `pre-commit.yml` contains steps allowed to fail (`continue-on-error: true`).']`
 
 ---

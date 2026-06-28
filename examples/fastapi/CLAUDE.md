@@ -14,6 +14,17 @@ For the repository directory map and file layout, see [.claude/directory-map.md]
 
 ## Architecture
 
+### Core Modules
+
+> The most-imported internal modules — the foundation other code builds on.
+
+- `fastapi/exceptions.py` — exceptions (12 dependents)
+- `fastapi/openapi/models.py` — models (8 dependents)
+- `fastapi/types.py` — types (8 dependents)
+- `fastapi/datastructures.py` — datastructures (7 dependents)
+- `fastapi/utils.py` — utils (5 dependents)
+- `fastapi/security/base.py` — base (5 dependents)
+
 ### Key Patterns
 
 - **API routes**: 29 endpoints (2 DELETE, 16 GET, 2 PATCH, 7 POST, 2 PUT)
@@ -69,10 +80,12 @@ For the repository directory map and file layout, see [.claude/directory-map.md]
 
 ## Decision Log
 
-- Changelog breaking change: 🔥 Remove slim package stub, deprecated for a while. PR [#15649](https://github.com/fastapi/fastapi/pull/15649) by [@tiangolo](https://github.com/tiangolo).
+- v0.137.0 (2026-06-14): 🔥 Remove slim package stub, deprecated for a while.
 
-- Changelog breaking change: 🔧 Migrate docs from MkDocs to Zensical. PR [#15563](https://github.com/fastapi/fastapi/pull/15563) by [@tiangolo](https://github.com/tiangolo).
+- v0.136.2 (2026-05-23): 🔧 Migrate docs from MkDocs to Zensical.
 
 ## Known Pitfalls
+
+- 20 circular import dependencies detected — watch import order and avoid introducing new cross-module import cycles.
 
 - CI workflow `pre-commit.yml` contains steps allowed to fail (`continue-on-error: true`).

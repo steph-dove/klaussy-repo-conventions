@@ -496,12 +496,7 @@ def _render_arch_rule(rule: ConventionRule, suffix: str) -> str:
         return f"- **API routes**: {total} endpoints ({method_str})"
 
     if suffix == "import_graph":
-        cycles = stats.get("cycle_count", 0)
-        cycle_examples = stats.get("cycles", [])
-        if cycles and cycle_examples:
-            example = cycle_examples[0]
-            parts = " -> ".join(_short_path(f) for f in example[:3])
-            return f"- **Circular dependencies**: {cycles} found (e.g. {parts})"
+        # Circular dependencies are surfaced under Known Pitfalls, not here.
         return ""
 
     if suffix == "endpoint_chains":
@@ -1590,6 +1585,39 @@ def _short_path(filepath: str) -> str:
 # --- Main generators ---
 
 
+def _collect_pitfalls(output: ConventionsOutput) -> list[str]:
+    """Aggregate Known Pitfalls from every available signal, not just history.
+
+    Sources: structural smells from the import graph (circular dependencies) and
+    the history detector's findings (flaky CI, changelog gotchas, workarounds).
+    Low-scoring code conventions are intentionally excluded — those are surfaced
+    in the dedicated "Anti-patterns Present" section instead.
+    """
+    pitfalls: list[str] = []
+
+    # Structural: circular import dependencies are a concrete code-level gotcha.
+    import_graph = next(
+        (r for r in output.rules if _get_suffix(r) == "import_graph"), None
+    )
+    if import_graph:
+        cycles = import_graph.stats.get("cycle_count", 0)
+        if cycles:
+            pitfalls.append(
+                f"{cycles} circular import dependencies detected — watch import "
+                "order and avoid introducing new cross-module import cycles."
+            )
+
+    # History: flaky-CI, changelog gotchas, workarounds.
+    history = next(
+        (r for r in output.rules if _get_suffix(r) == "history"), None
+    )
+    if history:
+        pitfalls.extend(history.stats.get("detected_pitfalls", []))
+
+    # De-duplicate while preserving order.
+    return list(dict.fromkeys(pitfalls))
+
+
 def generate_claude_md(output: ConventionsOutput) -> str:
     """Generate a CLAUDE.md from conventions output.
 
@@ -1675,7 +1703,7 @@ def generate_claude_md(output: ConventionsOutput) -> str:
             break
 
     detected_decisions = history_rule.stats.get("detected_decisions", []) if history_rule else []
-    detected_pitfalls = history_rule.stats.get("detected_pitfalls", []) if history_rule else []
+    detected_pitfalls = _collect_pitfalls(output)
 
     # Skeleton sections
     sections.append("## Decision Log\n")
@@ -1687,7 +1715,7 @@ def generate_claude_md(output: ConventionsOutput) -> str:
 
     sections.append("## Known Pitfalls\n")
     if detected_pitfalls:
-        for pit in detected_pitfalls[:5]:
+        for pit in detected_pitfalls[:7]:
             sections.append(f"- {pit}\n")
     else:
         sections.append("- *No project gotchas or anti-patterns documented yet. Add common issues to avoid here.*\n")

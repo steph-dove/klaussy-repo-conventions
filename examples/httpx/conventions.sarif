@@ -156,7 +156,7 @@
                 "text": "Project history"
               },
               "fullDescription": {
-                "text": "Detected 10 decision log items and 0 pitfalls."
+                "text": "Detected 9 decision log items and 0 pitfalls."
               },
               "helpUri": "https://github.com/steph-dove/klaussy-repo-conventions#rules",
               "properties": {
@@ -934,34 +934,6 @@
               }
             },
             {
-              "id": "python.conventions.password_hashing",
-              "name": "Password hashing: hashlib (not recommended)",
-              "shortDescription": {
-                "text": "Password hashing: hashlib (not recommended)"
-              },
-              "fullDescription": {
-                "text": "Uses hashlib for password hashing. Consider using argon2 or bcrypt for better security."
-              },
-              "helpUri": "https://github.com/steph-dove/klaussy-repo-conventions#rules",
-              "properties": {
-                "category": "security",
-                "language": "python",
-                "score": 1,
-                "scoreLabel": "Poor",
-                "precision": "medium",
-                "docsUrl": null,
-                "tags": []
-              },
-              "help": {
-                "text": "Assessment: Uses hashlib for password hashing\n\nSuggestion: CRITICAL: hashlib is not suitable for passwords. Use argon2-cffi or bcrypt immediately.",
-                "markdown": "**Assessment:** Uses hashlib for password hashing\n\n**Suggestion:** CRITICAL: hashlib is not suitable for passwords. Use argon2-cffi or bcrypt immediately."
-              },
-              "defaultConfiguration": {
-                "level": "error",
-                "enabled": true
-              }
-            },
-            {
               "id": "python.conventions.env_separation",
               "name": "Environment config: raw os.environ",
               "shortDescription": {
@@ -1580,16 +1552,15 @@
             "scoreLabel": "Average",
             "stats": {
               "detected_decisions": [
-                "Changelog breaking change: For users of the standard `verify=True` or `verify=False` cases, or `verify=<ssl_context>` case this should require no changes. The following cases have been deprecated...*",
-                "Changelog breaking change: The `verify` argument as a string argument is now deprecated and will raise warnings.",
-                "Changelog breaking change: The `cert` argument is now deprecated and will raise warnings.",
-                "Changelog breaking change: The deprecated `proxies` argument has now been removed.",
-                "Changelog breaking change: The deprecated `app` argument has now been removed.",
-                "Changelog breaking change: The `app=...` shortcut has been deprecated. Use the explicit style of `transport=httpx.WSGITransport()` or `transport=httpx.ASGITransport()` instead.",
-                "Changelog breaking change: The `proxy` argument was added. You should use the `proxy` argument instead of the deprecated `proxies`, or use `mounts=` for more complex configurations. (#2879)",
-                "Changelog breaking change: The `proxies` argument is now deprecated. It will still continue to work, but it will be removed in the future. (#2879)",
-                "Changelog breaking change: The `rfc3986` dependancy has been removed. (#2252)",
-                "Changelog breaking change: Partially revert the API breaking change in 0.23.1, which removed `RawURL`. We continue to expose a `url.raw` property which is now a plain named-tuple. This API is still expected to be deprecated, but we will do so with a major version bump. (#2481)"
+                "v0.28.0 (28th November, 2024): For users of the standard verify=True or verify=False cases, or verify=<ssl_context> case this should require no changes.",
+                "v0.28.0 (28th November, 2024): The verify argument as a string argument is now deprecated and will raise warnings.",
+                "v0.28.0 (28th November, 2024): The cert argument is now deprecated and will raise warnings.",
+                "v0.28.0 (28th November, 2024): The deprecated proxies argument has now been removed.",
+                "v0.28.0 (28th November, 2024): The deprecated app argument has now been removed.",
+                "v0.26.0 (20th December, 2023): The proxy argument was added.",
+                "v0.26.0 (20th December, 2023): The proxies argument is now deprecated.",
+                "v0.24.0 (6th April, 2023): The rfc3986 dependancy has been removed.",
+                "v0.23.2 (2nd January, 2023): Partially revert the API breaking change in 0.23.1, which removed RawURL."
               ],
               "detected_pitfalls": []
             }
@@ -2816,6 +2787,38 @@
                   "httpx/_transports/__init__.py",
                   5
                 ]
+              ],
+              "core_modules": [
+                {
+                  "path": "httpx/_types.py",
+                  "dependents": 9,
+                  "responsibility": "Type definitions for type checking purposes."
+                },
+                {
+                  "path": "httpx/_exceptions.py",
+                  "dependents": 8,
+                  "responsibility": "Our exception hierarchy:"
+                },
+                {
+                  "path": "httpx/_models.py",
+                  "dependents": 8,
+                  "responsibility": "models"
+                },
+                {
+                  "path": "httpx/_urls.py",
+                  "dependents": 7,
+                  "responsibility": "urls"
+                },
+                {
+                  "path": "httpx/_utils.py",
+                  "dependents": 6,
+                  "responsibility": "utils"
+                },
+                {
+                  "path": "httpx/_transports/base.py",
+                  "dependents": 6,
+                  "responsibility": "base"
+                }
               ]
             }
           },
@@ -4141,84 +4144,8 @@
           ]
         },
         {
-          "ruleId": "python.conventions.password_hashing",
-          "ruleIndex": 33,
-          "level": "error",
-          "kind": "fail",
-          "message": {
-            "text": "Password hashing: hashlib (not recommended): Uses hashlib for password hashing"
-          },
-          "properties": {
-            "confidence": 0.75,
-            "score": 1,
-            "scoreLabel": "Poor",
-            "stats": {
-              "hash_library_counts": {
-                "hashlib": 3
-              },
-              "primary_library": "hashlib",
-              "quality": "weak"
-            }
-          },
-          "fixes": [
-            {
-              "description": {
-                "text": "CRITICAL: hashlib is not suitable for passwords. Use argon2-cffi or bcrypt immediately."
-              },
-              "changes": []
-            }
-          ],
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/client/test_auth.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 4,
-                  "endLine": 10,
-                  "snippet": {
-                    "text": "Unit tests for auth classes also exist in tests/test_auth.py\n\"\"\"\n\nimport hashlib\nimport netrc\nimport os\nimport sys"
-                  }
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "httpx/_auth.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 1,
-                  "endLine": 6,
-                  "snippet": {
-                    "text": "from __future__ import annotations\n\nimport hashlib\nimport os\nimport re\nimport time"
-                  }
-                }
-              }
-            },
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "httpx/_auth.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 13,
-                  "endLine": 19,
-                  "snippet": {
-                    "text": "from ._utils import to_bytes, to_str, unquote\n\nif typing.TYPE_CHECKING:  # pragma: no cover\n    from hashlib import _Hash\n\n\n__all__ = [\"Auth\", \"BasicAuth\", \"DigestAuth\", \"FunctionAuth\", \"NetRCAuth\"]"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
           "ruleId": "python.conventions.env_separation",
-          "ruleIndex": 34,
+          "ruleIndex": 33,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -4255,7 +4182,7 @@
         },
         {
           "ruleId": "python.conventions.json_library",
-          "ruleIndex": 35,
+          "ruleIndex": 34,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -4331,7 +4258,7 @@
         },
         {
           "ruleId": "python.conventions.testing_framework",
-          "ruleIndex": 36,
+          "ruleIndex": 35,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -4429,7 +4356,7 @@
         },
         {
           "ruleId": "python.test_conventions.fixtures",
-          "ruleIndex": 37,
+          "ruleIndex": 36,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -4535,7 +4462,7 @@
         },
         {
           "ruleId": "python.test_conventions.assertions",
-          "ruleIndex": 38,
+          "ruleIndex": 37,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -4642,7 +4569,7 @@
         },
         {
           "ruleId": "python.test_conventions.mocking",
-          "ruleIndex": 39,
+          "ruleIndex": 38,
           "level": "error",
           "kind": "fail",
           "message": {
@@ -4717,7 +4644,7 @@
         },
         {
           "ruleId": "python.test_conventions.parametrized",
-          "ruleIndex": 40,
+          "ruleIndex": 39,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -4811,7 +4738,7 @@
         },
         {
           "ruleId": "python.conventions.test_structure",
-          "ruleIndex": 41,
+          "ruleIndex": 40,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -4854,7 +4781,7 @@
         },
         {
           "ruleId": "python.conventions.test_naming",
-          "ruleIndex": 42,
+          "ruleIndex": 41,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -4932,7 +4859,7 @@
         },
         {
           "ruleId": "python.conventions.linter",
-          "ruleIndex": 43,
+          "ruleIndex": 42,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -4977,7 +4904,7 @@
         },
         {
           "ruleId": "python.conventions.import_sorting",
-          "ruleIndex": 44,
+          "ruleIndex": 43,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -5027,7 +4954,7 @@
         },
         {
           "ruleId": "python.conventions.type_checker_strictness",
-          "ruleIndex": 45,
+          "ruleIndex": 44,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -5059,7 +4986,7 @@
         },
         {
           "ruleId": "python.conventions.typing_coverage",
-          "ruleIndex": 46,
+          "ruleIndex": 45,
           "level": "note",
           "kind": "pass",
           "message": {
@@ -5112,7 +5039,7 @@
         },
         {
           "ruleId": "python.conventions.validation_style",
-          "ruleIndex": 47,
+          "ruleIndex": 46,
           "level": "warning",
           "kind": "review",
           "message": {
@@ -5220,7 +5147,7 @@
       "invocations": [
         {
           "executionSuccessful": true,
-          "startTimeUtc": "2026-06-28T19:35:12.605589+00:00",
+          "startTimeUtc": "2026-06-28T22:19:52.252958+00:00",
           "workingDirectory": {
             "uri": "/Users/stephaniedover/projects/klaussy-repo-conventions/httpx_repo"
           }

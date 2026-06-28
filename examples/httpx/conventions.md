@@ -1,6 +1,6 @@
 # Code Conventions Report
 
-*Generated: 2026-06-28 12:35:12*
+*Generated: 2026-06-28 15:19:52*
 
 ## Summary
 
@@ -9,7 +9,7 @@
 - **Repository:** `/Users/stephaniedover/projects/klaussy-repo-conventions/httpx_repo`
 - **Languages:** python
 - **Files scanned:** 60
-- **Conventions detected:** 48
+- **Conventions detected:** 47
 
 ## Detected Conventions
 
@@ -46,7 +46,6 @@
 | `generic.conventions.config_access` | Config access patterns | 77% | 0 |  |
 | `python.conventions.logging_library` | Uses Python standard logging | 76% | 2 | [docs](https://docs.python.org/3/library/logging.html) |
 | `python.conventions.context_http_client` | HTTP clients with context managers | 75% | 5 |  |
-| `python.conventions.password_hashing` | Password hashing: hashlib (not recommended) | 75% | 3 |  |
 | `generic.conventions.ci_quality` | CI/CD best practices | 70% | 0 | [docs](https://docs.github.com/en/actions) |
 | `python.conventions.constant_naming` | lowercase constant naming | 70% | 5 | [docs](https://docs.astral.sh/ruff/) |
 | `python.conventions.dependency_management` | Dependency management: pip (requirements.txt) | 70% | 0 | [docs](https://pip.pypa.io/) |
@@ -1020,6 +1019,7 @@ Import graph: 60 files, 112 internal imports. 1 dependency clusters. Circular de
 - cluster_count: `1`
 - top_fan_in: `[('httpx/__init__.py', 32), ('httpx/_types.py', 9), ('httpx/_models.py', 8), ('httpx/_exceptions.py', 8), ('httpx/_urls.py', 7)]`
 - top_fan_out: `[('httpx/__init__.py', 13), ('httpx/_client.py', 12), ('httpx/_models.py', 8), ('httpx/_api.py', 5), ('httpx/_transports/__init__.py', 5)]`
+- core_modules: `[{'path': 'httpx/_types.py', 'dependents': 9, 'responsibility': 'Type definitions for type checking purposes.'}, {'path': 'httpx/_exceptions.py', 'dependents': 8, 'responsibility': 'Our exception hierarchy:'}, {'path': 'httpx/_models.py', 'dependents': 8, 'responsibility': 'models'}, {'path': 'httpx/_urls.py', 'dependents': 7, 'responsibility': 'urls'}, {'path': 'httpx/_utils.py', 'dependents': 6, 'responsibility': 'utils'}, {'path': 'httpx/_transports/base.py', 'dependents': 6, 'responsibility': 'base'}]`
 
 **Evidence:**
 
@@ -1059,11 +1059,11 @@ import datetime
 **Language:** generic  
 **Confidence:** 80%
 
-Detected 10 decision log items and 0 pitfalls.
+Detected 9 decision log items and 0 pitfalls.
 
 **Statistics:**
 
-- detected_decisions: `['Changelog breaking change: For users of the standard `verify=True` or `verify=False` cases, or `verify=<ssl_context>` case this should require no changes. The following cases have been deprecated...*', 'Changelog breaking change: The `verify` argument as a string argument is now deprecated and will raise warnings.', 'Changelog breaking change: The `cert` argument is now deprecated and will raise warnings.', 'Changelog breaking change: The deprecated `proxies` argument has now been removed.', 'Changelog breaking change: The deprecated `app` argument has now been removed.', 'Changelog breaking change: The `app=...` shortcut has been deprecated. Use the explicit style of `transport=httpx.WSGITransport()` or `transport=httpx.ASGITransport()` instead.', 'Changelog breaking change: The `proxy` argument was added. You should use the `proxy` argument instead of the deprecated `proxies`, or use `mounts=` for more complex configurations. (#2879)', 'Changelog breaking change: The `proxies` argument is now deprecated. It will still continue to work, but it will be removed in the future. (#2879)', 'Changelog breaking change: The `rfc3986` dependancy has been removed. (#2252)', 'Changelog breaking change: Partially revert the API breaking change in 0.23.1, which removed `RawURL`. We continue to expose a `url.raw` property which is now a plain named-tuple. This API is still expected to be deprecated, but we will do so with a major version bump. (#2481)']`
+- detected_decisions: `['v0.28.0 (28th November, 2024): For users of the standard verify=True or verify=False cases, or verify=<ssl_context> case this should require no changes.', 'v0.28.0 (28th November, 2024): The verify argument as a string argument is now deprecated and will raise warnings.', 'v0.28.0 (28th November, 2024): The cert argument is now deprecated and will raise warnings.', 'v0.28.0 (28th November, 2024): The deprecated proxies argument has now been removed.', 'v0.28.0 (28th November, 2024): The deprecated app argument has now been removed.', 'v0.26.0 (20th December, 2023): The proxy argument was added.', 'v0.26.0 (20th December, 2023): The proxies argument is now deprecated.', 'v0.24.0 (6th April, 2023): The rfc3986 dependancy has been removed.', 'v0.23.2 (2nd January, 2023): Partially revert the API breaking change in 0.23.1, which removed RawURL.']`
 - detected_pitfalls: `[]`
 
 ---
@@ -1260,60 +1260,6 @@ Uses context managers for HTTP client lifecycle. 5 usages.
         cookies=cookies,
         proxy=proxy,
         verify=verify,
-```
-
----
-
-### Password hashing: hashlib (not recommended)
-
-**ID:** `python.conventions.password_hashing`  
-**Category:** security  
-**Language:** python  
-**Confidence:** 75%
-
-Uses hashlib for password hashing. Consider using argon2 or bcrypt for better security.
-
-**Statistics:**
-
-- hash_library_counts: `{'hashlib': 3}`
-- primary_library: `hashlib`
-- quality: `weak`
-
-**Evidence:**
-
-1. `tests/client/test_auth.py:4-10`
-
-```
-Unit tests for auth classes also exist in tests/test_auth.py
-"""
-
-import hashlib
-import netrc
-import os
-import sys
-```
-
-2. `httpx/_auth.py:1-6`
-
-```
-from __future__ import annotations
-
-import hashlib
-import os
-import re
-import time
-```
-
-3. `httpx/_auth.py:13-19`
-
-```
-from ._utils import to_bytes, to_str, unquote
-
-if typing.TYPE_CHECKING:  # pragma: no cover
-    from hashlib import _Hash
-
-
-__all__ = ["Auth", "BasicAuth", "DigestAuth", "FunctionAuth", "NetRCAuth"]
 ```
 
 ---
