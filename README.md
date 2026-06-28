@@ -1,4 +1,4 @@
-# <img src="brand-mark.png" width="32" height="32" align="absmiddle" alt="Klaussy Logo"> klaussy-repo-conventions 🔍
+# <img src="https://raw.githubusercontent.com/steph-dove/klaussy-repo-conventions/main/brand-mark.png" width="32" height="32" align="absmiddle" alt="Klaussy Logo"> klaussy-repo-conventions 🔍
 
 [![PyPI version](https://img.shields.io/pypi/v/klaussy-repo-conventions.svg)](https://pypi.org/project/klaussy-repo-conventions/)
 [![Python versions](https://img.shields.io/pypi/pyversions/klaussy-repo-conventions.svg)](https://pypi.org/project/klaussy-repo-conventions/)
