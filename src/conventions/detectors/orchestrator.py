@@ -55,6 +55,11 @@ def detect_languages(repo_root: Path, exclude_patterns: Optional[list[str]] = No
     if kotlin_files:
         languages.add("kotlin")
 
+    # Check for Java files
+    java_files = list(walk_files(repo_root, {".java"}, max_files=5, exclude_patterns=detection_excludes))
+    if java_files:
+        languages.add("java")
+
     return languages
 
 
@@ -165,7 +170,7 @@ def run_detectors(
     # Get file count from all language indexes
     if ctx._python_index is not None:
         total_files_scanned += len(ctx._python_index.files)
-    for cache_key in ("node_index", "go_index", "rust_index"):
+    for cache_key in ("node_index", "go_index", "rust_index", "kotlin_index", "java_index"):
         index = ctx.cache.get(cache_key)
         if index is not None and hasattr(index, "files"):
             total_files_scanned += len(index.files)

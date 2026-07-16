@@ -46,6 +46,7 @@ def register_all_detectors() -> None:
     from . import (
         generic,  # noqa: F401
         go,  # noqa: F401
+        java,  # noqa: F401
         kotlin,  # noqa: F401
         node,  # noqa: F401
         python,  # noqa: F401

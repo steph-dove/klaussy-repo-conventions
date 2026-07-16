@@ -1,4 +1,4 @@
-"""Kotlin architecture conventions detector."""
+"""Java architecture conventions detector."""
 
 from __future__ import annotations
 
@@ -7,87 +7,49 @@ from typing import Optional
 
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
-from .base import KotlinDetector
-from .index import KotlinFileIndex, KotlinIndex, make_evidence
+from .base import JavaDetector
+from .index import JavaFileIndex, JavaIndex, make_evidence
 
-# Multiplatform source sets that signal a Kotlin Multiplatform (KMP) layout.
-# Source sets that only a Kotlin Multiplatform build declares.
-#
-# `androidTest` is deliberately absent: it is the standard instrumented-test
-# source set of every Android Gradle project (`src/androidTest/`) and says
-# nothing about multiplatform. KMP spells its Android sets `androidMain` and
-# `androidUnitTest`/`androidInstrumentedTest`.
-MULTIPLATFORM_SOURCE_SETS = (
-    "commonMain",
-    "commonTest",
-    "jvmMain",
-    "jvmTest",
-    "jsMain",
-    "jsTest",
-    "nativeMain",
-    "nativeTest",
-    "androidMain",
-    "androidUnitTest",
-    "androidInstrumentedTest",
-    "iosMain",
-    "iosTest",
-    "desktopMain",
-    "desktopTest",
-)
-
-# Package segments that indicate layering (package-by-layer at the top,
-# or nested per-feature for package-by-feature).
 LAYER_WORDS = frozenset({
     "controller", "controllers", "api", "routes", "routing", "handlers",
     "endpoints", "resources", "service", "services", "usecase", "usecases",
     "interactor", "interactors", "repository", "repositories", "dao", "db",
     "database", "store", "stores", "persistence", "datasource", "model",
     "models", "entity", "entities", "dto", "dtos", "schema", "ui", "screen",
-    "screens", "compose", "view", "views", "viewmodel", "viewmodels",
-    "widget", "widgets", "activity", "fragment",
+    "screens", "view", "views", "viewmodel", "viewmodels",
 })
 
-# Clean/hexagonal architecture markers.
 CLEAN_ARCHITECTURE_WORDS = frozenset({
     "domain", "application", "infrastructure", "adapter", "adapters",
     "port", "ports", "usecase", "usecases",
 })
 
-# The roles that represent architectural layers, as opposed to bookkeeping
-# roles like `test`, `androidTest` and `build`.
-ARCHITECTURAL_ROLES = ("main", "api", "service", "db", "model", "ui")
+ARCHITECTURAL_ROLES = ("main", "api", "service", "db", "model")
 
 
 @DetectorRegistry.register
-class KotlinArchitectureDetector(KotlinDetector):
-    """Detect Kotlin project structure, module layout and layering conventions."""
+class JavaArchitectureDetector(JavaDetector):
+    """Detect Java project structure, module layout and layering conventions."""
 
-    name = "kotlin_architecture"
-    description = "Detects Kotlin project structure, module layout and layering conventions"
+    name = "java_architecture"
+    description = "Detects Java project structure, module layout and layering conventions"
 
     def detect(self, ctx: DetectorContext) -> DetectorResult:
-        """Detect Kotlin architecture conventions."""
+        """Detect Java architecture conventions."""
         result = DetectorResult()
         index = self.get_index(ctx)
 
-        if not index.files or len(index.files) < 3:
+        if not index.files or len(index.files) < 2:
             return result
 
         build_info = self.get_build_info(ctx)
 
-        source_sets = {f.source_set for f in index.files.values() if f.source_set}
-        is_multiplatform = any(s in MULTIPLATFORM_SOURCE_SETS for s in source_sets)
-
-        modules = sorted(index.modules | set(build_info.modules))
+        # Re-use Gradle/Maven module mapping
+        modules = sorted(set(f.module for f in index.files.values() if f.module) | set(build_info.modules))
         module_count = len(modules)
         is_multi_module = module_count > 1 or build_info.is_multi_module
 
-        if is_multiplatform:
-            structure = "multiplatform"
-        elif is_multi_module:
-            structure = "multi-module"
-        else:
-            structure = "single-module"
+        structure = "multi-module" if is_multi_module else "single-module"
 
         role_counts = Counter(f.role for f in index.files.values())
         layers = sorted(role for role in role_counts if role in ARCHITECTURAL_ROLES)
@@ -96,12 +58,9 @@ class KotlinArchitectureDetector(KotlinDetector):
         package_style, style_confidence = self._detect_package_style(index, common_root)
 
         uses_clean_architecture = self._uses_clean_architecture(index)
-        uses_android_structure = self._uses_android_structure(role_counts)
+        framework = self._detect_framework(index)
 
-        # Confidence scales with how much clear structural signal was found.
         confidence = 0.4
-        if is_multiplatform:
-            confidence += 0.2
         if is_multi_module:
             confidence += 0.1
         if len(layers) >= 3:
@@ -109,17 +68,21 @@ class KotlinArchitectureDetector(KotlinDetector):
         confidence += style_confidence
         if uses_clean_architecture:
             confidence += 0.1
+        if framework != "standard library":
+            confidence += 0.1
         confidence = min(0.9, confidence)
 
         title_parts = [structure]
         if package_style != "unknown":
             title_parts.append(package_style)
+        if framework != "standard library":
+            title_parts.append(framework)
         title = "Architecture: " + ", ".join(title_parts)
         if common_root:
             title += f" under {common_root}"
 
         description_parts = [
-            f"Kotlin project with {len(index.files)} files uses a {structure} structure."
+            f"Java project with {len(index.files)} files uses a {structure} structure."
         ]
         if layers:
             description_parts.append(f"Layers present: {', '.join(layers)}.")
@@ -132,15 +95,8 @@ class KotlinArchitectureDetector(KotlinDetector):
                 "Uses clean/hexagonal architecture markers (domain, application, "
                 "infrastructure, adapter, port, or usecase packages)."
             )
-        if uses_android_structure:
-            description_parts.append(
-                "Follows an Android app structure with ui, viewmodel and repository layers."
-            )
-        if is_multiplatform:
-            multiplatform_sets = sorted(s for s in source_sets if s in MULTIPLATFORM_SOURCE_SETS)
-            description_parts.append(
-                f"Kotlin Multiplatform source sets: {', '.join(multiplatform_sets)}."
-            )
+        if framework != "standard library":
+            description_parts.append(f"Uses the {framework} framework stack.")
         description = " ".join(description_parts)
 
         evidence = self._build_evidence(ctx, index, role_counts)
@@ -149,39 +105,39 @@ class KotlinArchitectureDetector(KotlinDetector):
             "structure": structure,
             "module_count": module_count,
             "modules": modules[:20],
-            "source_sets": sorted(source_sets),
             "layers": layers,
             "role_counts": dict(role_counts),
             "package_style": package_style,
             "common_package_root": common_root,
-            "is_multiplatform": is_multiplatform,
             "uses_clean_architecture": uses_clean_architecture,
+            "framework": framework,
             "file_count": len(index.files),
             "patterns": self._collect_patterns(
-                is_multiplatform, is_multi_module, uses_clean_architecture, uses_android_structure
+                is_multi_module, uses_clean_architecture, framework
             ),
         }
 
         result.rules.append(self.make_rule(
-            rule_id="kotlin.conventions.architecture",
+            rule_id="java.conventions.architecture",
             category="architecture",
             title=title,
             description=description,
             confidence=confidence,
-            language="kotlin",
+            language="java",
             evidence=evidence,
             stats=stats,
         ))
 
         return result
 
-    def _common_package_root(self, index: KotlinIndex, dominance: float = 0.8) -> Optional[str]:
+    def _common_package_root(self, index: JavaIndex, dominance: float = 0.8) -> Optional[str]:
         """Find the package root shared by most indexed files.
 
         Uses a dominant prefix rather than a strict one: requiring every file to
         agree collapses the root to something useless as soon as a single
-        outlier package exists (a sample or test-fixture module whose only
-        shared prefix with the real code is `com`).
+        outlier package exists. gson has 241 files under `com.google.gson` and
+        18 under `com.example` (its JPMS and native-image test modules), and the
+        only prefix they all share is `com`.
 
         Extends the prefix one segment at a time for as long as a `dominance`
         share of all packages still agrees.
@@ -212,13 +168,10 @@ class KotlinArchitectureDetector(KotlinDetector):
 
     def _detect_package_style(
         self,
-        index: KotlinIndex,
+        index: JavaIndex,
         common_root: Optional[str],
     ) -> tuple[str, float]:
-        """Infer package-by-layer vs package-by-feature vs flat organization.
-
-        Returns (style, confidence_bonus).
-        """
+        """Infer package-by-layer vs package-by-feature vs flat organization."""
         root_depth = len(common_root.split(".")) if common_root else 0
 
         layer_at_shallow_depth = 0
@@ -234,7 +187,6 @@ class KotlinArchitectureDetector(KotlinDetector):
                 continue
             total_with_extra_segments += 1
 
-            # Position of the first layer word relative to the common root.
             layer_positions = [i for i, seg in enumerate(extra) if seg.lower() in LAYER_WORDS]
             if not layer_positions:
                 continue
@@ -261,7 +213,7 @@ class KotlinArchitectureDetector(KotlinDetector):
             return "package-by-layer", confidence_bonus
         return "unknown", 0.0
 
-    def _uses_clean_architecture(self, index: KotlinIndex) -> bool:
+    def _uses_clean_architecture(self, index: JavaIndex) -> bool:
         """Check whether packages contain clean/hexagonal architecture markers."""
         marker_packages = 0
         for file_idx in index.files.values():
@@ -273,43 +225,49 @@ class KotlinArchitectureDetector(KotlinDetector):
 
         return marker_packages >= 2
 
-    def _uses_android_structure(self, role_counts: Counter) -> bool:
-        """Check whether the project has an Android-style ui/viewmodel/repository split."""
-        return role_counts.get("ui", 0) > 0 and (
-            role_counts.get("service", 0) > 0 or role_counts.get("db", 0) > 0
-        )
+    def _detect_framework(self, index: JavaIndex) -> str:
+        """Detect the primary framework stack used (Spring Boot, Quarkus, Micronaut, etc.)."""
+        # Count key packages and annotations
+        spring_count = index.count_imports_matching("org.springframework")
+        quarkus_count = index.count_imports_matching("io.quarkus")
+        micronaut_count = index.count_imports_matching("io.micronaut")
+
+        if spring_count > 0 and spring_count >= quarkus_count and spring_count >= micronaut_count:
+            return "Spring Boot"
+        if quarkus_count > 0 and quarkus_count >= spring_count and quarkus_count >= micronaut_count:
+            return "Quarkus"
+        if micronaut_count > 0 and micronaut_count >= spring_count and micronaut_count >= quarkus_count:
+            return "Micronaut"
+
+        return "standard library"
 
     def _collect_patterns(
         self,
-        is_multiplatform: bool,
         is_multi_module: bool,
         uses_clean_architecture: bool,
-        uses_android_structure: bool,
+        framework: str,
     ) -> list[str]:
-        """Collect short, human-readable pattern tags for the stats block."""
+        """Collect short, human-readable pattern tags for stats."""
         patterns: list[str] = []
-        if is_multiplatform:
-            patterns.append("kotlin-multiplatform")
         if is_multi_module:
             patterns.append("multi-module")
         if uses_clean_architecture:
             patterns.append("clean-architecture")
-        if uses_android_structure:
-            patterns.append("android-app-structure")
+        if framework != "standard library":
+            patterns.append(framework.lower().replace(" ", "-"))
         return patterns
 
     def _build_evidence(
         self,
         ctx: DetectorContext,
-        index: KotlinIndex,
+        index: JavaIndex,
         role_counts: Counter,
     ) -> list:
         """Pick representative evidence files from distinct layers."""
         evidence = []
         seen_roles: set[str] = set()
 
-        # Prefer one file per distinct architectural layer, in a stable order.
-        preferred_role_order = ["api", "service", "db", "model", "ui", "main"]
+        preferred_role_order = ["api", "service", "db", "model", "main"]
         ordered_roles = [r for r in preferred_role_order if r in role_counts]
 
         for role in ordered_roles:
@@ -319,7 +277,7 @@ class KotlinArchitectureDetector(KotlinDetector):
                 continue
             seen_roles.add(role)
 
-            candidate: Optional[KotlinFileIndex] = None
+            candidate: Optional[JavaFileIndex] = None
             for file_idx in index.get_files_by_role(role):
                 if not file_idx.is_test:
                     candidate = file_idx

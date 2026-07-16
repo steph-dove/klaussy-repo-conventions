@@ -418,6 +418,7 @@ def _html_rules_table(rated_rules: list) -> str:
                 <option value="node">Node.js</option>
                 <option value="rust">Rust</option>
                 <option value="kotlin">Kotlin</option>
+                <option value="java">Java</option>
                 <option value="generic">Generic</option>
             </select>
             <select id="filter-score" onchange="filterTable()">

@@ -391,15 +391,21 @@ DOCS_URLS: dict[str, str] = {
 }
 
 
-def get_docs_url(key: str) -> Optional[str]:
+def get_docs_url(key: Optional[str]) -> Optional[str]:
     """Get documentation URL for a tool/framework/library.
 
     Args:
-        key: The identifier for the tool (case-insensitive, supports aliases)
+        key: The identifier for the tool (case-insensitive, supports aliases).
+            Accepts None so callers can pass a stat straight through: detectors
+            legitimately report `primary_framework: None` to mean "none
+            detected", and that must not break rule creation.
 
     Returns:
         Documentation URL or None if not found
     """
+    if not isinstance(key, str):
+        return None
+
     # Normalize key
     normalized = key.lower().replace("-", "_").replace(" ", "_")
 

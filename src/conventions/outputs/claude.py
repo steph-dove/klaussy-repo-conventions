@@ -112,11 +112,10 @@ _SINGLE_TEST_TEMPLATES: dict[str, str] = {
     "ava": "npx ava <file> --match='<name>'",
     "testify": "go test ./<pkg>/... -run <TestName> -v",
     "go": "go test ./<pkg>/... -run <TestName> -v",
-    "cargo": "cargo test <test_name> -- --exact",
-    "kotest": './gradlew test --tests "com.example.MyTest"',
-    "junit": './gradlew test --tests "com.example.MyTest.myMethod"',
-    "rstest": "cargo test <test_name> -- --exact",
-    "proptest": "cargo test <test_name> -- --exact",
+    # JVM and Rust frameworks are intentionally absent: how you run a single test
+    # there depends on the BUILD TOOL, not the framework. JUnit runs under Gradle
+    # *or* Maven, so a framework-keyed template hands Maven projects a `./gradlew`
+    # command that does not exist. Those live in _BUILD_TOOL_COMMANDS instead.
 }
 
 # Rule-ID suffixes carrying test-framework information. Rust names its rule
@@ -719,7 +718,11 @@ def _find_single_test_template(
             # template, while "junit5" must still match "junit".
             if fw_lower.startswith(key):
                 return template
-    return None
+
+    # JVM/Rust: the invocation comes from the build tool. Returning None when the
+    # build tool is unknown is deliberate -- a command for the wrong tool is worse
+    # than no command at all.
+    return _build_tool_command(tech_rules, include_rules, "test_single")
 
 
 def _build_commands_section(
@@ -851,9 +854,21 @@ def _build_commands_from_task_runner(
 # Build/test invocations for compiled-language toolchains, which declare a build
 # tool rather than a package manager. Keyed on the `primary_tool` stat.
 _BUILD_TOOL_COMMANDS: dict[str, dict[str, str]] = {
-    "gradle": {"build": "./gradlew build", "test": "./gradlew test"},
-    "maven": {"build": "mvn package", "test": "mvn test"},
-    "cargo": {"build": "cargo build", "test": "cargo test"},
+    "gradle": {
+        "build": "./gradlew build",
+        "test": "./gradlew test",
+        "test_single": './gradlew test --tests "com.example.MyTest.myMethod"',
+    },
+    "maven": {
+        "build": "mvn package",
+        "test": "mvn test",
+        "test_single": "mvn test -Dtest=MyTest#myMethod",
+    },
+    "cargo": {
+        "build": "cargo build",
+        "test": "cargo test",
+        "test_single": "cargo test <test_name> -- --exact",
+    },
 }
 
 # Rule-ID suffixes that describe a build tool.
@@ -1937,6 +1952,8 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "rust"
         elif ext in ("kt", "kts"):
             lang = "kotlin"
+        elif ext == "java":
+            lang = "java"
         else:
             lang = ""
 

@@ -2922,6 +2922,131 @@ def _kotlin_android_suggestion(r: ConventionRule, score: int) -> str | None:
     return None
 
 
+# Java rating helpers
+def _java_build_score(r: ConventionRule) -> int:
+    """Score Java build tooling - quality gates in the build are what matter."""
+    score = 3
+    if r.stats.get("quality_plugins"):
+        score += 1
+    if r.stats.get("jvm_target"):
+        score += 1
+    if r.stats.get("build_system") == "gradle-groovy":
+        score -= 1
+    return max(1, min(5, score))
+
+
+def _java_build_reason(r: ConventionRule, _score: int) -> str:
+    parts = [str(r.stats.get("build_system", "unknown"))]
+    if r.stats.get("java_version"):
+        parts.append(f"Java {r.stats['java_version']}")
+    parts.append(f"{int(_get_stat(r, 'dependency_count'))} deps")
+    return ", ".join(parts)
+
+
+def _java_build_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if not r.stats.get("quality_plugins"):
+        return (
+            "Add a static-analysis or coverage plugin (Checkstyle, SpotBugs, PMD or JaCoCo) "
+            "so quality is enforced by the build rather than by review."
+        )
+    if not r.stats.get("jvm_target"):
+        return "Pin the Java release level explicitly (maven.compiler.release or jvmToolchain) for reproducible builds."
+    if r.stats.get("build_system") == "gradle-groovy":
+        return "Consider the Gradle Kotlin DSL (build.gradle.kts) for type-safe, IDE-completable build scripts."
+    return None
+
+
+def _java_architecture_score(r: ConventionRule) -> int:
+    return 5 if r.stats.get("structure") == "multi-module" or len(r.stats.get("layers", [])) >= 3 else 4
+
+def _java_architecture_reason(r: ConventionRule, score: int) -> str:
+    return f"Structured as a {r.stats.get('structure')} Java application."
+
+def _java_architecture_suggestion(r: ConventionRule, score: int) -> str | None:
+    if len(r.stats.get("layers", [])) < 3:
+        return "Establish clear layering (controllers, services, repositories) for code separation."
+    return None
+
+def _java_database_score(r: ConventionRule) -> int:
+    if r.stats.get("raw_sql_concat_count", 0) > 0:
+        return 2
+    return 5 if r.stats.get("libraries") else 4
+
+def _java_database_reason(r: ConventionRule, score: int) -> str:
+    if score == 2:
+        return "Detected high-risk raw SQL string concatenation."
+    libs = r.stats.get("libraries", [])
+    return f"Uses {', '.join(libs) if libs else 'standard JDBC'} for persistence."
+
+def _java_database_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 2:
+        return "Replace raw SQL string concatenation with parameterized PreparedStatement placeholders to prevent SQL injection."
+    if not r.stats.get("migration_tool"):
+        return "Add Flyway or Liquibase to manage database migrations systematically."
+    return None
+
+def _java_di_score(r: ConventionRule) -> int:
+    if r.stats.get("primary_style") == "field":
+        return 3
+    return 5
+
+def _java_di_reason(r: ConventionRule, score: int) -> str:
+    fws = r.stats.get("frameworks", [])
+    return f"Uses {', '.join(fws)} with {r.stats.get('primary_style')} injection."
+
+def _java_di_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 3:
+        return "Migrate from field injection (@Autowired/@Inject) to constructor injection - it simplifies unit testing and avoids hidden dependencies."
+    return None
+
+def _java_logging_score(r: ConventionRule) -> int:
+    if r.stats.get("raw_print_count", 0) > 10:
+        return 2
+    elif r.stats.get("raw_print_count", 0) > 0:
+        return 3
+    return 5
+
+def _java_logging_reason(r: ConventionRule, score: int) -> str:
+    fw = r.stats.get("primary_framework") or "System.out"
+    return f"Uses {fw} for application logging."
+
+def _java_logging_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score <= 3:
+        return "Eliminate raw System.out/err.println statements in favor of structured logging (SLF4J/Logback)."
+    return None
+
+def _java_testing_score(r: ConventionRule) -> int:
+    count = r.stats.get("test_file_count", 0)
+    if count == 0:
+        return 1
+    if count < 3:
+        return 3
+    return 5
+
+def _java_testing_reason(r: ConventionRule, score: int) -> str:
+    return f"Detected {r.stats.get('test_file_count')} test files."
+
+def _java_testing_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 1:
+        return "Add unit and integration tests (JUnit 5 with AssertJ/Mockito is the standard stack)."
+    if r.stats.get("junit_info") and not r.stats.get("junit_info", {}).get("has_parameterized", False):
+        return "Consider using @ParameterizedTest in JUnit 5 to reuse test logic across multiple inputs."
+    return None
+
+def _java_conventions_score(r: ConventionRule) -> int:
+    return 4 if r.stats.get("data_class_style") == "standard classes (POJOs)" else 5
+
+def _java_conventions_reason(r: ConventionRule, score: int) -> str:
+    return f"Uses {r.stats.get('data_class_style')} for data carrier classes."
+
+def _java_conventions_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 4:
+        return "Consider adopting Java Records (Java 16+) or Lombok annotations to reduce boilerplate in data carrier classes."
+    return None
+
+
 # Rating rules registry
 RATING_RULES: dict[str, RatingRule] = {
     # Python typing and documentation
@@ -4010,6 +4135,56 @@ RATING_RULES: dict[str, RatingRule] = {
         reason_func=_kotlin_android_reason,
         suggestion_func=_kotlin_android_suggestion,
     ),
+
+    # Java architecture
+    "java.conventions.architecture": RatingRule(
+        score_func=_java_architecture_score,
+        reason_func=_java_architecture_reason,
+        suggestion_func=_java_architecture_suggestion,
+    ),
+
+    # Java database
+    "java.conventions.database": RatingRule(
+        score_func=_java_database_score,
+        reason_func=_java_database_reason,
+        suggestion_func=_java_database_suggestion,
+    ),
+
+    # Java DI
+    "java.conventions.di": RatingRule(
+        score_func=_java_di_score,
+        reason_func=_java_di_reason,
+        suggestion_func=_java_di_suggestion,
+    ),
+
+    # Java logging
+    "java.conventions.logging": RatingRule(
+        score_func=_java_logging_score,
+        reason_func=_java_logging_reason,
+        suggestion_func=_java_logging_suggestion,
+    ),
+
+    # Java build tooling
+    "java.conventions.build_tools": RatingRule(
+        score_func=_java_build_score,
+        reason_func=_java_build_reason,
+        suggestion_func=_java_build_suggestion,
+    ),
+
+    # Java testing
+    "java.conventions.testing": RatingRule(
+        score_func=_java_testing_score,
+        reason_func=_java_testing_reason,
+        suggestion_func=_java_testing_suggestion,
+    ),
+
+    # Java general conventions
+    "java.conventions.general": RatingRule(
+        score_func=_java_conventions_score,
+        reason_func=_java_conventions_reason,
+        suggestion_func=_java_conventions_suggestion,
+    ),
+
 }
 
 

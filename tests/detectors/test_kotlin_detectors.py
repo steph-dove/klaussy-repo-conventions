@@ -1032,3 +1032,22 @@ class TestAndroidTestIsNotMultiplatform:
         rules = KotlinArchitectureDetector().detect(_ctx(tmp_path)).rules
         assert rules
         assert rules[0].stats["is_multiplatform"] is True
+
+
+class TestKotlinDominantPackageRoot:
+    """Same dominant-prefix contract as Java: one outlier must not collapse the root."""
+
+    def test_outlier_package_does_not_collapse_root(self, tmp_path: Path):
+        _write(tmp_path / "build.gradle.kts", 'plugins { kotlin("jvm") version "1.9.22" }\n')
+        for i in range(9):
+            _write(
+                tmp_path / f"src/main/kotlin/com/acme/app/T{i}.kt",
+                f"package com.acme.app\n\nclass T{i}\n",
+            )
+        _write(
+            tmp_path / "fixtures/src/main/kotlin/com/other/demo/Odd.kt",
+            "package com.other.demo\n\nclass Odd\n",
+        )
+        rules = KotlinArchitectureDetector().detect(_ctx(tmp_path)).rules
+        assert rules
+        assert rules[0].stats["common_package_root"] == "com.acme.app"
