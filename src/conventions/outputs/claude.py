@@ -87,6 +87,13 @@ _TECH_STACK_SUFFIXES = frozenset({
     "message_broker",
     "async_http_client",
     "cargo",
+    # Rust names these without the _framework/_library qualifier the other
+    # languages use. `testing` is also emitted by Go, whose rule carries no
+    # primary_framework stat, so it contributes nothing and Go's own
+    # testing_framework rule still fills the Testing label.
+    "testing",
+    "database",
+    "logging",
     "schema_library",
     "tracing",
     "metrics",
@@ -106,7 +113,15 @@ _SINGLE_TEST_TEMPLATES: dict[str, str] = {
     "testify": "go test ./<pkg>/... -run <TestName> -v",
     "go": "go test ./<pkg>/... -run <TestName> -v",
     "cargo": "cargo test <test_name> -- --exact",
+    "kotest": './gradlew test --tests "com.example.MyTest"',
+    "junit": './gradlew test --tests "com.example.MyTest.myMethod"',
+    "rstest": "cargo test <test_name> -- --exact",
+    "proptest": "cargo test <test_name> -- --exact",
 }
+
+# Rule-ID suffixes carrying test-framework information. Rust names its rule
+# `testing`; the other languages use `testing_framework`.
+_TESTING_SUFFIXES = ("testing_framework", "testing")
 
 
 def _get_suffix(rule: ConventionRule) -> str:
@@ -231,6 +246,7 @@ _CONVENTION_SUFFIXES = frozenset({
     "table_driven_tests", "test_helpers",
     "serialization", "resilience",
     "state_management",
+    "null_safety", "coroutines",
     "config_access",
     "code_owners", "file_hotspots",
     "pr_template",
@@ -600,7 +616,11 @@ def _build_tech_stack_section(
         ("frontend", "Frontend", ["primary_framework", "primary_library"]),
         ("ui_library", "UI library", ["primary_library"]),
         ("testing_framework", "Testing", ["primary_framework", "primary_library"]),
+        ("testing", "Testing", ["primary_framework", "primary_library"]),
         ("db_library", "Database", ["primary_library"]),
+        ("database", "Database", ["primary_library"]),
+        ("cargo", "Build", ["primary_tool"]),
+        ("logging", "Logging", ["primary_framework", "primary_library"]),
         ("formatting", "Formatting", ["primary_formatter", "primary_tool"]),
         ("formatter", "Formatting", ["primary_formatter"]),
         ("linting", "Linting", ["primary_linter", "primary_tool"]),
@@ -686,7 +706,7 @@ def _find_single_test_template(
 ) -> str | None:
     """Find the single-test invocation template from testing framework rules."""
     for rule in tech_rules + include_rules:
-        if _get_suffix(rule) != "testing_framework":
+        if _get_suffix(rule) not in _TESTING_SUFFIXES:
             continue
         fw = (_get_stat(rule, "primary_framework")
               or _get_stat(rule, "primary_library")
@@ -695,7 +715,9 @@ def _find_single_test_template(
             continue
         fw_lower = fw.lower()
         for key, template in _SINGLE_TEST_TEMPLATES.items():
-            if key in fw_lower:
+            # Prefix, not substring: "cargo test" must not match the "go"
+            # template, while "junit5" must still match "junit".
+            if fw_lower.startswith(key):
                 return template
     return None
 
@@ -826,6 +848,63 @@ def _build_commands_from_task_runner(
     return "\n".join(lines)
 
 
+# Build/test invocations for compiled-language toolchains, which declare a build
+# tool rather than a package manager. Keyed on the `primary_tool` stat.
+_BUILD_TOOL_COMMANDS: dict[str, dict[str, str]] = {
+    "gradle": {"build": "./gradlew build", "test": "./gradlew test"},
+    "maven": {"build": "mvn package", "test": "mvn test"},
+    "cargo": {"build": "cargo build", "test": "cargo test"},
+}
+
+# Rule-ID suffixes that describe a build tool.
+_BUILD_TOOL_SUFFIXES = ("build_tools", "cargo")
+
+
+def _framework_test_command(fw_lower: str, pkg_mgr: str | None) -> str | None:
+    """Map a detected test framework to the command that runs its suite.
+
+    Framework names are matched by PREFIX, not substring: `cargo test` contains
+    "go" and `javalin` contains "ava", so substring matching hands a Rust repo
+    the Go test command. Compiled toolchains are absent here on purpose -- they
+    run tests through their build tool, via :func:`_build_tool_command`.
+    """
+    node = pkg_mgr or "npm"
+    if fw_lower.startswith("pytest"):
+        return "pytest"
+    if fw_lower.startswith("ava"):
+        return f"{node} run ava"
+    if fw_lower.startswith(("jest", "vitest", "mocha")):
+        return f"{node} test"
+    if fw_lower.startswith(("go", "testify")):
+        return "go test ./..."
+    return None
+
+
+def _detect_build_tool(
+    tech_rules: list[ConventionRule],
+    include_rules: list[ConventionRule],
+) -> str | None:
+    """Return the detected build tool ('gradle', 'maven', 'cargo') if any."""
+    for rule in tech_rules + include_rules:
+        if _get_suffix(rule) in _BUILD_TOOL_SUFFIXES:
+            tool = _get_stat(rule, "primary_tool", "")
+            if tool in _BUILD_TOOL_COMMANDS:
+                return str(tool)
+    return None
+
+
+def _build_tool_command(
+    tech_rules: list[ConventionRule],
+    include_rules: list[ConventionRule],
+    kind: str,
+) -> str | None:
+    """Return the 'build' or 'test' command for the detected build tool."""
+    tool = _detect_build_tool(tech_rules, include_rules)
+    if tool is None:
+        return None
+    return _BUILD_TOOL_COMMANDS[tool].get(kind)
+
+
 def _build_commands_inferred(
     include_rules: list[ConventionRule],
     tech_rules: list[ConventionRule],
@@ -853,25 +932,16 @@ def _build_commands_inferred(
     # Detect test framework
     test_cmd = None
     for rule in tech_rules + include_rules:
-        if _get_suffix(rule) == "testing_framework":
+        if _get_suffix(rule) in _TESTING_SUFFIXES:
             fw = _get_stat(rule, "primary_framework") or _get_stat(rule, "primary_library") or ""
             if fw:
-                fw_lower = fw.lower()
-                if "pytest" in fw_lower:
-                    test_cmd = "pytest"
-                elif "ava" in fw_lower:
-                    test_cmd = f"{pkg_mgr or 'npm'} run ava"
-                elif "jest" in fw_lower:
-                    test_cmd = f"{pkg_mgr or 'npm'} test"
-                elif "vitest" in fw_lower:
-                    test_cmd = f"{pkg_mgr or 'npm'} test"
-                elif "mocha" in fw_lower:
-                    test_cmd = f"{pkg_mgr or 'npm'} test"
-                elif "go" in fw_lower:
-                    test_cmd = "go test ./..."
-                elif "cargo" in fw_lower:
-                    test_cmd = "cargo test"
+                test_cmd = _framework_test_command(fw.lower(), pkg_mgr)
             break
+
+    # Compiled toolchains (cargo, gradle, maven) run tests through the build
+    # tool, so the framework name doesn't determine the command.
+    if test_cmd is None:
+        test_cmd = _build_tool_command(tech_rules, include_rules, "test")
 
     if pkg_mgr in ("npm", "yarn", "pnpm", "bun"):
         lines.append(f"- **Install**: `{pkg_mgr} install`")
@@ -883,6 +953,11 @@ def _build_commands_inferred(
         lines.append(f"- **Install**: `{pkg_mgr} install`")
     elif pkg_mgr == "go":
         lines.append("- **Build**: `go build ./...`")
+
+    # Compiled toolchains declare a build tool rather than a package manager.
+    build_cmd = _build_tool_command(tech_rules, include_rules, "build")
+    if build_cmd:
+        lines.append(f"- **Build**: `{build_cmd}`")
 
     if test_cmd:
         lines.append(f"- **Test**: `{test_cmd}`")
@@ -1205,7 +1280,11 @@ def _make_prescriptive(rule: ConventionRule, summary: str) -> str:
     # 1. Clean up count and percentage metadata first (e.g. "snake_case (95%)" -> "snake_case")
     summary = re.sub(r"\s*\(\d+/\d+\)", "", summary)
     summary = re.sub(r"\s*\(\d+%\)", "", summary)
-    summary = re.sub(r"\s*\d+%", "", summary)
+    # Only a LEADING bare percentage is metadata (`_summarize_rule` renders the
+    # typescript rule as "72% TypeScript" -> "Use TypeScript"). Stripping bare
+    # percentages anywhere would also hit prose, since summaries fall back to a
+    # detector's description: "(67% of 6 functions)" became "( of 6 functions)".
+    summary = re.sub(r"^\d+%\s*", "", summary)
     summary = summary.strip()
 
     # 2. Apply general heuristic conversions to convert descriptions to imperatives
@@ -1856,6 +1935,8 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "go"
         elif ext == "rs":
             lang = "rust"
+        elif ext in ("kt", "kts"):
+            lang = "kotlin"
         else:
             lang = ""
 

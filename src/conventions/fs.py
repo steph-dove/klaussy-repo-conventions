@@ -12,8 +12,9 @@ except ImportError:
     pathspec = None  # type: ignore
 
 
-# Hard excludes - always skip these directories/patterns
-HARD_EXCLUDES = {
+# Structural excludes — machine-generated or vendored trees. These are artifacts
+# wherever they appear, so they are matched at ANY depth of the relative path.
+STRUCTURAL_EXCLUDES = {
     # VCS
     ".git",
     ".svn",
@@ -41,8 +42,17 @@ HARD_EXCLUDES = {
     "site-packages",
     # Conventions output
     ".conventions",
-    # Documentation & examples — tutorial/example code is not representative
-    # of project conventions and pollutes language detection and pattern analysis
+}
+
+# Content excludes — tutorial/example code is not representative of project
+# conventions and pollutes language detection and pattern analysis.
+#
+# These are matched ONLY at the repository root, where the directory name
+# genuinely denotes its role. Deeper in a source tree the same words are
+# ordinary package names — `com/example/...` is the conventional Java/Kotlin
+# package root (and Android Studio's default), so matching it at any depth
+# silently discards the entire codebase.
+CONTENT_EXCLUDES = {
     "docs",
     "docs_src",
     "doc",
@@ -55,6 +65,10 @@ HARD_EXCLUDES = {
     "demo",
     "demos",
 }
+
+# Every directory name excluded by one rule or the other. Retained as the
+# historical name; prefer the two sets above, which carry the matching depth.
+HARD_EXCLUDES = STRUCTURAL_EXCLUDES | CONTENT_EXCLUDES
 
 # File size limit (skip very large files)
 MAX_FILE_SIZE_BYTES = 1024 * 1024  # 1MB
@@ -80,6 +94,16 @@ def load_gitignore(repo_root: Path) -> Optional["pathspec.PathSpec"]:
         return None
 
 
+def _matches_exclude(part: str, patterns: set[str]) -> bool:
+    """Whether a single path component matches an exclude name or wildcard."""
+    if part in patterns:
+        return True
+    return any(
+        pattern.startswith("*") and part.endswith(pattern[1:])
+        for pattern in patterns
+    )
+
+
 def should_exclude(
     path: Path,
     repo_root: Path,
@@ -87,20 +111,28 @@ def should_exclude(
     custom_excludes: Optional["pathspec.PathSpec"] = None,
 ) -> bool:
     """Check if a path should be excluded from scanning."""
-    # Check hard excludes against any path component
-    for part in path.parts:
-        if part in HARD_EXCLUDES:
-            return True
-        # Handle wildcard patterns
-        for pattern in HARD_EXCLUDES:
-            if pattern.startswith("*") and part.endswith(pattern[1:]):
-                return True
-
     try:
         rel_path = path.relative_to(repo_root)
         rel_path_str = str(rel_path)
     except ValueError:
+        rel_path = None
         rel_path_str = None
+
+    # Excludes are matched against the path RELATIVE to the repository root.
+    # Matching the absolute path would let directories above the repo (a parent
+    # folder named "demo", a CI checkout under "build/") exclude the whole scan.
+    if rel_path is not None:
+        parts = rel_path.parts
+
+        if any(_matches_exclude(part, STRUCTURAL_EXCLUDES) for part in parts):
+            return True
+
+        # Content excludes apply only to a top-level directory: `parts[0]` is
+        # the repo-root entry, and it is only a directory name when the path
+        # goes deeper (otherwise it is the file itself).
+        if parts and _matches_exclude(parts[0], CONTENT_EXCLUDES):
+            if len(parts) > 1 or path.is_dir():
+                return True
 
     # Check gitignore patterns
     if gitignore_spec is not None and rel_path_str is not None:

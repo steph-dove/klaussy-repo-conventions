@@ -123,6 +123,9 @@ class RustCargoDetector(RustDetector):
             evidence=[],
             stats={
                 "crate_type": crate_type,
+                # CLAUDE.md's tech-stack renderer reads `primary_tool` to label
+                # the build system and to infer build/test commands.
+                "primary_tool": "cargo",
                 "is_workspace": is_workspace,
                 "dependency_count": dep_count,
                 "edition": info.get("edition"),

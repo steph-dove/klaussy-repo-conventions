@@ -204,3 +204,22 @@ For an overview of language support, see the [README](../README.md#language-supp
 | **Patterns** | `rust.conventions.macros` | Macro usage (macro_rules!, proc-macro) |
 | **Observability** | `rust.conventions.logging` | Logging (tracing, log) |
 | **Database** | `rust.conventions.database` | Database libraries (SQLx, Diesel, SeaORM) |
+
+## Kotlin
+
+| Category | Convention ID | Description |
+|----------|--------------|-------------|
+| **Project** | `kotlin.conventions.build_tools` | Gradle/Maven build, Kotlin version, JVM target, version catalog |
+| **Testing** | `kotlin.conventions.testing_framework` | Testing frameworks (JUnit 5, Kotest, MockK, Turbine) |
+| **Concurrency** | `kotlin.conventions.coroutines` | Coroutines, Flow, dispatchers, structured concurrency |
+| **Type Safety** | `kotlin.conventions.null_safety` | Null-safety hygiene (`!!`, safe calls, elvis, lateinit) |
+| **Error Handling** | `kotlin.conventions.error_handling` | Error handling (sealed results, runCatching, Arrow) |
+| **Observability** | `kotlin.conventions.logging_library` | Logging (kotlin-logging, SLF4J, Timber) |
+| **Data** | `kotlin.conventions.serialization` | Serialization (kotlinx.serialization, Jackson, Moshi) |
+| **Architecture** | `kotlin.conventions.dependency_injection` | DI framework and wiring (Spring, Koin, Hilt, Dagger) |
+| **Web** | `kotlin.conventions.web_framework` | Web framework and routing (Spring MVC/WebFlux, Ktor) |
+| **Database** | `kotlin.conventions.db_library` | Database access (Exposed, JPA/Hibernate, Room, SQLDelight) |
+| **Documentation** | `kotlin.conventions.documentation` | KDoc coverage and Dokka |
+| **Architecture** | `kotlin.conventions.architecture` | Module layout, source sets, package structure |
+| **Architecture** | `kotlin.conventions.data_flow` | Layer boundaries and DTO mapping |
+| **Frontend** | `kotlin.conventions.android` | Android UI and lifecycle (Compose, ViewModel, StateFlow) |

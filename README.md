@@ -29,8 +29,8 @@ conventions discover
 
 ## 🚀 Key Features
 
-*   **🔍 AST-Backed Convention Scan:** Traverses your AST (Python) and code structures (Go, Node, Rust) to detect style patterns, naming strategies, and testing setups.
-*   **📊 Multi-Language Analysis:** Deep-dives into Python, Go, Node.js/TypeScript, and Rust, plus cross-language assets (Docker, Kubernetes, GitHub Actions).
+*   **🔍 AST-Backed Convention Scan:** Traverses your AST (Python) and code structures (Go, Node, Rust, Kotlin) to detect style patterns, naming strategies, and testing setups.
+*   **📊 Multi-Language Analysis:** Deep-dives into Python, Go, Node.js/TypeScript, Rust, and Kotlin, plus cross-language assets (Docker, Kubernetes, GitHub Actions).
 *   **🗺️ Architecture Data-Flow Maps:** Computes package dependency graphs, detects circular dependencies (DFS), and traces API endpoints down to their database store layers, generating Mermaid flowcharts directly in `CLAUDE.md`.
 *   **🤖 Prescriptive Agent Scoping:** Generates `CLAUDE.md` and path-scoped rules files in `.claude/rules/` with imperative instructions and embedded few-shot code evidence blocks—giving agents the exact models they need to mirror.
 *   **📈 Review & Scoring Gate:** Rates each detected convention on a 1-5 scale, listing prioritized improvement suggestions. Ideal for local quality audits and CI/CD validation gates.
@@ -79,6 +79,7 @@ The engine supports 180+ rules across languages and configurations:
 | **Node.js/TypeScript** | 45+ | TypeScript strictness, jest/vitest frameworks, express/fastify api, mongoose, state management, monorepo workspaces, migrations |
 | **Go** | 40+ | modules, testimony frameworks, stdlib loggers, channels & goroutines, gRPC structures, wire DI, database configurations |
 | **Rust** | 15+ | Cargo configs, tokio async, web frameworks, serialization, macros, unsafe blocks, database ORMs |
+| **Kotlin** | 14+ | Gradle/Maven builds, coroutines & Flow, null-safety (`!!` usage), Kotest/MockK, Spring/Ktor, Exposed/JPA, kotlinx.serialization, Jetpack Compose |
 | **Generic** | 20+ | GitHub workflows, pre-commit configuration, git hooks, Docker/Kubernetes files, repository layout |
 
 *For the full list of convention IDs, see the [Convention ID Reference](docs/conventions-reference.md).*

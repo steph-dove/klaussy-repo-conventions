@@ -2438,6 +2438,490 @@ def _dockerfile_suggestion(r: ConventionRule, score: int) -> str | None:
     return None
 
 
+# ============================================
+# Kotlin rating helpers
+# ============================================
+
+def _kotlin_build_score(r: ConventionRule) -> int:
+    """Score Kotlin build tooling - Kotlin DSL and version catalogs are current practice."""
+    score = 3
+    if r.stats.get("build_system") == "gradle-kotlin-dsl":
+        score += 1
+    if r.stats.get("uses_version_catalog"):
+        score += 1
+    plugins = r.stats.get("plugins", [])
+    if not any("ktlint" in p or "detekt" in p or "spotless" in p for p in plugins):
+        score -= 1
+    return max(1, min(5, score))
+
+
+def _kotlin_build_reason(r: ConventionRule, _score: int) -> str:
+    parts = [str(r.stats.get("build_system", "unknown"))]
+    if r.stats.get("kotlin_version"):
+        parts.append(f"Kotlin {r.stats['kotlin_version']}")
+    if r.stats.get("jvm_target"):
+        parts.append(f"JVM {r.stats['jvm_target']}")
+    parts.append(f"{int(_get_stat(r, 'dependency_count'))} deps")
+    return ", ".join(parts)
+
+
+def _kotlin_build_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if r.stats.get("build_system") == "gradle-groovy":
+        return "Migrate to the Gradle Kotlin DSL (build.gradle.kts) for type-safe, IDE-completable build scripts."
+    if not r.stats.get("uses_version_catalog"):
+        return "Adopt a Gradle version catalog (gradle/libs.versions.toml) to centralize dependency versions."
+    plugins = r.stats.get("plugins", [])
+    if not any("ktlint" in p or "detekt" in p or "spotless" in p for p in plugins):
+        return "Add ktlint or detekt to enforce Kotlin style and catch code smells in CI."
+    return None
+
+
+def _kotlin_testing_score(r: ConventionRule) -> int:
+    """Score Kotlin testing - framework breadth plus a healthy test-to-source ratio."""
+    if int(_get_stat(r, "total_tests")) == 0:
+        return 1
+    score = 2 + min(2, len(r.stats.get("frameworks", [])))
+    if _get_stat(r, "test_to_source_ratio") >= 0.5:
+        score += 1
+    return max(1, min(5, score))
+
+
+def _kotlin_testing_reason(r: ConventionRule, _score: int) -> str:
+    return (
+        f"{int(_get_stat(r, 'total_tests'))} tests across "
+        f"{int(_get_stat(r, 'test_file_count'))} files with "
+        f"{r.stats.get('primary_framework') or 'standard'}"
+    )
+
+
+def _kotlin_testing_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if int(_get_stat(r, "total_tests")) == 0:
+        return "Add tests - JUnit 5 with MockK is the common Kotlin baseline."
+    if _get_stat(r, "test_to_source_ratio") < 0.3:
+        return "Test coverage looks thin relative to source files; add tests for untested modules."
+    if not r.stats.get("uses_mockk"):
+        return "Use MockK rather than Mockito - it handles Kotlin final classes and coroutines natively."
+    if not r.stats.get("uses_coroutine_test"):
+        return "Add kotlinx-coroutines-test (runTest) to test suspend functions deterministically."
+    return None
+
+
+def _kotlin_coroutines_score(r: ConventionRule) -> int:
+    """Score coroutine usage - structured concurrency good, GlobalScope/runBlocking bad."""
+    score = 4 if r.stats.get("uses_flow") else 3
+    if r.stats.get("uses_structured_concurrency"):
+        score += 1
+    score -= min(2, int(_get_stat(r, "global_scope_count")))
+    if int(_get_stat(r, "runblocking_in_production")) > 0:
+        score -= 1
+    return max(1, min(5, score))
+
+
+def _kotlin_coroutines_reason(r: ConventionRule, _score: int) -> str:
+    parts = [f"{int(_get_stat(r, 'suspend_function_count'))} suspend functions"]
+    if r.stats.get("uses_flow"):
+        parts.append("Flow-based streams")
+    if int(_get_stat(r, "global_scope_count")):
+        parts.append(f"{int(_get_stat(r, 'global_scope_count'))} GlobalScope usages")
+    return ", ".join(parts)
+
+
+def _kotlin_coroutines_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if int(_get_stat(r, "global_scope_count")) > 0:
+        return "Replace GlobalScope with a scoped CoroutineScope - GlobalScope leaks coroutines and escapes structured concurrency."
+    if int(_get_stat(r, "runblocking_in_production")) > 0:
+        return "Avoid runBlocking outside tests and main() - it blocks the calling thread."
+    if not r.stats.get("uses_structured_concurrency"):
+        return "Use coroutineScope/supervisorScope so child coroutines are cancelled with their parent."
+    return None
+
+
+def _kotlin_null_safety_score(r: ConventionRule) -> int:
+    """Score null-safety hygiene - `!!` in production is the key penalty."""
+    assertions = int(_get_stat(r, "not_null_assertions"))
+    ratio = _get_stat(r, "safety_ratio")
+
+    if assertions == 0:
+        score = 5
+    elif assertions <= 3:
+        score = 4
+    elif assertions <= 10:
+        score = 3
+    elif assertions <= 25:
+        score = 2
+    else:
+        score = 1
+
+    if ratio >= 0.95 and score < 5:
+        score += 1
+    return max(1, min(5, score))
+
+
+def _kotlin_null_safety_reason(r: ConventionRule, _score: int) -> str:
+    return (
+        f"{int(_get_stat(r, 'not_null_assertions'))} `!!` assertions in production across "
+        f"{int(_get_stat(r, 'files_with_assertions'))} files, "
+        f"{_get_stat(r, 'safety_ratio'):.0%} safe null handling"
+    )
+
+
+def _kotlin_null_safety_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if int(_get_stat(r, "not_null_assertions")) > 0:
+        return "Replace `!!` with `?.let`, elvis (`?:`), or requireNotNull() so failures carry context instead of a bare NPE."
+    if int(_get_stat(r, "lateinit_count")) > 10:
+        return "Prefer constructor injection over lateinit var - lateinit defers null errors to runtime."
+    return None
+
+
+def _kotlin_errors_score(r: ConventionRule) -> int:
+    """Score error handling - modelled failures good, swallowed/broad catches bad."""
+    if r.stats.get("primary") in ("sealed-class-results", "arrow-either"):
+        score = 5
+    elif r.stats.get("uses_result_type") or r.stats.get("runcatching_count"):
+        score = 4
+    else:
+        score = 3
+
+    score -= min(2, int(_get_stat(r, "empty_catch_count")))
+    if int(_get_stat(r, "broad_catch_count")) > 3:
+        score -= 1
+    return max(1, min(5, score))
+
+
+def _kotlin_errors_reason(r: ConventionRule, _score: int) -> str:
+    parts = [f"Error handling: {r.stats.get('primary', 'basic')}"]
+    if int(_get_stat(r, "empty_catch_count")):
+        parts.append(f"{int(_get_stat(r, 'empty_catch_count'))} empty catch blocks")
+    if int(_get_stat(r, "broad_catch_count")):
+        parts.append(f"{int(_get_stat(r, 'broad_catch_count'))} broad catches")
+    return ", ".join(parts)
+
+
+def _kotlin_errors_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if int(_get_stat(r, "empty_catch_count")) > 0:
+        return "Empty catch blocks swallow failures silently - log, rethrow, or model the failure explicitly."
+    if int(_get_stat(r, "broad_catch_count")) > 3:
+        return "Catch specific exception types rather than Exception/Throwable, which also swallows cancellation."
+    if not r.stats.get("sealed_error_types"):
+        return "Model expected failures as a sealed class hierarchy so `when` handling is exhaustive at compile time."
+    return None
+
+
+def _kotlin_logging_score(r: ConventionRule) -> int:
+    """Score logging - a real framework with lazy messages beats println."""
+    if not r.stats.get("primary_framework") or r.stats.get("primary_framework") == "none":
+        return 1
+
+    score = 4 if r.stats.get("primary_framework") in ("kotlin-logging", "slf4j", "timber") else 3
+    if r.stats.get("uses_structured_logging"):
+        score += 1
+    if int(_get_stat(r, "println_in_production")) > 0:
+        score -= 1
+    return max(1, min(5, score))
+
+
+def _kotlin_logging_reason(r: ConventionRule, _score: int) -> str:
+    parts = [f"Logging: {r.stats.get('primary_framework') or 'none'}"]
+    if int(_get_stat(r, "println_in_production")):
+        parts.append(f"{int(_get_stat(r, 'println_in_production'))} println calls in production")
+    return ", ".join(parts)
+
+
+def _kotlin_logging_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if int(_get_stat(r, "println_in_production")) > 0:
+        return "Replace println in production code with a logger so output has levels, structure, and routing."
+    if int(_get_stat(r, "eager_logging_count")) > int(_get_stat(r, "lazy_logging_count")):
+        return "Prefer kotlin-logging's lambda form (logger.info { ... }) so messages are only built when the level is enabled."
+    if not r.stats.get("uses_structured_logging"):
+        return "Add structured context (MDC) so logs are queryable by request or correlation id."
+    return None
+
+
+def _kotlin_serialization_score(r: ConventionRule) -> int:
+    """Score serialization - kotlinx.serialization is the Kotlin-native choice."""
+    primary = r.stats.get("primary_library")
+    if primary == "kotlinx.serialization":
+        score = 5
+    elif primary in ("jackson", "moshi"):
+        score = 4
+    elif primary == "gson":
+        score = 2
+    else:
+        score = 3
+
+    if r.stats.get("jackson_missing_kotlin_module"):
+        score -= 1
+    return max(1, min(5, score))
+
+
+def _kotlin_serialization_reason(r: ConventionRule, _score: int) -> str:
+    return (
+        f"Serialization: {r.stats.get('primary_library') or 'none'} on "
+        f"{int(_get_stat(r, 'serializable_class_count'))} classes"
+    )
+
+
+def _kotlin_serialization_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if r.stats.get("jackson_missing_kotlin_module"):
+        return "Add jackson-module-kotlin - without it Jackson ignores default values and nullability on data classes."
+    if r.stats.get("primary_library") == "gson":
+        return "Migrate off Gson - it ignores Kotlin nullability and default values, and is effectively unmaintained."
+    if r.stats.get("primary_library") != "kotlinx.serialization":
+        return "Consider kotlinx.serialization for compile-time-checked, reflection-free serialization."
+    return None
+
+
+def _kotlin_di_score(r: ConventionRule) -> int:
+    """Score dependency injection - constructor injection is the testable form."""
+    if r.stats.get("framework") == "manual":
+        return 3
+
+    constructor = int(_get_stat(r, "constructor_injection_count"))
+    field = int(_get_stat(r, "field_injection_count"))
+    total = constructor + field
+    if total == 0:
+        return 3
+
+    ratio = constructor / total
+    if ratio >= 0.95:
+        return 5
+    if ratio >= 0.8:
+        return 4
+    if ratio >= 0.5:
+        return 3
+    return 2
+
+
+def _kotlin_di_reason(r: ConventionRule, _score: int) -> str:
+    return (
+        f"DI: {r.stats.get('framework', 'none')}, "
+        f"{int(_get_stat(r, 'constructor_injection_count'))} constructor / "
+        f"{int(_get_stat(r, 'field_injection_count'))} field injections"
+    )
+
+
+def _kotlin_di_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if r.stats.get("uses_field_injection"):
+        return "Switch field injection (@Autowired/@Inject on properties) to constructor injection - it keeps dependencies explicit, immutable, and testable without a container."
+    return None
+
+
+def _kotlin_web_score(r: ConventionRule) -> int:
+    """Score web layer - validation and error handling matter more than framework choice."""
+    if r.stats.get("is_client_only") or r.stats.get("framework") in (None, "none"):
+        return 3
+
+    score = 3
+    if r.stats.get("uses_validation"):
+        score += 1
+    if r.stats.get("has_error_handler"):
+        score += 1
+    if not r.stats.get("uses_versioning"):
+        score -= 1
+    return max(1, min(5, score))
+
+
+def _kotlin_web_reason(r: ConventionRule, _score: int) -> str:
+    return f"Web: {r.stats.get('framework', 'none')} with {int(_get_stat(r, 'route_count'))} routes"
+
+
+def _kotlin_web_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if not r.stats.get("has_error_handler"):
+        return "Add a central error handler (@ControllerAdvice or Ktor StatusPages) so failures map to consistent responses."
+    if not r.stats.get("uses_validation"):
+        return "Validate request bodies at the boundary (@Valid / jakarta.validation) instead of inside handlers."
+    if not r.stats.get("uses_versioning"):
+        return "Version API paths (e.g. /api/v1) so breaking changes don't strand existing clients."
+    return None
+
+
+def _kotlin_database_score(r: ConventionRule) -> int:
+    """Score database access - type-safe access plus migrations."""
+    if not r.stats.get("primary_library"):
+        return 3
+
+    score = 4 if r.stats.get("primary_library") in ("exposed", "sqldelight", "jooq", "spring-data-jpa", "room") else 3
+    if r.stats.get("uses_migrations"):
+        score += 1
+    if int(_get_stat(r, "raw_sql_interpolation_count")) > 0:
+        score -= 2
+    return max(1, min(5, score))
+
+
+def _kotlin_database_reason(r: ConventionRule, _score: int) -> str:
+    parts = [f"Database: {r.stats.get('primary_library') or 'none'}"]
+    if r.stats.get("migration_tool"):
+        parts.append(f"migrations via {r.stats['migration_tool']}")
+    else:
+        parts.append("no migration tool")
+    if int(_get_stat(r, "raw_sql_interpolation_count")):
+        parts.append(f"{int(_get_stat(r, 'raw_sql_interpolation_count'))} interpolated SQL strings")
+    return ", ".join(parts)
+
+
+def _kotlin_database_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if int(_get_stat(r, "raw_sql_interpolation_count")) > 0:
+        return "Interpolating values into SQL strings risks injection - use bound parameters or the query DSL."
+    if not r.stats.get("uses_migrations"):
+        return "Add a migration tool (Flyway or Liquibase) so schema changes are versioned and reproducible."
+    return None
+
+
+def _kotlin_documentation_score(r: ConventionRule) -> int:
+    """Score KDoc coverage on the public API."""
+    coverage = _get_stat(r, "coverage")
+    if coverage >= 0.8:
+        return 5
+    if coverage >= 0.6:
+        return 4
+    if coverage >= 0.4:
+        return 3
+    if coverage >= 0.2:
+        return 2
+    return 1
+
+
+def _kotlin_documentation_reason(r: ConventionRule, _score: int) -> str:
+    parts = [
+        f"KDoc coverage {_get_stat(r, 'coverage'):.0%} on "
+        f"{int(_get_stat(r, 'public_function_count'))} public functions"
+    ]
+    if r.stats.get("uses_dokka"):
+        parts.append("Dokka configured")
+    return ", ".join(parts)
+
+
+def _kotlin_documentation_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    coverage = _get_stat(r, "coverage")
+    if coverage < 0.5:
+        return "Add KDoc to public declarations - start with the exported API surface."
+    if not r.stats.get("uses_dokka"):
+        return "Add the Dokka plugin to publish KDoc as browsable API docs."
+    return None
+
+
+def _kotlin_architecture_score(r: ConventionRule) -> int:
+    """Score project structure - clear layering and package-by-feature scale better."""
+    score = 3
+    if r.stats.get("package_style") == "package-by-feature":
+        score += 1
+    elif r.stats.get("package_style") == "flat":
+        score -= 1
+    if r.stats.get("uses_clean_architecture"):
+        score += 1
+    if len(r.stats.get("layers", [])) >= 3:
+        score += 1
+    return max(1, min(5, score))
+
+
+def _kotlin_architecture_reason(r: ConventionRule, _score: int) -> str:
+    return (
+        f"{r.stats.get('structure', 'unknown')}, {r.stats.get('package_style', 'unknown')}, "
+        f"{len(r.stats.get('layers', []))} layers across {int(_get_stat(r, 'file_count'))} files"
+    )
+
+
+def _kotlin_architecture_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if r.stats.get("package_style") == "flat":
+        return "Group code into packages by feature - a flat package makes ownership and boundaries hard to see."
+    if r.stats.get("package_style") == "package-by-layer":
+        return "Consider package-by-feature over package-by-layer - it keeps related code together and localizes change."
+    return None
+
+
+def _kotlin_data_flow_score(r: ConventionRule) -> int:
+    """Score layering discipline - violations are the penalty."""
+    score = 4 if r.stats.get("follows_layered_flow") else 3
+    if r.stats.get("uses_dto_mapping"):
+        score += 1
+    score -= min(2, int(_get_stat(r, "layer_violations")))
+    return max(1, min(5, score))
+
+
+def _kotlin_data_flow_reason(r: ConventionRule, _score: int) -> str:
+    # `layers` is a sorted set of layer names, not a path -- don't render it with
+    # arrows, which would imply a flow order the stat doesn't carry.
+    layers = r.stats.get("layers", [])
+    parts = [f"{len(layers)} layers ({', '.join(layers)})" if layers else "flat structure"]
+    if r.stats.get("follows_layered_flow"):
+        parts.append("follows api -> service -> db")
+    if int(_get_stat(r, "layer_violations")):
+        parts.append(f"{int(_get_stat(r, 'layer_violations'))} layer violations")
+    return ", ".join(parts)
+
+
+def _kotlin_data_flow_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if int(_get_stat(r, "layer_violations")) > 0:
+        return "Some controllers reach past the service layer straight into repositories - route access through services to keep business rules in one place."
+    if not r.stats.get("uses_dto_mapping"):
+        return "Map entities to DTOs at the boundary so persistence types don't leak into the API contract."
+    if int(_get_stat(r, "mutable_dto_count")) > 0:
+        return "Use `val` in data-class DTOs - mutable transfer objects invite accidental shared-state bugs."
+    return None
+
+
+def _kotlin_android_score(r: ConventionRule) -> int:
+    """Score Android conventions against current Jetpack guidance."""
+    score = 3
+    if r.stats.get("ui_toolkit") == "compose":
+        score += 1
+    if r.stats.get("state_holder") == "stateflow":
+        score += 1
+    elif r.stats.get("state_holder") == "livedata":
+        score -= 1
+    if r.stats.get("uses_synthetics"):
+        score -= 2
+    return max(1, min(5, score))
+
+
+def _kotlin_android_reason(r: ConventionRule, _score: int) -> str:
+    parts = [
+        f"Android: {r.stats.get('ui_toolkit', 'unknown')} UI",
+        f"{r.stats.get('state_holder', 'none')} state",
+    ]
+    if r.stats.get("uses_synthetics"):
+        parts.append("deprecated synthetics")
+    return ", ".join(parts)
+
+
+def _kotlin_android_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if r.stats.get("uses_synthetics"):
+        return "Migrate off kotlinx.android.synthetic - it was removed in Kotlin 1.9; use ViewBinding or Compose."
+    if r.stats.get("state_holder") == "livedata":
+        return "Prefer StateFlow over LiveData for new code - it is Kotlin-native and works outside the Android framework."
+    if r.stats.get("ui_toolkit") == "views":
+        return "Consider Jetpack Compose for new screens - it is the current Android UI direction."
+    return None
+
+
 # Rating rules registry
 RATING_RULES: dict[str, RatingRule] = {
     # Python typing and documentation
@@ -3423,6 +3907,108 @@ RATING_RULES: dict[str, RatingRule] = {
         score_func=lambda r: 5 if r.stats.get("primary_library") in ("sqlx", "diesel", "sea_orm") else 4 if r.stats.get("primary_library") else 3,
         reason_func=lambda r, _: f"Database: {r.stats.get('primary_library', 'none')}",
         suggestion_func=lambda r, s: None if s >= 5 else "Use SQLx or Diesel for type-safe database access.",
+    ),
+
+    # ============================================
+    # Kotlin conventions
+    # ============================================
+
+    # Kotlin build tooling
+    "kotlin.conventions.build_tools": RatingRule(
+        score_func=_kotlin_build_score,
+        reason_func=_kotlin_build_reason,
+        suggestion_func=_kotlin_build_suggestion,
+    ),
+
+    # Kotlin testing
+    "kotlin.conventions.testing_framework": RatingRule(
+        score_func=_kotlin_testing_score,
+        reason_func=_kotlin_testing_reason,
+        suggestion_func=_kotlin_testing_suggestion,
+    ),
+
+    # Kotlin coroutines
+    "kotlin.conventions.coroutines": RatingRule(
+        score_func=_kotlin_coroutines_score,
+        reason_func=_kotlin_coroutines_reason,
+        suggestion_func=_kotlin_coroutines_suggestion,
+    ),
+
+    # Kotlin null safety
+    "kotlin.conventions.null_safety": RatingRule(
+        score_func=_kotlin_null_safety_score,
+        reason_func=_kotlin_null_safety_reason,
+        suggestion_func=_kotlin_null_safety_suggestion,
+    ),
+
+    # Kotlin error handling
+    "kotlin.conventions.error_handling": RatingRule(
+        score_func=_kotlin_errors_score,
+        reason_func=_kotlin_errors_reason,
+        suggestion_func=_kotlin_errors_suggestion,
+    ),
+
+    # Kotlin logging
+    "kotlin.conventions.logging_library": RatingRule(
+        score_func=_kotlin_logging_score,
+        reason_func=_kotlin_logging_reason,
+        suggestion_func=_kotlin_logging_suggestion,
+    ),
+
+    # Kotlin serialization
+    "kotlin.conventions.serialization": RatingRule(
+        score_func=_kotlin_serialization_score,
+        reason_func=_kotlin_serialization_reason,
+        suggestion_func=_kotlin_serialization_suggestion,
+    ),
+
+    # Kotlin dependency injection
+    "kotlin.conventions.dependency_injection": RatingRule(
+        score_func=_kotlin_di_score,
+        reason_func=_kotlin_di_reason,
+        suggestion_func=_kotlin_di_suggestion,
+    ),
+
+    # Kotlin web framework
+    "kotlin.conventions.web_framework": RatingRule(
+        score_func=_kotlin_web_score,
+        reason_func=_kotlin_web_reason,
+        suggestion_func=_kotlin_web_suggestion,
+    ),
+
+    # Kotlin database
+    "kotlin.conventions.db_library": RatingRule(
+        score_func=_kotlin_database_score,
+        reason_func=_kotlin_database_reason,
+        suggestion_func=_kotlin_database_suggestion,
+    ),
+
+    # Kotlin documentation
+    "kotlin.conventions.documentation": RatingRule(
+        score_func=_kotlin_documentation_score,
+        reason_func=_kotlin_documentation_reason,
+        suggestion_func=_kotlin_documentation_suggestion,
+    ),
+
+    # Kotlin architecture
+    "kotlin.conventions.architecture": RatingRule(
+        score_func=_kotlin_architecture_score,
+        reason_func=_kotlin_architecture_reason,
+        suggestion_func=_kotlin_architecture_suggestion,
+    ),
+
+    # Kotlin data flow
+    "kotlin.conventions.data_flow": RatingRule(
+        score_func=_kotlin_data_flow_score,
+        reason_func=_kotlin_data_flow_reason,
+        suggestion_func=_kotlin_data_flow_suggestion,
+    ),
+
+    # Kotlin Android
+    "kotlin.conventions.android": RatingRule(
+        score_func=_kotlin_android_score,
+        reason_func=_kotlin_android_reason,
+        suggestion_func=_kotlin_android_suggestion,
     ),
 }
 

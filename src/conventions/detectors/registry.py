@@ -42,9 +42,11 @@ def register_all_detectors() -> None:
     # Go detectors
     # Node.js detectors
     # Rust detectors
+    # Kotlin detectors
     from . import (
         generic,  # noqa: F401
         go,  # noqa: F401
+        kotlin,  # noqa: F401
         node,  # noqa: F401
         python,  # noqa: F401
         rust,  # noqa: F401

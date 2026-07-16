@@ -2,7 +2,11 @@
 from __future__ import annotations
 
 from conventions.outputs.claude import (
+    _build_tool_command,
     _classify_rule,
+    _detect_build_tool,
+    _framework_test_command,
+    _make_prescriptive,
     _summarize_rule,
     generate_claude_md,
     write_claude_md,
@@ -1253,3 +1257,88 @@ class TestAgentCompatibilityFeatures:
         assert "- Test flakiness fix" in result
 
 
+
+
+class TestPrescriptiveMetadataStripping:
+    """Tests for percentage/count metadata cleanup in prescriptive summaries."""
+
+    def test_leading_percentage_is_stripped(self):
+        """A leading bare percentage is metadata ("72% TypeScript" -> "TypeScript")."""
+        rule = _make_rule("typescript", stats={"ts_ratio": 72})
+        result = _make_prescriptive(rule, _summarize_rule(rule))
+        assert "72%" not in result
+        assert "TypeScript" in result
+
+    def test_mid_sentence_percentage_is_preserved(self):
+        """A percentage inside prose is content, not metadata, and must survive.
+
+        Summaries fall back to a detector's description, so stripping bare
+        percentages anywhere turned "(67% of 6 functions)" into "( of 6 functions)".
+        """
+        desc = "Uses coroutines. 4 suspend functions (67% of 6 functions)."
+        rule = _make_rule("coroutines", description=desc)
+        result = _make_prescriptive(rule, desc)
+        assert "67% of 6 functions" in result
+        assert "( of" not in result
+
+    def test_parenthesized_percentage_metadata_still_stripped(self):
+        """Trailing "(85%)" metadata is still removed."""
+        rule = _make_rule("file_naming", stats={"dominant_style": "kebab-case", "dominant_percentage": 85})
+        result = _make_prescriptive(rule, _summarize_rule(rule))
+        assert "85%" not in result
+        assert "kebab-case" in result
+
+    def test_count_metadata_still_stripped(self):
+        """Trailing "(12/14)" count metadata is still removed."""
+        rule = _make_rule("naming", description="Uses snake_case (12/14)")
+        result = _make_prescriptive(rule, "Uses snake_case (12/14)")
+        assert "12/14" not in result
+
+
+class TestTestCommandResolution:
+    """Tests for framework/build-tool test command inference."""
+
+    def test_framework_matching_is_prefix_not_substring(self):
+        """"cargo test" must not resolve to the Go command.
+
+        "cargo" contains "go" and "javalin" contains "ava", so substring
+        matching handed Rust repos `go test ./...`.
+        """
+        assert _framework_test_command("cargo test", None) is None
+        assert _framework_test_command("javalin", None) is None
+
+    def test_known_frameworks_still_resolve(self):
+        assert _framework_test_command("pytest", None) == "pytest"
+        assert _framework_test_command("go", None) == "go test ./..."
+        assert _framework_test_command("testify", None) == "go test ./..."
+        assert _framework_test_command("jest", "pnpm") == "pnpm test"
+        assert _framework_test_command("ava", None) == "npm run ava"
+
+    def test_build_tool_commands(self):
+        """Compiled toolchains derive build/test commands from `primary_tool`."""
+        for tool, build, test in (
+            ("cargo", "cargo build", "cargo test"),
+            ("gradle", "./gradlew build", "./gradlew test"),
+            ("maven", "mvn package", "mvn test"),
+        ):
+            rule = _make_rule("build_tools", stats={"primary_tool": tool})
+            assert _build_tool_command([rule], [], "build") == build
+            assert _build_tool_command([rule], [], "test") == test
+
+    def test_rust_cargo_suffix_is_a_build_tool(self):
+        """Rust names its build rule `cargo` rather than `build_tools`."""
+        rule = ConventionRule(
+            id="rust.conventions.cargo",
+            category="build",
+            title="Cargo",
+            description="d",
+            confidence=0.9,
+            language="rust",
+            stats={"primary_tool": "cargo"},
+        )
+        assert _detect_build_tool([rule], []) == "cargo"
+        assert _build_tool_command([rule], [], "test") == "cargo test"
+
+    def test_no_build_tool_detected(self):
+        assert _detect_build_tool([], []) is None
+        assert _build_tool_command([], [], "test") is None

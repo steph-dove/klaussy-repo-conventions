@@ -50,6 +50,11 @@ def detect_languages(repo_root: Path, exclude_patterns: Optional[list[str]] = No
     if rust_files:
         languages.add("rust")
 
+    # Check for Kotlin files
+    kotlin_files = list(walk_files(repo_root, {".kt", ".kts"}, max_files=5, exclude_patterns=detection_excludes))
+    if kotlin_files:
+        languages.add("kotlin")
+
     return languages
 
 

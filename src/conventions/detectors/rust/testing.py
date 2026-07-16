@@ -111,9 +111,16 @@ class RustTestingDetector(RustDetector):
         if not patterns:
             return result
 
-        [p["name"] for p in patterns.values()]
         total_tests = patterns.get("unit_tests", {}).get("count", 0)
         total_tests += integration_test_count
+
+        # Rust's test harness is built into cargo; a named framework only layers
+        # on top of it. Report the most specific one present.
+        primary_framework = "cargo test"
+        for candidate in ("rstest", "proptest", "quickcheck", "test_case"):
+            if candidate in patterns:
+                primary_framework = candidate
+                break
 
         title = f"Testing: {total_tests} tests"
         description = f"Has {total_tests} test(s)."
@@ -145,6 +152,7 @@ class RustTestingDetector(RustDetector):
             evidence=evidence,
             stats={
                 "total_tests": total_tests,
+                "primary_framework": primary_framework,
                 "patterns": list(patterns.keys()),
                 "pattern_details": patterns,
                 "assert_eq_count": assert_eq_count,
