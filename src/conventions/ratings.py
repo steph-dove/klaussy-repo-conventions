@@ -3047,6 +3047,125 @@ def _java_conventions_suggestion(r: ConventionRule, score: int) -> str | None:
     return None
 
 
+# C# rating helpers
+def _csharp_build_score(r: ConventionRule) -> int:
+    """Score .NET build config - analyzers and nullable are the quality gates."""
+    score = 3
+    if r.stats.get("quality_packages"):
+        score += 1
+    if r.stats.get("nullable_projects"):
+        score += 1
+    return max(1, min(5, score))
+
+
+def _csharp_build_reason(r: ConventionRule, _score: int) -> str:
+    parts = [".NET SDK"]
+    frameworks = r.stats.get("target_frameworks", [])
+    if frameworks:
+        parts.append(", ".join(frameworks[:3]))
+    parts.append(f"{int(_get_stat(r, 'project_count'))} projects")
+    return ", ".join(parts)
+
+
+def _csharp_build_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if not r.stats.get("nullable_projects"):
+        return (
+            "Enable nullable reference types (<Nullable>enable</Nullable>) so the compiler "
+            "catches null-dereference bugs."
+        )
+    if not r.stats.get("quality_packages"):
+        return (
+            "Add an analyzer package (StyleCop.Analyzers or Microsoft.CodeAnalysis.NetAnalyzers) "
+            "so style and correctness are enforced by the build."
+        )
+    return None
+
+
+def _csharp_architecture_score(r: ConventionRule) -> int:
+    return 5 if r.stats.get("structure") == "multi-module" or len(r.stats.get("layers", [])) >= 3 else 4
+
+def _csharp_architecture_reason(r: ConventionRule, score: int) -> str:
+    return f"Structured as a {r.stats.get('structure')} C# application."
+
+def _csharp_architecture_suggestion(r: ConventionRule, score: int) -> str | None:
+    if len(r.stats.get("layers", [])) < 3:
+        return "Establish clear layering (controllers, services, repositories) for separation of concerns."
+    return None
+
+def _csharp_database_score(r: ConventionRule) -> int:
+    if r.stats.get("raw_sql_concat_count", 0) > 0:
+        return 2
+    return 5 if r.stats.get("libraries") else 4
+
+def _csharp_database_reason(r: ConventionRule, score: int) -> str:
+    if score == 2:
+        return "Detected high-risk raw SQL string concatenation."
+    libs = r.stats.get("libraries", [])
+    return f"Uses {', '.join(libs) if libs else 'direct ADO.NET'} for persistence."
+
+def _csharp_database_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 2:
+        return "Replace raw SQL string concatenation with SQL parameter binding to prevent SQL injection."
+    return None
+
+def _csharp_di_score(r: ConventionRule) -> int:
+    return 5
+
+def _csharp_di_reason(r: ConventionRule, score: int) -> str:
+    fws = r.stats.get("frameworks", [])
+    return f"Uses {', '.join(fws)} with {r.stats.get('primary_style')} injection."
+
+def _csharp_di_suggestion(r: ConventionRule, score: int) -> str | None:
+    return None
+
+def _csharp_logging_score(r: ConventionRule) -> int:
+    if r.stats.get("raw_print_count", 0) > 10:
+        return 2
+    elif r.stats.get("raw_print_count", 0) > 0:
+        return 3
+    return 5
+
+def _csharp_logging_reason(r: ConventionRule, score: int) -> str:
+    fw = r.stats.get("primary_framework") or "Console"
+    return f"Uses {fw} for application logging."
+
+def _csharp_logging_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score <= 3:
+        return "Eliminate raw Console.WriteLine statements in production code in favor of structured Logging (ILogger / Serilog)."
+    return None
+
+def _csharp_testing_score(r: ConventionRule) -> int:
+    count = r.stats.get("test_file_count", 0)
+    if count == 0:
+        return 1
+    if count < 3:
+        return 3
+    return 5
+
+def _csharp_testing_reason(r: ConventionRule, score: int) -> str:
+    return f"Detected {r.stats.get('test_file_count')} test files."
+
+def _csharp_testing_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 1:
+        return "Add unit and integration tests (xUnit / NUnit with Moq or NSubstitute)."
+    return None
+
+def _csharp_conventions_score(r: ConventionRule) -> int:
+    ratio = r.stats.get("nullable_ratio", 0.0)
+    return 5 if ratio > 0.8 else 4
+
+def _csharp_conventions_reason(r: ConventionRule, score: int) -> str:
+    ratio = r.stats.get("nullable_ratio", 0.0)
+    return f"C# conventions with {ratio * 100:.0f}% nullable reference types coverage."
+
+def _csharp_conventions_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 4:
+        return "Enable Nullable Reference Types (`<Nullable>enable</Nullable>`) across all project files to enforce compile-time null safety."
+    return None
+
+
 # Rating rules registry
 RATING_RULES: dict[str, RatingRule] = {
     # Python typing and documentation
@@ -4183,6 +4302,55 @@ RATING_RULES: dict[str, RatingRule] = {
         score_func=_java_conventions_score,
         reason_func=_java_conventions_reason,
         suggestion_func=_java_conventions_suggestion,
+    ),
+
+    # C# architecture
+    "csharp.conventions.architecture": RatingRule(
+        score_func=_csharp_architecture_score,
+        reason_func=_csharp_architecture_reason,
+        suggestion_func=_csharp_architecture_suggestion,
+    ),
+
+    # C# database
+    "csharp.conventions.database": RatingRule(
+        score_func=_csharp_database_score,
+        reason_func=_csharp_database_reason,
+        suggestion_func=_csharp_database_suggestion,
+    ),
+
+    # C# DI
+    "csharp.conventions.di": RatingRule(
+        score_func=_csharp_di_score,
+        reason_func=_csharp_di_reason,
+        suggestion_func=_csharp_di_suggestion,
+    ),
+
+    # C# logging
+    "csharp.conventions.logging": RatingRule(
+        score_func=_csharp_logging_score,
+        reason_func=_csharp_logging_reason,
+        suggestion_func=_csharp_logging_suggestion,
+    ),
+
+    # C# build tooling
+    "csharp.conventions.build_tools": RatingRule(
+        score_func=_csharp_build_score,
+        reason_func=_csharp_build_reason,
+        suggestion_func=_csharp_build_suggestion,
+    ),
+
+    # C# testing
+    "csharp.conventions.testing": RatingRule(
+        score_func=_csharp_testing_score,
+        reason_func=_csharp_testing_reason,
+        suggestion_func=_csharp_testing_suggestion,
+    ),
+
+    # C# general conventions
+    "csharp.conventions.general": RatingRule(
+        score_func=_csharp_conventions_score,
+        reason_func=_csharp_conventions_reason,
+        suggestion_func=_csharp_conventions_suggestion,
     ),
 
 }

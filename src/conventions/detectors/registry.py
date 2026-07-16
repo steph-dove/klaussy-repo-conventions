@@ -44,6 +44,7 @@ def register_all_detectors() -> None:
     # Rust detectors
     # Kotlin detectors
     from . import (
+        csharp,  # noqa: F401
         generic,  # noqa: F401
         go,  # noqa: F401
         java,  # noqa: F401

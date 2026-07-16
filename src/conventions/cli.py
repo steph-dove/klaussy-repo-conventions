@@ -36,7 +36,7 @@ def discover(
     languages: Optional[str] = typer.Option(
         None,
         "-l", "--languages",
-        help="Comma-separated languages to analyze (python,go,node,rust,kotlin,java). Auto-detect if not specified.",
+        help="Comma-separated languages to analyze (python,go,node,rust,kotlin,java,csharp). Auto-detect if not specified.",
     ),
     max_files: Optional[int] = typer.Option(
         None,
@@ -121,7 +121,7 @@ def discover(
         lang_set = None
 
     if lang_set:
-        valid_langs = {"python", "go", "node", "rust", "kotlin", "java"}
+        valid_langs = {"python", "go", "node", "rust", "kotlin", "java", "csharp"}
         invalid = lang_set - valid_langs
         if invalid:
             console.print(f"[red]Invalid languages: {', '.join(invalid)}[/red]")

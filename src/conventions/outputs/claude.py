@@ -116,6 +116,9 @@ _SINGLE_TEST_TEMPLATES: dict[str, str] = {
     # there depends on the BUILD TOOL, not the framework. JUnit runs under Gradle
     # *or* Maven, so a framework-keyed template hands Maven projects a `./gradlew`
     # command that does not exist. Those live in _BUILD_TOOL_COMMANDS instead.
+    "xunit": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
+    "nunit": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
+    "mstest": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
 }
 
 # Rule-ID suffixes carrying test-framework information. Rust names its rule
@@ -868,6 +871,11 @@ _BUILD_TOOL_COMMANDS: dict[str, dict[str, str]] = {
         "build": "cargo build",
         "test": "cargo test",
         "test_single": "cargo test <test_name> -- --exact",
+    },
+    "dotnet": {
+        "build": "dotnet build",
+        "test": "dotnet test",
+        "test_single": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
     },
 }
 
@@ -1954,6 +1962,8 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "kotlin"
         elif ext == "java":
             lang = "java"
+        elif ext == "cs":
+            lang = "csharp"
         else:
             lang = ""
 
