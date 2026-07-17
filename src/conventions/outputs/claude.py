@@ -125,6 +125,11 @@ _SINGLE_TEST_TEMPLATES: dict[str, str] = {
     "rspec": "bundle exec rspec <file>:<line>",
     "xctest": "swift test --filter <TestName>",
     "swift-testing": "swift test --filter <TestName>",
+    "phpunit": "./vendor/bin/phpunit --filter <TestMethod>",
+    "pest": "./vendor/bin/pest --filter <TestMethod>",
+    "gtest": "./build/bin/tests --gtest_filter=<TestName>",
+    "catch": './build/bin/tests "<TestCaseName>"',
+    "doctest": './build/bin/tests --tc="<TestCaseName>"',
 }
 
 # Rule-ID suffixes carrying test-framework information. Rust names its rule
@@ -1985,6 +1990,8 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "ruby"
         elif ext == "swift":
             lang = "swift"
+        elif ext == "php" or ev.file_path.endswith("composer.json"):
+            lang = "php"
         else:
             lang = ""
 

@@ -3262,6 +3262,45 @@ def _swift_testing_suggestion(r: ConventionRule, score: int) -> str | None:
     return None
 
 
+# PHP rating helpers
+def _php_architecture_score(r: ConventionRule) -> int:
+    return 5
+
+def _php_architecture_reason(r: ConventionRule, score: int) -> str:
+    return f"Structured as a {r.stats.get('framework')}."
+
+def _php_architecture_suggestion(r: ConventionRule, score: int) -> str | None:
+    if not r.stats.get("has_phpcs"):
+        return "Add PHP CS Fixer or PHP_CodeSniffer to enforce PHP code style and formatting standards."
+    return None
+
+def _php_database_score(r: ConventionRule) -> int:
+    return 5
+
+def _php_database_reason(r: ConventionRule, score: int) -> str:
+    libs = r.stats.get("libraries", [])
+    return f"Uses {', '.join(libs)} for database access and migrations."
+
+def _php_database_suggestion(r: ConventionRule, score: int) -> str | None:
+    return None
+
+def _php_testing_score(r: ConventionRule) -> int:
+    count = r.stats.get("test_file_count", 0)
+    if count == 0:
+        return 1
+    if count < 3:
+        return 3
+    return 5
+
+def _php_testing_reason(r: ConventionRule, score: int) -> str:
+    return f"Detected {r.stats.get('test_file_count')} test files."
+
+def _php_testing_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 1:
+        return "Add unit and integration tests (PHPUnit or Pest are the standard PHP testing frameworks)."
+    return None
+
+
 # Rating rules registry
 RATING_RULES: dict[str, RatingRule] = {
     # Python typing and documentation
@@ -4490,6 +4529,28 @@ RATING_RULES: dict[str, RatingRule] = {
         reason_func=_swift_testing_reason,
         suggestion_func=_swift_testing_suggestion,
     ),
+
+    # PHP architecture
+    "php.conventions.architecture": RatingRule(
+        score_func=_php_architecture_score,
+        reason_func=_php_architecture_reason,
+        suggestion_func=_php_architecture_suggestion,
+    ),
+
+    # PHP database
+    "php.conventions.database": RatingRule(
+        score_func=_php_database_score,
+        reason_func=_php_database_reason,
+        suggestion_func=_php_database_suggestion,
+    ),
+
+    # PHP testing
+    "php.conventions.testing": RatingRule(
+        score_func=_php_testing_score,
+        reason_func=_php_testing_reason,
+        suggestion_func=_php_testing_suggestion,
+    ),
+
 }
 
 
