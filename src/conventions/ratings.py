@@ -3166,6 +3166,73 @@ def _csharp_conventions_suggestion(r: ConventionRule, score: int) -> str | None:
     return None
 
 
+# Ruby rating helpers
+def _ruby_build_score(r: ConventionRule) -> int:
+    """Score Ruby build config - a committed lockfile and quality gems."""
+    score = 3
+    if r.stats.get("quality_gems"):
+        score += 1
+    # A gem intentionally does not commit Gemfile.lock; an application should.
+    if r.stats.get("has_lockfile") or r.stats.get("is_gem"):
+        score += 1
+    return max(1, min(5, score))
+
+
+def _ruby_build_reason(r: ConventionRule, _score: int) -> str:
+    return (
+        f"Bundler, {r.stats.get('project_type', 'Ruby project')}, "
+        f"{int(_get_stat(r, 'gem_count'))} gems"
+    )
+
+
+def _ruby_build_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score >= 5:
+        return None
+    if not r.stats.get("has_lockfile") and not r.stats.get("is_gem"):
+        return "Commit Gemfile.lock so deployments resolve the same gem versions as development."
+    if not r.stats.get("quality_gems"):
+        return "Add RuboCop (or Standard) so style is enforced by the build rather than by review."
+    return None
+
+
+def _ruby_rails_conventions_score(r: ConventionRule) -> int:
+    return 5 if r.stats.get("is_rails") else 4
+
+def _ruby_rails_conventions_reason(r: ConventionRule, score: int) -> str:
+    return f"Structured as a {r.stats.get('structure')} codebase."
+
+def _ruby_rails_conventions_suggestion(r: ConventionRule, score: int) -> str | None:
+    if not r.stats.get("has_rubocop"):
+        return "Add RuboCop to enforce Ruby styling and formatting guidelines across the codebase."
+    return None
+
+def _ruby_database_score(r: ConventionRule) -> int:
+    return 5
+
+def _ruby_database_reason(r: ConventionRule, score: int) -> str:
+    libs = r.stats.get("libraries", [])
+    return f"Uses {', '.join(libs)} for database access and migrations."
+
+def _ruby_database_suggestion(r: ConventionRule, score: int) -> str | None:
+    return None
+
+def _ruby_testing_score(r: ConventionRule) -> int:
+    count = r.stats.get("test_file_count", 0)
+    if count == 0:
+        return 1
+    if count < 3:
+        return 3
+    return 5
+
+def _ruby_testing_reason(r: ConventionRule, score: int) -> str:
+    return f"Detected {r.stats.get('test_file_count')} test files."
+
+def _ruby_testing_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 1:
+        return "Add unit and integration tests (RSpec or Minitest are the standard Ruby frameworks)."
+    return None
+
+
 # Rating rules registry
 RATING_RULES: dict[str, RatingRule] = {
     # Python typing and documentation
@@ -4351,6 +4418,34 @@ RATING_RULES: dict[str, RatingRule] = {
         score_func=_csharp_conventions_score,
         reason_func=_csharp_conventions_reason,
         suggestion_func=_csharp_conventions_suggestion,
+    ),
+
+    # Ruby build tooling
+    "ruby.conventions.build_tools": RatingRule(
+        score_func=_ruby_build_score,
+        reason_func=_ruby_build_reason,
+        suggestion_func=_ruby_build_suggestion,
+    ),
+
+    # Ruby Rails conventions
+    "ruby.conventions.rails_structure": RatingRule(
+        score_func=_ruby_rails_conventions_score,
+        reason_func=_ruby_rails_conventions_reason,
+        suggestion_func=_ruby_rails_conventions_suggestion,
+    ),
+
+    # Ruby database
+    "ruby.conventions.database": RatingRule(
+        score_func=_ruby_database_score,
+        reason_func=_ruby_database_reason,
+        suggestion_func=_ruby_database_suggestion,
+    ),
+
+    # Ruby testing
+    "ruby.conventions.testing": RatingRule(
+        score_func=_ruby_testing_score,
+        reason_func=_ruby_testing_reason,
+        suggestion_func=_ruby_testing_suggestion,
     ),
 
 }

@@ -177,7 +177,7 @@ def generate_sarif_report(output: ConventionsOutput) -> dict[str, Any]:
                     "informationUri": TOOL_INFO_URI,
                     "rules": rules,
                     "properties": {
-                        "supportedLanguages": ["python", "go", "node", "rust", "kotlin", "java", "csharp", "generic"],
+                        "supportedLanguages": ["python", "go", "node", "rust", "kotlin", "java", "csharp", "ruby", "generic"],
                     },
                 },
             },

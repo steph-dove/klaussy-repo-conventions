@@ -65,6 +65,11 @@ def detect_languages(repo_root: Path, exclude_patterns: Optional[list[str]] = No
     if csharp_files:
         languages.add("csharp")
 
+    # Check for Ruby files
+    ruby_files = list(walk_files(repo_root, {".rb"}, max_files=5, exclude_patterns=detection_excludes))
+    if ruby_files:
+        languages.add("ruby")
+
     return languages
 
 
@@ -175,10 +180,26 @@ def run_detectors(
     # Get file count from all language indexes
     if ctx._python_index is not None:
         total_files_scanned += len(ctx._python_index.files)
-    for cache_key in ("node_index", "go_index", "rust_index", "kotlin_index", "java_index", "csharp_index"):
+    for cache_key in ("node_index", "go_index", "rust_index", "kotlin_index", "java_index", "csharp_index", "ruby_index"):
         index = ctx.cache.get(cache_key)
         if index is not None and hasattr(index, "files"):
             total_files_scanned += len(index.files)
+
+            # An index that filled to max_files means the walk stopped early, so
+            # every count and layer derived from it is partial -- and silently so.
+            # Mastodon has 3219 Ruby files: at the default cap of 2000 its entire
+            # db/ layer went unseen and the reported architecture omitted it.
+            if len(index.files) >= max_files:
+                language = cache_key.removesuffix("_index")
+                all_warnings.append(DetectorWarning(
+                    detector=f"{language}_index",
+                    message=(
+                        f"Scan stopped at the {max_files}-file limit for {language}; "
+                        "results are based on a partial view of the codebase and some "
+                        "directories may be missing entirely. Re-run with --max-files "
+                        "to cover the whole repository."
+                    ),
+                ))
 
     # Get project description if layout rule exists
     project_desc = None

@@ -119,6 +119,10 @@ _SINGLE_TEST_TEMPLATES: dict[str, str] = {
     "xunit": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
     "nunit": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
     "mstest": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
+    # RSpec runs the same way in a Rails app and a plain gem. Minitest does
+    # not -- `rails test` only exists in a Rails app -- so it is resolved from
+    # the build tool instead (see _BUILD_TOOL_COMMANDS).
+    "rspec": "bundle exec rspec <file>:<line>",
 }
 
 # Rule-ID suffixes carrying test-framework information. Rust names its rule
@@ -877,6 +881,15 @@ _BUILD_TOOL_COMMANDS: dict[str, dict[str, str]] = {
         "test": "dotnet test",
         "test_single": "dotnet test --filter FullyQualifiedName=MyNamespace.MyClass.MyMethod",
     },
+    # Ruby has no build step; the keys it omits simply yield no command.
+    "rails": {
+        "test": "bin/rails test",
+        "test_single": "bin/rails test <file>:<line>",
+    },
+    "bundler": {
+        "test": "bundle exec rake test",
+        "test_single": "bundle exec ruby -Itest <file> -n <test_name>",
+    },
 }
 
 # Rule-ID suffixes that describe a build tool.
@@ -900,6 +913,8 @@ def _framework_test_command(fw_lower: str, pkg_mgr: str | None) -> str | None:
         return f"{node} test"
     if fw_lower.startswith(("go", "testify")):
         return "go test ./..."
+    if fw_lower.startswith("rspec"):
+        return "bundle exec rspec"
     return None
 
 
@@ -1964,6 +1979,8 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "java"
         elif ext == "cs":
             lang = "csharp"
+        elif ext == "rb" or ev.file_path.endswith("Gemfile"):
+            lang = "ruby"
         else:
             lang = ""
 

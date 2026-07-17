@@ -51,5 +51,6 @@ def register_all_detectors() -> None:
         kotlin,  # noqa: F401
         node,  # noqa: F401
         python,  # noqa: F401
+        ruby,  # noqa: F401
         rust,  # noqa: F401
     )

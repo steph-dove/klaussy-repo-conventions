@@ -420,6 +420,7 @@ def _html_rules_table(rated_rules: list) -> str:
                 <option value="kotlin">Kotlin</option>
                 <option value="java">Java</option>
                 <option value="csharp">C#</option>
+                <option value="ruby">Ruby</option>
                 <option value="generic">Generic</option>
             </select>
             <select id="filter-score" onchange="filterTable()">
