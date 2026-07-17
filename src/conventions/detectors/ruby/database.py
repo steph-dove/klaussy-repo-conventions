@@ -87,4 +87,35 @@ class RubyDatabaseDetector(RubyDetector):
             stats=stats,
         ))
 
+        # 2. Database Entities
+        db_entities = []
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "model" or "app/models" in rel_path:
+                for cls_name in file_idx.class_names:
+                    db_entities.append({
+                        "name": cls_name,
+                        "file": rel_path,
+                    })
+
+        if db_entities:
+            names = [e["name"] for e in db_entities[:10]]
+            db_ent_desc = (
+                f"{len(db_entities)} database model(s)/table(s) detected: {', '.join(names)}"
+                + ("..." if len(db_entities) > 10 else "") + "."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="ruby.conventions.db_entities",
+                category="database",
+                title="Database entities",
+                description=db_ent_desc,
+                confidence=0.9,
+                language="ruby",
+                evidence=[],
+                stats={
+                    "entities": db_entities,
+                    "entity_count": len(db_entities),
+                    "orm": libs[0] if libs else "activerecord",
+                },
+            ))
+
         return result

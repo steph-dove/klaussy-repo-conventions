@@ -228,6 +228,82 @@ class KotlinWebDetector(KotlinDetector):
             },
         ))
 
+        # 2. API Routes
+        api_routes: list[dict[str, object]] = []
+        api_methods: dict[str, int] = {}
+
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "test":
+                continue
+            content = "\n".join(file_idx.lines)
+
+            # Spring mapping annotations
+            spring_pattern = re.compile(r'@(GetMapping|PostMapping|PutMapping|DeleteMapping|PatchMapping|RequestMapping)\s*\(\s*(?:value\s*=\s*)?["\']([^"\']+)["\']')
+            for match in spring_pattern.finditer(content):
+                ann = match.group(1)
+                path = match.group(2)
+                method = "ANY"
+                if ann == "GetMapping":
+                    method = "GET"
+                elif ann == "PostMapping":
+                    method = "POST"
+                elif ann == "PutMapping":
+                    method = "PUT"
+                elif ann == "DeleteMapping":
+                    method = "DELETE"
+                elif ann == "PatchMapping":
+                    method = "PATCH"
+
+                line = content[:match.start()].count("\n") + 1
+                api_methods[method] = api_methods.get(method, 0) + 1
+                api_routes.append({
+                    "method": method,
+                    "path": path,
+                    "file": rel_path,
+                    "line": line,
+                })
+                if len(api_routes) >= 100:
+                    break
+
+            # Ktor routing (e.g. get("/path") or post("/path"))
+            ktor_pattern = re.compile(r'\b(get|post|put|delete|patch)\s*\(\s*["\']([^"\']+)["\']')
+            for match in ktor_pattern.finditer(content):
+                method = match.group(1).upper()
+                path = match.group(2)
+                line = content[:match.start()].count("\n") + 1
+                api_methods[method] = api_methods.get(method, 0) + 1
+                api_routes.append({
+                    "method": method,
+                    "path": path,
+                    "file": rel_path,
+                    "line": line,
+                })
+                if len(api_routes) >= 100:
+                    break
+
+            if len(api_routes) >= 100:
+                break
+
+        if api_routes:
+            description = (
+                f"{len(api_routes)} API routes detected. "
+                f"Methods: {', '.join(f'{k}: {v}' for k, v in sorted(api_methods.items()))}."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="kotlin.conventions.api_routes",
+                category="api",
+                title="API routes",
+                description=description,
+                confidence=0.85,
+                language="kotlin",
+                evidence=[],
+                stats={
+                    "routes": api_routes,
+                    "total_routes": len(api_routes),
+                    "methods": api_methods,
+                },
+            ))
+
         return result
 
     def _collect_framework_signals(

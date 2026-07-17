@@ -150,4 +150,76 @@ class JavaConventionsDetector(JavaDetector):
             stats=stats,
         ))
 
+        # 4. Error Handling
+        try_catch_count = index.count_pattern(r"\btry\s*\{", exclude_tests=True)
+        custom_exceptions_count = index.count_pattern(r"class\s+\w+Exception\s+extends\s+(?:Exception|RuntimeException)\b", exclude_tests=True)
+
+        errors_title = "Error Handling: Standard exceptions"
+        if custom_exceptions_count > 0:
+            errors_title = "Error Handling: Custom Exception taxonomy"
+
+        errors_desc = f"Uses try-catch blocks ({try_catch_count} found) and declares {custom_exceptions_count} custom Exception classes."
+        errors_evidence = []
+        if try_catch_count > 0:
+            tc_sites = index.search_pattern(r"\btry\s*\{", exclude_tests=True, limit=1)
+            if tc_sites:
+                ev = make_evidence(index, tc_sites[0][0], tc_sites[0][1], radius=3)
+                if ev:
+                    errors_evidence.append(ev)
+
+        result.rules.append(self.make_rule(
+            rule_id="java.conventions.errors",
+            category="errors",
+            title=errors_title,
+            description=errors_desc,
+            confidence=0.8,
+            language="java",
+            evidence=errors_evidence,
+            stats={
+                "try_catch_count": try_catch_count,
+                "custom_exceptions_count": custom_exceptions_count,
+            },
+        ))
+
+        # 5. Security & Secrets
+        has_raw_sql_usage = index.count_pattern(r'\b(?:createNativeQuery|createSQLQuery|jdbcTemplate\.query)\b', exclude_tests=True) > 0
+        security_title = "Security: Secure settings"
+        if has_raw_sql_usage:
+            security_title = "Security: Raw SQL injection risk"
+
+        security_desc = "Checks for secure configurations."
+        if has_raw_sql_usage:
+            security_desc += " Warning: Detected raw native SQL query API usage (e.g. createNativeQuery / jdbcTemplate.query)."
+
+        result.rules.append(self.make_rule(
+            rule_id="java.conventions.security",
+            category="security",
+            title=security_title,
+            description=security_desc,
+            confidence=0.8,
+            language="java",
+            evidence=[],
+            stats={
+                "has_raw_sql_usage": has_raw_sql_usage,
+            },
+        ))
+
+        # 6. Concurrency
+        concurrency_primitives_count = index.count_pattern(r'\b(?:synchronized|ReentrantLock|CompletableFuture|ExecutorService)\b', exclude_tests=True)
+        concurrency_title = "Concurrency: JVM Threads"
+        concurrency_desc = f"Uses standard JVM concurrency or asynchronous structures ({concurrency_primitives_count} primitives like synchronized/CompletableFuture)."
+
+        result.rules.append(self.make_rule(
+            rule_id="java.conventions.concurrency",
+            category="concurrency",
+            title=concurrency_title,
+            description=concurrency_desc,
+            confidence=0.8,
+            language="java",
+            evidence=[],
+            stats={
+                "concurrency_primitives_count": concurrency_primitives_count,
+            },
+        ))
+
         return result

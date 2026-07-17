@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from typing import Optional
 
+from ...schemas import EvidenceSnippet
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
 from .base import CSharpDetector
@@ -126,6 +128,69 @@ class CSharpArchitectureDetector(CSharpDetector):
             stats=stats,
         ))
 
+        # 2. API Routes
+        routes = []
+        methods: dict[str, int] = {}
+
+        map_pattern = re.compile(r'\.Map(Get|Post|Put|Delete|Patch)\s*\(\s*["\']([^"\']+)["\']')
+        attr_pattern = re.compile(r'\[Http(Get|Post|Put|Delete|Patch)\s*\(\s*["\']([^"\']+)["\']')
+
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "test":
+                continue
+            content = "\n".join(file_idx.lines)
+
+            for match in map_pattern.finditer(content):
+                method = match.group(1).upper()
+                path = match.group(2)
+                line = content[:match.start()].count("\n") + 1
+                methods[method] = methods.get(method, 0) + 1
+                routes.append({
+                    "method": method,
+                    "path": path,
+                    "file": rel_path,
+                    "line": line,
+                })
+                if len(routes) >= 100:
+                    break
+
+            for match in attr_pattern.finditer(content):
+                method = match.group(1).upper()
+                path = match.group(2)
+                line = content[:match.start()].count("\n") + 1
+                methods[method] = methods.get(method, 0) + 1
+                routes.append({
+                    "method": method,
+                    "path": path,
+                    "file": rel_path,
+                    "line": line,
+                })
+                if len(routes) >= 100:
+                    break
+
+            if len(routes) >= 100:
+                break
+
+        if routes:
+            description = (
+                f"{len(routes)} API routes detected. "
+                f"Methods: {', '.join(f'{k}: {v}' for k, v in sorted(methods.items()))}."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="csharp.conventions.api_routes",
+                category="api",
+                title="API routes",
+                description=description,
+                confidence=0.85,
+                language="csharp",
+                evidence=[],
+                stats={
+                    "routes": routes,
+                    "total_routes": len(routes),
+                    "methods": methods,
+                },
+            ))
+
         return result
 
     def _common_namespace_root(self, index: CSharpIndex) -> Optional[str]:
@@ -246,7 +311,7 @@ class CSharpArchitectureDetector(CSharpDetector):
         role_counts: Counter,
     ) -> list:
         """Pick representative evidence files from distinct layers."""
-        evidence = []
+        evidence: list[EvidenceSnippet] = []
         seen_roles: set[str] = set()
 
         preferred_role_order = ["api", "service", "db", "model", "main"]

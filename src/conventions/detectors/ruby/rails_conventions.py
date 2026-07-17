@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from typing import Optional
 
+from ...fs import read_file_safe
+from ...schemas import EvidenceSnippet
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
 from .base import RubyDetector
@@ -74,7 +77,7 @@ class RubyRailsConventionsDetector(RubyDetector):
         description = " ".join(desc_parts)
 
         # Build evidence
-        evidence = []
+        evidence: list[EvidenceSnippet] = []
         preferred_role_order = ["api", "model", "db", "main"]
         ordered_roles = [r for r in preferred_role_order if r in role_counts]
 
@@ -113,5 +116,145 @@ class RubyRailsConventionsDetector(RubyDetector):
             evidence=evidence,
             stats=stats,
         ))
+
+        # 2. Build Tools / Bundler
+        has_gemfile = ctx.repo_root.joinpath("Gemfile").exists()
+        gem_count = len(index.gems)
+        build_title = "Build: Bundler"
+        build_desc = f"Uses Bundler package manager with {gem_count} gems declared in Gemfile."
+
+        result.rules.append(self.make_rule(
+            rule_id="ruby.conventions.build_tools",
+            category="build",
+            title=build_title,
+            description=build_desc,
+            confidence=0.8,
+            language="ruby",
+            evidence=[],
+            stats={
+                "has_gemfile": has_gemfile,
+                "gem_count": gem_count,
+            },
+        ))
+
+        # 3. Error Handling
+        rescue_count = index.count_pattern(r"\brescue\b", exclude_tests=True)
+        errors_title = "Error Handling: Standard rescue"
+        errors_desc = f"Uses begin-rescue blocks ({rescue_count} found) for exception handling."
+
+        errors_evidence = []
+        if rescue_count > 0:
+            rescue_sites = index.search_pattern(r"\brescue\b", exclude_tests=True, limit=1)
+            if rescue_sites:
+                ev = make_evidence(index, rescue_sites[0][0], rescue_sites[0][1], radius=3)
+                if ev:
+                    errors_evidence.append(ev)
+
+        result.rules.append(self.make_rule(
+            rule_id="ruby.conventions.errors",
+            category="errors",
+            title=errors_title,
+            description=errors_desc,
+            confidence=0.8,
+            language="ruby",
+            evidence=errors_evidence,
+            stats={
+                "rescue_count": rescue_count,
+            },
+        ))
+
+        # 4. Security & SQL Injection
+        has_raw_sql_usage = index.count_pattern(r'\b(?:find_by_sql|connection\.execute)\b', exclude_tests=True) > 0
+        security_title = "Security: Secure settings"
+        if has_raw_sql_usage:
+            security_title = "Security: Raw SQL injection risk"
+
+        security_desc = "Checks for secure Rails settings."
+        if has_raw_sql_usage:
+            security_desc += " Warning: Detected raw SQL query API usage (e.g. find_by_sql)."
+
+        result.rules.append(self.make_rule(
+            rule_id="ruby.conventions.security",
+            category="security",
+            title=security_title,
+            description=security_desc,
+            confidence=0.8,
+            language="ruby",
+            evidence=[],
+            stats={
+                "has_raw_sql_usage": has_raw_sql_usage,
+            },
+        ))
+
+        # 5. Logging
+        logger_count = index.count_pattern(r'\b(?:logger\.(?:info|error|warn|debug)|Rails\.logger)\b', exclude_tests=True)
+        logging_title = "Logging: Rails logger"
+        logging_desc = f"Uses Rails logger for application events ({logger_count} statements found)."
+
+        result.rules.append(self.make_rule(
+            rule_id="ruby.conventions.logging",
+            category="logging",
+            title=logging_title,
+            description=logging_desc,
+            confidence=0.8,
+            language="ruby",
+            evidence=[],
+            stats={
+                "logger_count": logger_count,
+            },
+        ))
+
+        # 6. API Routes
+        routes = []
+        methods: dict[str, int] = {}
+        routes_file = ctx.repo_root.joinpath("config/routes.rb")
+        if routes_file.exists():
+            content = read_file_safe(routes_file)
+            if content:
+                route_pattern = re.compile(r'\b(get|post|put|delete|patch)\s+["\']([^"\']+)["\']')
+                for match in route_pattern.finditer(content):
+                    method = match.group(1).upper()
+                    path = match.group(2)
+                    line = content[:match.start()].count("\n") + 1
+                    methods[method] = methods.get(method, 0) + 1
+                    routes.append({
+                        "method": method,
+                        "path": path,
+                        "file": "config/routes.rb",
+                        "line": line,
+                    })
+
+                res_pattern = re.compile(r'\bresources\s+:(\w+)')
+                for match in res_pattern.finditer(content):
+                    res_name = match.group(1)
+                    line = content[:match.start()].count("\n") + 1
+                    for m in ("GET", "POST", "PUT", "DELETE"):
+                        methods[m] = methods.get(m, 0) + 1
+                    routes.append({
+                        "method": "ANY",
+                        "path": f"/{res_name}",
+                        "file": "config/routes.rb",
+                        "line": line,
+                    })
+
+        if routes:
+            description = (
+                f"{len(routes)} API routes detected. "
+                f"Methods: {', '.join(f'{k}: {v}' for k, v in sorted(methods.items()))}."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="ruby.conventions.api_routes",
+                category="api",
+                title="API routes",
+                description=description,
+                confidence=0.85,
+                language="ruby",
+                evidence=[],
+                stats={
+                    "routes": routes,
+                    "total_routes": len(routes),
+                    "methods": methods,
+                },
+            ))
 
         return result

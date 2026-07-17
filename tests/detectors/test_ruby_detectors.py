@@ -99,7 +99,7 @@ def test_ruby_rails_conventions_detector(tmp_path: Path):
     detector = RubyRailsConventionsDetector()
     result = detector.detect(ctx)
 
-    assert len(result.rules) == 1
+    assert len(result.rules) == 5
     rule = result.rules[0]
     assert rule.id == "ruby.conventions.rails_structure"
     assert rule.stats["is_rails"] is True
@@ -145,7 +145,7 @@ def test_ruby_database_detector(tmp_path: Path):
     detector = RubyDatabaseDetector()
     result = detector.detect(ctx)
 
-    assert len(result.rules) == 1
+    assert len(result.rules) == 2
     rule = result.rules[0]
     assert rule.id == "ruby.conventions.database"
     assert "ActiveRecord" in rule.stats["libraries"]

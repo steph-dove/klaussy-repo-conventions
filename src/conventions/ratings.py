@@ -3328,6 +3328,28 @@ def _cpp_testing_suggestion(r: ConventionRule, score: int) -> str | None:
     if score == 1:
         return "Add unit tests (Google Test, Catch2, or doctest are standard C++ test runners)."
     return None
+# Shared simple helper functions for newly added conventions
+def _simple_conventions_score(r: ConventionRule) -> int:
+    return 5
+
+def _simple_conventions_reason(r: ConventionRule, score: int) -> str:
+    return r.description
+
+def _simple_conventions_suggestion(r: ConventionRule, score: int) -> str | None:
+    return None
+
+def _security_conventions_score(r: ConventionRule) -> int:
+    return 3 if r.stats.get("has_raw_sql_usage") else 5
+
+def _security_conventions_reason(r: ConventionRule, score: int) -> str:
+    if score == 3:
+        return "Detected potential raw SQL query usage which poses injection risks."
+    return r.description
+
+def _security_conventions_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 3:
+        return "Avoid raw SQL query building or ensure all queries are fully parameterized."
+    return None
 
 
 # Rating rules registry
@@ -4592,6 +4614,197 @@ RATING_RULES: dict[str, RatingRule] = {
         score_func=_cpp_testing_score,
         reason_func=_cpp_testing_reason,
         suggestion_func=_cpp_testing_suggestion,
+    ),
+
+    # C# new conventions
+    "csharp.conventions.errors": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "csharp.conventions.security": RatingRule(
+        score_func=_security_conventions_score,
+        reason_func=_security_conventions_reason,
+        suggestion_func=_security_conventions_suggestion,
+    ),
+    "csharp.conventions.concurrency": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # Java new conventions
+    "java.conventions.errors": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "java.conventions.security": RatingRule(
+        score_func=_security_conventions_score,
+        reason_func=_security_conventions_reason,
+        suggestion_func=_security_conventions_suggestion,
+    ),
+    "java.conventions.concurrency": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # Ruby new conventions
+    "ruby.conventions.errors": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "ruby.conventions.security": RatingRule(
+        score_func=_security_conventions_score,
+        reason_func=_security_conventions_reason,
+        suggestion_func=_security_conventions_suggestion,
+    ),
+    "ruby.conventions.logging": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # PHP new conventions
+    "php.conventions.errors": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "php.conventions.security": RatingRule(
+        score_func=_security_conventions_score,
+        reason_func=_security_conventions_reason,
+        suggestion_func=_security_conventions_suggestion,
+    ),
+    "php.conventions.logging": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "php.conventions.build_tools": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # Swift new conventions
+    "swift.conventions.errors": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "swift.conventions.concurrency": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "swift.conventions.build_tools": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # C++ new conventions
+    "cpp.conventions.errors": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "cpp.conventions.concurrency": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "cpp.conventions.general": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # Kotlin API/DB parity
+    "kotlin.conventions.api_routes": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "kotlin.conventions.db_entities": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # Java API/DB parity
+    "java.conventions.api_routes": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "java.conventions.db_entities": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # C# API/DB parity
+    "csharp.conventions.api_routes": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "csharp.conventions.db_entities": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # Ruby API/DB parity
+    "ruby.conventions.api_routes": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "ruby.conventions.db_entities": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # PHP API/DB parity
+    "php.conventions.api_routes": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "php.conventions.db_entities": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # Swift API/DB parity
+    "swift.conventions.api_routes": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "swift.conventions.db_entities": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+
+    # C++ API/DB parity
+    "cpp.conventions.api_routes": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
+    ),
+    "cpp.conventions.db_entities": RatingRule(
+        score_func=_simple_conventions_score,
+        reason_func=_simple_conventions_reason,
+        suggestion_func=_simple_conventions_suggestion,
     ),
 }
 

@@ -181,9 +181,9 @@ class JavaDatabaseDetector(JavaDetector):
         for lib in libs_list:
             if len(evidence) >= ctx.max_evidence_snippets:
                 break
-            hits = library_hits.get(lib)
-            if hits and hits.examples:
-                rel_path, line = hits.examples[0]
+            lib_hits = library_hits.get(lib)
+            if lib_hits and lib_hits.examples:
+                rel_path, line = lib_hits.examples[0]
                 ev = make_evidence(index, rel_path, line, radius=3)
                 if ev:
                     evidence.append(ev)
@@ -208,5 +208,38 @@ class JavaDatabaseDetector(JavaDetector):
             evidence=evidence,
             stats=stats,
         ))
+
+        # 2. Database Entities
+        db_entities = []
+        for rel_path, file_idx in index.files.items():
+            if file_idx.is_test:
+                continue
+            for cls in file_idx.classes:
+                if "Entity" in cls.annotations:
+                    db_entities.append({
+                        "name": cls.name,
+                        "file": rel_path,
+                    })
+
+        if db_entities:
+            names = [e["name"] for e in db_entities[:10]]
+            db_ent_desc = (
+                f"{len(db_entities)} database entity/model(s) detected: {', '.join(names)}"
+                + ("..." if len(db_entities) > 10 else "") + "."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="java.conventions.db_entities",
+                category="database",
+                title="Database entities",
+                description=db_ent_desc,
+                confidence=0.9,
+                language="java",
+                evidence=[],
+                stats={
+                    "entities": db_entities,
+                    "entity_count": len(db_entities),
+                    "orm": libs_list[0] if libs_list else "hibernate",
+                },
+            ))
 
         return result

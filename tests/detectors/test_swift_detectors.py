@@ -97,7 +97,7 @@ def test_swift_architecture_detector(tmp_path: Path):
     detector = SwiftArchitectureDetector()
     result = detector.detect(ctx)
 
-    assert len(result.rules) == 1
+    assert len(result.rules) == 4
     rule = result.rules[0]
     assert rule.id == "swift.conventions.architecture"
     assert rule.stats["framework"] == "Vapor Server Application"

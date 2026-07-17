@@ -115,4 +115,79 @@ class CSharpConventionsDetector(CSharpDetector):
             stats=stats,
         ))
 
+        # 4. Error Handling
+        try_catch_count = index.count_pattern(r"\btry\s*\{", exclude_tests=True)
+        custom_exceptions_count = index.count_pattern(r"class\s+\w+Exception\s*:\s*(?:Exception|RuntimeException)\b", exclude_tests=True)
+
+        errors_title = "Error Handling: Standard exceptions"
+        if custom_exceptions_count > 0:
+            errors_title = "Error Handling: Custom Exception taxonomy"
+
+        errors_desc = f"Uses try-catch blocks ({try_catch_count} found) and declares {custom_exceptions_count} custom Exception classes."
+        errors_evidence = []
+        if try_catch_count > 0:
+            tc_sites = index.search_pattern(r"\btry\s*\{", exclude_tests=True, limit=1)
+            if tc_sites:
+                ev = make_evidence(index, tc_sites[0][0], tc_sites[0][1], radius=3)
+                if ev:
+                    errors_evidence.append(ev)
+
+        result.rules.append(self.make_rule(
+            rule_id="csharp.conventions.errors",
+            category="errors",
+            title=errors_title,
+            description=errors_desc,
+            confidence=0.8,
+            language="csharp",
+            evidence=errors_evidence,
+            stats={
+                "try_catch_count": try_catch_count,
+                "custom_exceptions_count": custom_exceptions_count,
+            },
+        ))
+
+        # 5. Security & Secrets
+        has_raw_sql_usage = index.count_pattern(r'\b(?:ExecuteSqlRaw|FromSqlRaw|FromSqlInterpolated)\b', exclude_tests=True) > 0
+        connection_string_count = index.count_pattern(r'\bConnectionString\b', exclude_tests=True)
+
+        security_title = "Security: Secure settings"
+        if has_raw_sql_usage:
+            security_title = "Security: Raw SQL injection risk"
+
+        security_desc = f"Checks for secure configurations. Found {connection_string_count} connection string references."
+        if has_raw_sql_usage:
+            security_desc += " Warning: Detected raw SQL query API usage (e.g. FromSqlRaw/ExecuteSqlRaw)."
+
+        result.rules.append(self.make_rule(
+            rule_id="csharp.conventions.security",
+            category="security",
+            title=security_title,
+            description=security_desc,
+            confidence=0.8,
+            language="csharp",
+            evidence=[],
+            stats={
+                "has_raw_sql_usage": has_raw_sql_usage,
+                "connection_string_count": connection_string_count,
+            },
+        ))
+
+        # 6. Concurrency
+        concurrency_primitives_count = index.count_pattern(r'\b(?:SemaphoreSlim|Monitor|Mutex|lock\s*\(|Task\.Run)\b', exclude_tests=True)
+        concurrency_title = "Concurrency: Tasks & Threads"
+        concurrency_desc = f"Uses async tasks and {concurrency_primitives_count} explicit synchronization/concurrency primitives (e.g. lock, SemaphoreSlim)."
+
+        result.rules.append(self.make_rule(
+            rule_id="csharp.conventions.concurrency",
+            category="concurrency",
+            title=concurrency_title,
+            description=concurrency_desc,
+            confidence=0.8,
+            language="csharp",
+            evidence=[],
+            stats={
+                "concurrency_primitives_count": concurrency_primitives_count,
+            },
+        ))
+
         return result

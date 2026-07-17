@@ -123,7 +123,7 @@ class JavaTestingDetector(JavaDetector):
         # Test naming style
         primary_naming = "unknown"
         if class_naming:
-            primary_naming = max(class_naming, key=class_naming.get)
+            primary_naming = max(class_naming, key=lambda name: class_naming[name])
 
         # Assertion style
         primary_assertion = "junit"

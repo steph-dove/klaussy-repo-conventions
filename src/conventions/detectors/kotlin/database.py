@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Optional
 
 from ..base import DetectorContext, DetectorResult
@@ -339,5 +340,42 @@ class KotlinDatabaseDetector(KotlinDetector):
                 "drivers": drivers,
             },
         ))
+
+        # 2. Database Entities
+        db_entities = []
+        for rel, cls in entity_classes:
+            db_entities.append({
+                "name": cls.name,
+                "file": rel,
+            })
+        if "Exposed" in libraries:
+            for rel, line, match_str in index.search_pattern(EXPOSED_TABLE_PATTERN, limit=100):
+                match = re.search(r"object\s+(\w+)", match_str)
+                if match:
+                    db_entities.append({
+                        "name": match.group(1),
+                        "file": rel,
+                    })
+
+        if db_entities:
+            names = [e["name"] for e in db_entities[:10]]
+            db_ent_desc = (
+                f"{len(db_entities)} database model(s)/table(s) detected: {', '.join(names)}"
+                + ("..." if len(db_entities) > 10 else "") + "."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="kotlin.conventions.db_entities",
+                category="database",
+                title="Database entities",
+                description=db_ent_desc,
+                confidence=0.9,
+                language="kotlin",
+                evidence=[],
+                stats={
+                    "entities": db_entities,
+                    "entity_count": len(db_entities),
+                    "orm": primary_library,
+                },
+            ))
 
         return result

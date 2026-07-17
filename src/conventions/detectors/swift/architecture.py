@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from typing import Optional
 
+from ...schemas import EvidenceSnippet
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
 from .base import SwiftDetector
@@ -104,7 +106,7 @@ class SwiftArchitectureDetector(SwiftDetector):
         description = " ".join(desc_parts)
 
         # Build evidence
-        evidence = []
+        evidence: list[EvidenceSnippet] = []
         preferred_role_order = ["api", "service", "model", "main"]
         ordered_roles = [r for r in preferred_role_order if r in role_counts]
 
@@ -144,5 +146,163 @@ class SwiftArchitectureDetector(SwiftDetector):
             evidence=evidence,
             stats=stats,
         ))
+
+        # 3. Swift Build Tools / SwiftPM
+        has_package_swift = ctx.repo_root.joinpath("Package.swift").exists()
+        has_podfile = ctx.repo_root.joinpath("Podfile").exists()
+        build_title = "Build: SwiftPM"
+        if has_podfile and not has_package_swift:
+            build_title = "Build: CocoaPods"
+        build_desc = "Uses Swift Package Manager (Package.swift) for dependency management."
+        if has_podfile:
+            build_desc += " CocoaPods (Podfile) is also present in the repository."
+
+        result.rules.append(self.make_rule(
+            rule_id="swift.conventions.build_tools",
+            category="build",
+            title=build_title,
+            description=build_desc,
+            confidence=0.8,
+            language="swift",
+            evidence=[],
+            stats={
+                "has_package_swift": has_package_swift,
+                "has_podfile": has_podfile,
+            },
+        ))
+
+        # 4. Swift Error Handling
+        do_catch_count = index.count_pattern(r"\bdo\s*\{", exclude_tests=True)
+        throws_count = index.count_pattern(r"\bthrows\b", exclude_tests=True)
+        errors_title = "Error Handling: Swift exceptions"
+        errors_desc = f"Uses structured do-try-catch blocks ({do_catch_count} found) and throws functions ({throws_count} found) for error propagation."
+
+        errors_evidence = []
+        if do_catch_count > 0:
+            dc_sites = index.search_pattern(r"\bdo\s*\{", exclude_tests=True, limit=1)
+            if dc_sites:
+                ev = make_evidence(index, dc_sites[0][0], dc_sites[0][1], radius=3)
+                if ev:
+                    errors_evidence.append(ev)
+
+        result.rules.append(self.make_rule(
+            rule_id="swift.conventions.errors",
+            category="errors",
+            title=errors_title,
+            description=errors_desc,
+            confidence=0.8,
+            language="swift",
+            evidence=errors_evidence,
+            stats={
+                "do_catch_count": do_catch_count,
+                "throws_count": throws_count,
+            },
+        ))
+
+        # 5. Swift Concurrency
+        async_count = index.count_pattern(r"\basync\b", exclude_tests=True)
+        actor_count = index.count_pattern(r"\bactor\s+\w+\b", exclude_tests=True)
+        task_count = index.count_pattern(r"\bTask\s*\{", exclude_tests=True)
+        concurrency_title = "Concurrency: Swift Concurrency"
+        concurrency_desc = f"Uses modern Swift Concurrency features. Found {async_count} async calls, {actor_count} actors, and {task_count} structured Tasks."
+
+        result.rules.append(self.make_rule(
+            rule_id="swift.conventions.concurrency",
+            category="concurrency",
+            title=concurrency_title,
+            description=concurrency_desc,
+            confidence=0.8,
+            language="swift",
+            evidence=[],
+            stats={
+                "async_count": async_count,
+                "actor_count": actor_count,
+                "task_count": task_count,
+            },
+        ))
+
+        # 6. API Routes
+        routes = []
+        methods: dict[str, int] = {}
+
+        vapor_route_pattern = re.compile(r'\b(app|routes|group|router)\.(get|post|put|delete|patch)\s*\(\s*["\']([^"\']+)["\']')
+
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "test":
+                continue
+            content = "\n".join(file_idx.lines)
+
+            for match in vapor_route_pattern.finditer(content):
+                method = match.group(2).upper()
+                path = match.group(3)
+                line = content[:match.start()].count("\n") + 1
+                methods[method] = methods.get(method, 0) + 1
+                routes.append({
+                    "method": method,
+                    "path": path,
+                    "file": rel_path,
+                    "line": line,
+                })
+                if len(routes) >= 100:
+                    break
+
+            if len(routes) >= 100:
+                break
+
+        if routes:
+            description = (
+                f"{len(routes)} API routes detected. "
+                f"Methods: {', '.join(f'{k}: {v}' for k, v in sorted(methods.items()))}."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="swift.conventions.api_routes",
+                category="api",
+                title="API routes",
+                description=description,
+                confidence=0.85,
+                language="swift",
+                evidence=[],
+                stats={
+                    "routes": routes,
+                    "total_routes": len(routes),
+                    "methods": methods,
+                },
+            ))
+
+        # 7. Swift Fluent Database Entities
+        db_entities = []
+        fluent_model_pattern = re.compile(r'\b(?:class|struct)\s+(\w+)\s*:\s*(?:[\w,\s:]*,\s*)?Model\b')
+
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "test":
+                continue
+            content = "\n".join(file_idx.lines)
+
+            for match in fluent_model_pattern.finditer(content):
+                db_entities.append({
+                    "name": match.group(1),
+                    "file": rel_path,
+                })
+
+        if db_entities:
+            names = [e["name"] for e in db_entities[:10]]
+            db_ent_desc = (
+                f"{len(db_entities)} database model(s)/table(s) detected: {', '.join(names)}"
+                + ("..." if len(db_entities) > 10 else "") + "."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="swift.conventions.db_entities",
+                category="database",
+                title="Database entities",
+                description=db_ent_desc,
+                confidence=0.9,
+                language="swift",
+                evidence=[],
+                stats={
+                    "entities": db_entities,
+                    "entity_count": len(db_entities),
+                    "orm": "fluent",
+                },
+            ))
 
         return result

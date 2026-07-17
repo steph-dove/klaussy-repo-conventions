@@ -383,7 +383,7 @@ def test_java_conventions_detector(tmp_path: Path):
     detector = JavaConventionsDetector()
     result = detector.detect(ctx)
 
-    assert len(result.rules) == 1
+    assert len(result.rules) == 4
     rule = result.rules[0]
     assert rule.id == "java.conventions.general"
     assert rule.stats["data_class_style"] == "Lombok annotations"

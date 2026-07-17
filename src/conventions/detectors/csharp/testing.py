@@ -130,7 +130,7 @@ class CSharpTestingDetector(CSharpDetector):
         }
         primary_naming = "unknown"
         if any(class_naming_counts.values()):
-            primary_naming = max(class_naming_counts, key=class_naming_counts.get)
+            primary_naming = max(class_naming_counts, key=lambda name: class_naming_counts[name])
             desc_parts.append(f"Test classes are primarily named with a {primary_naming.replace('_', ' ')} convention.")
 
         description = " ".join(desc_parts)

@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import Optional
 
+from ...schemas import EvidenceSnippet
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
 from .base import KotlinDetector
@@ -305,7 +306,7 @@ class KotlinArchitectureDetector(KotlinDetector):
         role_counts: Counter,
     ) -> list:
         """Pick representative evidence files from distinct layers."""
-        evidence = []
+        evidence: list[EvidenceSnippet] = []
         seen_roles: set[str] = set()
 
         # Prefer one file per distinct architectural layer, in a stable order.

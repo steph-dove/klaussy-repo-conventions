@@ -98,7 +98,7 @@ def test_php_architecture_detector(tmp_path: Path):
     detector = PHPArchitectureDetector()
     result = detector.detect(ctx)
 
-    assert len(result.rules) == 1
+    assert len(result.rules) == 4
     rule = result.rules[0]
     assert rule.id == "php.conventions.architecture"
     assert rule.stats["framework"] == "Laravel Application"
@@ -126,7 +126,7 @@ def test_php_database_detector(tmp_path: Path):
     detector = PHPDatabaseDetector()
     result = detector.detect(ctx)
 
-    assert len(result.rules) == 1
+    assert len(result.rules) == 2
     rule = result.rules[0]
     assert rule.id == "php.conventions.database"
     assert "Eloquent ORM" in rule.stats["libraries"]

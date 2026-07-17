@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
 from .base import CSharpDetector
@@ -119,5 +121,40 @@ class CSharpDatabaseDetector(CSharpDetector):
             evidence=evidence,
             stats=stats,
         ))
+
+        # 2. Database Entities
+        db_entities = []
+        dbset_pattern = re.compile(r'DbSet<\s*(\w+)\s*>')
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "test":
+                continue
+            content = "\n".join(file_idx.lines)
+            for match in dbset_pattern.finditer(content):
+                entity_name = match.group(1)
+                db_entities.append({
+                    "name": entity_name,
+                    "file": rel_path,
+                })
+
+        if db_entities:
+            names = [e["name"] for e in db_entities[:10]]
+            db_ent_desc = (
+                f"{len(db_entities)} database model(s)/table(s) detected: {', '.join(names)}"
+                + ("..." if len(db_entities) > 10 else "") + "."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="csharp.conventions.db_entities",
+                category="database",
+                title="Database entities",
+                description=db_ent_desc,
+                confidence=0.9,
+                language="csharp",
+                evidence=[],
+                stats={
+                    "entities": db_entities,
+                    "entity_count": len(db_entities),
+                    "orm": "efcore" if "Entity Framework Core" in detected_libs else "unknown",
+                },
+            ))
 
         return result

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from typing import Optional
 
+from ...schemas import EvidenceSnippet
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
 from .base import JavaDetector
@@ -127,6 +129,66 @@ class JavaArchitectureDetector(JavaDetector):
             evidence=evidence,
             stats=stats,
         ))
+
+        # 2. API Routes
+        routes = []
+        methods: dict[str, int] = {}
+
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "test":
+                continue
+            content = "\n".join(file_idx.lines)
+
+            # Spring mapping annotations
+            spring_pattern = re.compile(r'@(GetMapping|PostMapping|PutMapping|DeleteMapping|PatchMapping|RequestMapping)\s*\(\s*(?:value\s*=\s*)?["\']([^"\']+)["\']')
+            for match in spring_pattern.finditer(content):
+                ann = match.group(1)
+                path = match.group(2)
+                method = "ANY"
+                if ann == "GetMapping":
+                    method = "GET"
+                elif ann == "PostMapping":
+                    method = "POST"
+                elif ann == "PutMapping":
+                    method = "PUT"
+                elif ann == "DeleteMapping":
+                    method = "DELETE"
+                elif ann == "PatchMapping":
+                    method = "PATCH"
+
+                line = content[:match.start()].count("\n") + 1
+                methods[method] = methods.get(method, 0) + 1
+                routes.append({
+                    "method": method,
+                    "path": path,
+                    "file": rel_path,
+                    "line": line,
+                })
+                if len(routes) >= 100:
+                    break
+
+            if len(routes) >= 100:
+                break
+
+        if routes:
+            description = (
+                f"{len(routes)} API routes detected. "
+                f"Methods: {', '.join(f'{k}: {v}' for k, v in sorted(methods.items()))}."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="java.conventions.api_routes",
+                category="api",
+                title="API routes",
+                description=description,
+                confidence=0.85,
+                language="java",
+                evidence=[],
+                stats={
+                    "routes": routes,
+                    "total_routes": len(routes),
+                    "methods": methods,
+                },
+            ))
 
         return result
 
@@ -264,7 +326,7 @@ class JavaArchitectureDetector(JavaDetector):
         role_counts: Counter,
     ) -> list:
         """Pick representative evidence files from distinct layers."""
-        evidence = []
+        evidence: list[EvidenceSnippet] = []
         seen_roles: set[str] = set()
 
         preferred_role_order = ["api", "service", "db", "model", "main"]

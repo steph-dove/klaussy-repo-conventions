@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from ..base import DetectorContext, DetectorResult
 from ..registry import DetectorRegistry
 from .base import PHPDetector
@@ -85,5 +87,48 @@ class PHPDatabaseDetector(PHPDetector):
             evidence=evidence,
             stats=stats,
         ))
+
+        # 2. Database Entities
+        db_entities = []
+        eloquent_pattern = re.compile(r'\bclass\s+(\w+)\s+extends\s+Model\b')
+        doctrine_pattern = re.compile(r'#\[ORM\\Entity\]\s*(?:/\*\*.*?\*/\s*)?\b(?:class|interface)\s+(\w+)\b', re.DOTALL)
+
+        for rel_path, file_idx in index.files.items():
+            if file_idx.role == "test":
+                continue
+            content = "\n".join(file_idx.lines)
+
+            for match in eloquent_pattern.finditer(content):
+                db_entities.append({
+                    "name": match.group(1),
+                    "file": rel_path,
+                })
+
+            for match in doctrine_pattern.finditer(content):
+                db_entities.append({
+                    "name": match.group(1),
+                    "file": rel_path,
+                })
+
+        if db_entities:
+            names = [e["name"] for e in db_entities[:10]]
+            db_ent_desc = (
+                f"{len(db_entities)} database model(s)/table(s) detected: {', '.join(names)}"
+                + ("..." if len(db_entities) > 10 else "") + "."
+            )
+            result.rules.append(self.make_rule(
+                rule_id="php.conventions.db_entities",
+                category="database",
+                title="Database entities",
+                description=db_ent_desc,
+                confidence=0.9,
+                language="php",
+                evidence=[],
+                stats={
+                    "entities": db_entities,
+                    "entity_count": len(db_entities),
+                    "orm": libs[0] if libs else "eloquent",
+                },
+            ))
 
         return result
