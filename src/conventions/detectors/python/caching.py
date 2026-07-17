@@ -62,7 +62,7 @@ class PythonCachingDetector(PythonDetector):
                 "name": "Redis",
                 "import_count": len(redis_imports),
             }
-            examples["redis"] = [(f.file_path, f.line) for f in redis_imports[:5]]
+            examples["redis"] = [(rel_path, imp.line) for rel_path, imp in redis_imports[:5]]
 
         # cachetools
         cachetools_imports = index.find_imports_matching("cachetools", limit=20)
@@ -71,7 +71,7 @@ class PythonCachingDetector(PythonDetector):
                 "name": "cachetools",
                 "import_count": len(cachetools_imports),
             }
-            examples["cachetools"] = [(f.file_path, f.line) for f in cachetools_imports[:5]]
+            examples["cachetools"] = [(rel_path, imp.line) for rel_path, imp in cachetools_imports[:5]]
 
         # aiocache
         aiocache_imports = index.find_imports_matching("aiocache", limit=20)
@@ -80,7 +80,7 @@ class PythonCachingDetector(PythonDetector):
                 "name": "aiocache",
                 "import_count": len(aiocache_imports),
             }
-            examples["aiocache"] = [(f.file_path, f.line) for f in aiocache_imports[:5]]
+            examples["aiocache"] = [(rel_path, imp.line) for rel_path, imp in aiocache_imports[:5]]
 
         # diskcache
         diskcache_imports = index.find_imports_matching("diskcache", limit=20)
@@ -89,7 +89,7 @@ class PythonCachingDetector(PythonDetector):
                 "name": "diskcache",
                 "import_count": len(diskcache_imports),
             }
-            examples["diskcache"] = [(f.file_path, f.line) for f in diskcache_imports[:5]]
+            examples["diskcache"] = [(rel_path, imp.line) for rel_path, imp in diskcache_imports[:5]]
 
         if not caching_methods:
             return result
