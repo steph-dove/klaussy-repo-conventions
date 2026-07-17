@@ -70,6 +70,11 @@ def detect_languages(repo_root: Path, exclude_patterns: Optional[list[str]] = No
     if ruby_files:
         languages.add("ruby")
 
+    # Check for Swift files
+    swift_files = list(walk_files(repo_root, {".swift"}, max_files=5, exclude_patterns=detection_excludes))
+    if swift_files:
+        languages.add("swift")
+
     return languages
 
 
@@ -180,7 +185,7 @@ def run_detectors(
     # Get file count from all language indexes
     if ctx._python_index is not None:
         total_files_scanned += len(ctx._python_index.files)
-    for cache_key in ("node_index", "go_index", "rust_index", "kotlin_index", "java_index", "csharp_index", "ruby_index"):
+    for cache_key in ("node_index", "go_index", "rust_index", "kotlin_index", "java_index", "csharp_index", "ruby_index", "swift_index"):
         index = ctx.cache.get(cache_key)
         if index is not None and hasattr(index, "files"):
             total_files_scanned += len(index.files)

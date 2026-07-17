@@ -3233,6 +3233,35 @@ def _ruby_testing_suggestion(r: ConventionRule, score: int) -> str | None:
     return None
 
 
+# Swift rating helpers
+def _swift_architecture_score(r: ConventionRule) -> int:
+    return 5
+
+def _swift_architecture_reason(r: ConventionRule, score: int) -> str:
+    return f"Structured as a {r.stats.get('framework')}."
+
+def _swift_architecture_suggestion(r: ConventionRule, score: int) -> str | None:
+    if not r.stats.get("has_swiftlint"):
+        return "Add SwiftLint to enforce Swift formatting and style guidelines."
+    return None
+
+def _swift_testing_score(r: ConventionRule) -> int:
+    count = r.stats.get("test_file_count", 0)
+    if count == 0:
+        return 1
+    if count < 3:
+        return 3
+    return 5
+
+def _swift_testing_reason(r: ConventionRule, score: int) -> str:
+    return f"Detected {r.stats.get('test_file_count')} test files."
+
+def _swift_testing_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 1:
+        return "Add unit tests (XCTest or the modern swift-testing framework)."
+    return None
+
+
 # Rating rules registry
 RATING_RULES: dict[str, RatingRule] = {
     # Python typing and documentation
@@ -4448,6 +4477,19 @@ RATING_RULES: dict[str, RatingRule] = {
         suggestion_func=_ruby_testing_suggestion,
     ),
 
+    # Swift architecture
+    "swift.conventions.architecture": RatingRule(
+        score_func=_swift_architecture_score,
+        reason_func=_swift_architecture_reason,
+        suggestion_func=_swift_architecture_suggestion,
+    ),
+
+    # Swift testing
+    "swift.conventions.testing": RatingRule(
+        score_func=_swift_testing_score,
+        reason_func=_swift_testing_reason,
+        suggestion_func=_swift_testing_suggestion,
+    ),
 }
 
 

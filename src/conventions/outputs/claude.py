@@ -123,6 +123,8 @@ _SINGLE_TEST_TEMPLATES: dict[str, str] = {
     # not -- `rails test` only exists in a Rails app -- so it is resolved from
     # the build tool instead (see _BUILD_TOOL_COMMANDS).
     "rspec": "bundle exec rspec <file>:<line>",
+    "xctest": "swift test --filter <TestName>",
+    "swift-testing": "swift test --filter <TestName>",
 }
 
 # Rule-ID suffixes carrying test-framework information. Rust names its rule
@@ -1981,6 +1983,8 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "csharp"
         elif ext == "rb" or ev.file_path.endswith("Gemfile"):
             lang = "ruby"
+        elif ext == "swift":
+            lang = "swift"
         else:
             lang = ""
 

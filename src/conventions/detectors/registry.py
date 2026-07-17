@@ -53,4 +53,5 @@ def register_all_detectors() -> None:
         python,  # noqa: F401
         ruby,  # noqa: F401
         rust,  # noqa: F401
+        swift,  # noqa: F401
     )
