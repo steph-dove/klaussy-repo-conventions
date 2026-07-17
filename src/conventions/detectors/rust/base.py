@@ -13,7 +13,11 @@ if TYPE_CHECKING:
 class RustDetector(BaseDetector):
     """Base class for Rust-specific detectors."""
 
-    language = "rust"
+    # `languages` (plural) is the attribute BaseDetector.should_run gates on; a
+    # singular `language` was silently ignored, leaving these detectors with the
+    # inherited empty set, which means "language-agnostic -- always run". Every
+    # Rust detector was building a RustIndex for every repository scanned.
+    languages: set[str] = {"rust"}
 
     def get_index(self, ctx: DetectorContext) -> "RustIndex":
         """Get or create the Rust index from context."""
