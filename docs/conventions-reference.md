@@ -223,3 +223,58 @@ For an overview of language support, see the [README](../README.md#language-supp
 | **Architecture** | `kotlin.conventions.architecture` | Module layout, source sets, package structure |
 | **Architecture** | `kotlin.conventions.data_flow` | Layer boundaries and DTO mapping |
 | **Frontend** | `kotlin.conventions.android` | Android UI and lifecycle (Compose, ViewModel, StateFlow) |
+
+## Java
+
+| Category | Convention ID | Description |
+|----------|--------------|-------------|
+| **Project** | `java.conventions.build_tools` | Gradle/Maven build, Java release level, analyzer plugins |
+| **Architecture** | `java.conventions.architecture` | Module layout, package structure, framework (Spring Boot) |
+| **Dependency Injection** | `java.conventions.di` | DI framework and constructor vs field injection |
+| **Database** | `java.conventions.database` | Persistence (Spring Data JPA, Hibernate, MyBatis, jOOQ), drivers, migrations |
+| **Testing** | `java.conventions.testing` | JUnit version, assertion style, test class naming |
+| **Observability** | `java.conventions.logging` | Logging framework and raw System.out usage |
+| **Conventions** | `java.conventions.general` | Records vs Lombok, Streams/lambdas, Optional usage |
+
+## C#/.NET
+
+| Category | Convention ID | Description |
+|----------|--------------|-------------|
+| **Project** | `csharp.conventions.build_tools` | .NET SDK, target frameworks, analyzer packages |
+| **Architecture** | `csharp.conventions.architecture` | Project layout and framework (ASP.NET Core) |
+| **Dependency Injection** | `csharp.conventions.di` | DI container and injection style |
+| **Database** | `csharp.conventions.database` | Entity Framework Core, Dapper, raw SQL risk |
+| **Testing** | `csharp.conventions.testing` | xUnit/NUnit/MSTest and assertion style |
+| **Observability** | `csharp.conventions.logging` | Logging framework and raw Console.WriteLine usage |
+| **Conventions** | `csharp.conventions.general` | Nullable reference types, async/await, LINQ |
+
+## Ruby
+
+| Category | Convention ID | Description |
+|----------|--------------|-------------|
+| **Project** | `ruby.conventions.build_tools` | Bundler, Rails app vs gem, lockfile, quality gems |
+| **Architecture** | `ruby.conventions.rails_structure` | Rails MVC layout, layering, RuboCop |
+| **Database** | `ruby.conventions.database` | ActiveRecord, migrations, associations |
+| **Testing** | `ruby.conventions.testing` | RSpec vs Minitest and spec/test naming |
+
+## PHP
+
+| Category | Convention ID | Description |
+|----------|--------------|-------------|
+| **Architecture** | `php.conventions.architecture` | Laravel vs Symfony vs library, layering, PHP CS Fixer |
+| **Database** | `php.conventions.database` | Eloquent/Doctrine ORM, models, migrations |
+| **Testing** | `php.conventions.testing` | PHPUnit vs Pest |
+
+## Swift
+
+| Category | Convention ID | Description |
+|----------|--------------|-------------|
+| **Architecture** | `swift.conventions.architecture` | SwiftPM products (library vs app), SwiftUI/UIKit/Vapor, SwiftLint |
+| **Testing** | `swift.conventions.testing` | XCTest vs swift-testing |
+
+## C++
+
+| Category | Convention ID | Description |
+|----------|--------------|-------------|
+| **Architecture** | `cpp.conventions.architecture` | Build system (CMake/Make/Bazel), header-only vs separated layout, clang-format |
+| **Testing** | `cpp.conventions.testing` | GoogleTest vs Catch2 vs doctest |
