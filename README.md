@@ -71,22 +71,22 @@ conventions discover --claude --init
 
 ## 🌐 Language Support
 
-The engine supports 180+ rules across languages and configurations:
+The engine supports 300+ conventions across eleven languages and cross-language configurations:
 
-| Language/Platform | Rules | Sample Scanned Patterns |
+| Language/Platform | Conventions | Sample Scanned Patterns |
 | :--- | :---: | :--- |
-| **Python** | 70+ | typing coverage, docstrings, testing fixtures, stdlib logging, error boundaries, sqlalchemy, context managers, async, dependency injection |
-| **Node.js/TypeScript** | 45+ | TypeScript strictness, jest/vitest frameworks, express/fastify api, mongoose, state management, monorepo workspaces, migrations |
-| **Go** | 40+ | modules, testimony frameworks, stdlib loggers, channels & goroutines, gRPC structures, wire DI, database configurations |
-| **Rust** | 15+ | Cargo configs, tokio async, web frameworks, serialization, macros, unsafe blocks, database ORMs |
-| **Kotlin** | 14+ | Gradle/Maven builds, coroutines & Flow, null-safety (`!!` usage), Kotest/MockK, Spring/Ktor, Exposed/JPA, kotlinx.serialization, Jetpack Compose |
-| **Java** | 7+ | Gradle/Maven builds, Spring DI & injection style, JPA/Hibernate & Spring Data, JUnit/AssertJ, Lombok vs records, layering |
-| **C#/.NET** | 7+ | .NET SDK & target frameworks, nullable reference types, Microsoft.Extensions DI, EF Core, xUnit/NUnit, ASP.NET Core routing |
-| **Ruby** | 4+ | Bundler & Rails vs gem layout, ActiveRecord & migrations, RSpec/Minitest, RuboCop |
-| **PHP** | 3+ | Composer, Laravel vs Symfony vs library, Eloquent/Doctrine, PHPUnit/Pest, PHP CS Fixer |
-| **Swift** | 2+ | SwiftPM products (library vs app), SwiftUI/UIKit/Vapor, XCTest & swift-testing, SwiftLint |
-| **C++** | 2+ | CMake/Make/Bazel, header-only vs separated layout, GoogleTest/Catch2/doctest, clang-format |
-| **Generic** | 20+ | GitHub workflows, pre-commit configuration, git hooks, Docker/Kubernetes files, repository layout |
+| **Python** | 96 | typing coverage, docstrings, testing fixtures, stdlib logging, error boundaries, sqlalchemy, context managers, async, dependency injection |
+| **Node.js/TypeScript** | 60 | TypeScript strictness, jest/vitest frameworks, express/fastify api, mongoose, state management, monorepo workspaces, migrations |
+| **Go** | 43 | modules, testing frameworks, stdlib loggers, channels & goroutines, gRPC structures, wire DI, database configurations |
+| **Rust** | 17 | Cargo configs, tokio async, web frameworks, serialization, macros, unsafe blocks, database ORMs |
+| **Kotlin** | 16 | Gradle/Maven builds, coroutines & Flow, null-safety (`!!` usage), Kotest/MockK, Spring/Ktor API routes, Exposed/JPA, kotlinx.serialization, Jetpack Compose |
+| **Java** | 12 | Gradle/Maven builds, Spring DI & injection style, JPA/Hibernate & Spring Data, JUnit/AssertJ, Lombok vs records, Spring MVC routes, layering |
+| **C#/.NET** | 12 | .NET SDK & target frameworks, nullable reference types, Microsoft.Extensions DI, EF Core, xUnit/NUnit, ASP.NET Core routing |
+| **Ruby** | 9 | Bundler & Rails vs gem layout, ActiveRecord & migrations, RSpec/Minitest, RuboCop |
+| **PHP** | 8 | Composer, Laravel vs Symfony vs library, Eloquent/Doctrine, PHPUnit/Pest, route detection, PHP CS Fixer |
+| **Swift** | 7 | SwiftPM products (library vs app), SwiftUI/UIKit/Vapor routes, XCTest & swift-testing, SwiftLint |
+| **C++** | 7 | CMake/Make/Bazel, header-only vs separated layout, GoogleTest/Catch2/doctest, clang-format |
+| **Generic** | 24 | GitHub workflows, pre-commit configuration, git hooks, Docker/Kubernetes files, repository layout |
 
 *For the full list of convention IDs, see the [Convention ID Reference](docs/conventions-reference.md).*
 
