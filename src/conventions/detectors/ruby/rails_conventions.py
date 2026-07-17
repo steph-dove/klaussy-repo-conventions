@@ -46,7 +46,7 @@ class RubyRailsConventionsDetector(RubyDetector):
         # rather than the codebase size, and the layers below are only those that
         # happened to be reached first.
         scanned = len(index.files)
-        truncated = scanned >= ctx.max_files
+        truncated = self.scan_was_truncated(index, ctx)
 
         if truncated:
             desc_parts = [

@@ -54,7 +54,7 @@ class PHPArchitectureDetector(PHPDetector):
         # happened to be reached first. Laravel has 3007 PHP files against a
         # default cap of 2000.
         scanned = len(index.files)
-        truncated = scanned >= ctx.max_files
+        truncated = self.scan_was_truncated(index, ctx)
 
         if truncated:
             desc_parts = [

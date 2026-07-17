@@ -73,6 +73,23 @@ class BaseDetector(ABC):
         """
         pass
 
+    @staticmethod
+    def scan_was_truncated(index: Any, ctx: DetectorContext) -> bool:
+        """Whether `index` filled to max_files, making its view of the repo partial.
+
+        An index at the cap means the walk stopped early, so file counts, role
+        counts and layers derived from it describe only the part that was
+        reached -- and silently so. Detectors that report any of those should
+        say the scan was truncated rather than present the cap as the project's
+        size. Mastodon (3219 Ruby files) and Laravel (~3000 PHP files) both
+        reported exactly the default 2000-file cap as their size, and Mastodon's
+        entire db/ layer went unseen.
+        """
+        files = getattr(index, "files", None)
+        if files is None:
+            return False
+        return len(files) >= ctx.max_files
+
     def make_evidence(
         self,
         ctx: DetectorContext,
