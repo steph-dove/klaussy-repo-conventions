@@ -80,6 +80,17 @@ def detect_languages(repo_root: Path, exclude_patterns: Optional[list[str]] = No
     if php_files:
         languages.add("php")
 
+    # Check for C++ files
+    # `.h` is deliberately absent: it is equally a C, C++ and Objective-C header,
+    # so it cannot establish the language. Including it reported any pure C
+    # project (.c + .h) as C++ -- redis, whose only C++ files are vendored under
+    # deps/, was read as a 319-file "C++ codebase" of 312 headers. The C++ index
+    # still reads .h files once one of the unambiguous extensions has confirmed
+    # the language.
+    cpp_files = list(walk_files(repo_root, {".cpp", ".cc", ".cxx", ".hpp", ".hh", ".hxx"}, max_files=5, exclude_patterns=detection_excludes))
+    if cpp_files:
+        languages.add("cpp")
+
     return languages
 
 
@@ -190,7 +201,7 @@ def run_detectors(
     # Get file count from all language indexes
     if ctx._python_index is not None:
         total_files_scanned += len(ctx._python_index.files)
-    for cache_key in ("node_index", "go_index", "rust_index", "kotlin_index", "java_index", "csharp_index", "ruby_index", "swift_index", "php_index"):
+    for cache_key in ("node_index", "go_index", "rust_index", "kotlin_index", "java_index", "csharp_index", "ruby_index", "swift_index", "php_index", "cpp_index"):
         index = ctx.cache.get(cache_key)
         if index is not None and hasattr(index, "files"):
             total_files_scanned += len(index.files)

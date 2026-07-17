@@ -3301,6 +3301,35 @@ def _php_testing_suggestion(r: ConventionRule, score: int) -> str | None:
     return None
 
 
+# C++ rating helpers
+def _cpp_architecture_score(r: ConventionRule) -> int:
+    return 5
+
+def _cpp_architecture_reason(r: ConventionRule, score: int) -> str:
+    return f"Structured as a {r.stats.get('layout')} layout via {r.stats.get('build_system')}."
+
+def _cpp_architecture_suggestion(r: ConventionRule, score: int) -> str | None:
+    if not r.stats.get("has_clang_format"):
+        return "Add a .clang-format configuration file to enforce automated, consistent C++ code style."
+    return None
+
+def _cpp_testing_score(r: ConventionRule) -> int:
+    count = r.stats.get("test_file_count", 0)
+    if count == 0:
+        return 1
+    if count < 3:
+        return 3
+    return 5
+
+def _cpp_testing_reason(r: ConventionRule, score: int) -> str:
+    return f"Detected {r.stats.get('test_file_count')} test files."
+
+def _cpp_testing_suggestion(r: ConventionRule, score: int) -> str | None:
+    if score == 1:
+        return "Add unit tests (Google Test, Catch2, or doctest are standard C++ test runners)."
+    return None
+
+
 # Rating rules registry
 RATING_RULES: dict[str, RatingRule] = {
     # Python typing and documentation
@@ -4551,6 +4580,19 @@ RATING_RULES: dict[str, RatingRule] = {
         suggestion_func=_php_testing_suggestion,
     ),
 
+    # C++ architecture
+    "cpp.conventions.architecture": RatingRule(
+        score_func=_cpp_architecture_score,
+        reason_func=_cpp_architecture_reason,
+        suggestion_func=_cpp_architecture_suggestion,
+    ),
+
+    # C++ testing
+    "cpp.conventions.testing": RatingRule(
+        score_func=_cpp_testing_score,
+        reason_func=_cpp_testing_reason,
+        suggestion_func=_cpp_testing_suggestion,
+    ),
 }
 
 

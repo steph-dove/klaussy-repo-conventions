@@ -1992,6 +1992,8 @@ def _render_rule_for_rules_file(rule: ConventionRule) -> str:
             lang = "swift"
         elif ext == "php" or ev.file_path.endswith("composer.json"):
             lang = "php"
+        elif ext in ("cpp", "h", "hpp", "cc", "cxx", "hh", "hxx"):
+            lang = "cpp"
         else:
             lang = ""
 

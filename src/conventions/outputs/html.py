@@ -423,6 +423,7 @@ def _html_rules_table(rated_rules: list) -> str:
                 <option value="ruby">Ruby</option>
                 <option value="swift">Swift</option>
                 <option value="php">PHP</option>
+                <option value="cpp">C++</option>
                 <option value="generic">Generic</option>
             </select>
             <select id="filter-score" onchange="filterTable()">

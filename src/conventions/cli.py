@@ -121,7 +121,7 @@ def discover(
         lang_set = None
 
     if lang_set:
-        valid_langs = {"python", "go", "node", "rust", "kotlin", "java", "csharp", "ruby", "swift", "php"}
+        valid_langs = {"python", "go", "node", "rust", "kotlin", "java", "csharp", "ruby", "swift", "php", "cpp"}
         invalid = lang_set - valid_langs
         if invalid:
             console.print(f"[red]Invalid languages: {', '.join(invalid)}[/red]")
