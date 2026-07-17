@@ -204,9 +204,13 @@ class NodeConventionsDetector(NodeDetector):
             "jasmine": ["jasmine"],
         }
 
+        # Package imports, not substrings: `ava` must not match
+        # `components/avatar`. The counts also decide the primary framework, so
+        # they must not be capped -- a capped phantom count outvoted the real
+        # framework on Mastodon (10 fake "ava" against 2 real vitest).
         for lib, patterns in test_patterns.items():
             for pattern in patterns:
-                imports = index.find_imports_matching(pattern, limit=10)
+                imports = index.find_package_imports(pattern)
                 if imports:
                     test_libs[lib] += len(imports)
                     if lib not in test_examples:

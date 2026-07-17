@@ -156,11 +156,38 @@ class NodeIndex:
         pattern: str,
         limit: int = 50,
     ) -> list[tuple[str, str, int]]:
-        """Find imports matching pattern. Returns (file_path, module, line)."""
+        """Find imports whose module path CONTAINS `pattern`.
+
+        This is a substring test. To detect use of a specific npm package prefer
+        :meth:`find_package_imports`, which will not mistake
+        `components/avatar` for the `ava` package.
+        """
         results = []
         for rel_path, file_idx in self.files.items():
             for module, line in file_idx.imports:
                 if pattern in module:
+                    results.append((rel_path, module, line))
+                    if len(results) >= limit:
+                        return results
+        return results
+
+    def find_package_imports(
+        self,
+        package: str,
+        limit: int = 1000,
+    ) -> list[tuple[str, str, int]]:
+        """Find imports of a specific npm package. Returns (file_path, module, line).
+
+        Matches the package itself and its subpaths (`ava`, `ava/helpers`,
+        `@jest/globals`) but never an arbitrary substring. Substring matching
+        counts Mastodon's `mastodon/components/avatar` imports as the `ava` test
+        framework, and there are enough of them to outvote the real one.
+        """
+        prefix = package + "/"
+        results = []
+        for rel_path, file_idx in self.files.items():
+            for module, line in file_idx.imports:
+                if module == package or module.startswith(prefix):
                     results.append((rel_path, module, line))
                     if len(results) >= limit:
                         return results
