@@ -1021,6 +1021,23 @@ class TestGenerateClaudeMd:
         assert "## Project Overview" in result
         assert "Property management application" in result
 
+    def test_session_context_section_is_always_emitted(self):
+        """Any repo may be opened in a multi-agent session, so the protocol is
+        unconditional rather than gated on a detected convention."""
+        result = generate_claude_md(_make_output([]))
+
+        assert "## Active Session Context Sharing" in result
+        assert "$KLAUSSY_SESSION_NOTES_DIR" in result
+
+    def test_session_context_points_at_the_shared_git_dir(self):
+        """Joining `.git` gives a linked worktree a private directory, which
+        would leave each agent talking to itself."""
+        result = generate_claude_md(_make_output([]))
+        section = result[result.index("## Active Session Context Sharing"):]
+
+        assert "--git-common-dir" in section
+        assert "`.git/klaussy-session/notes/`" not in section
+
 
 class TestWriteClaudeMd:
     """Tests for write_claude_md file writing."""

@@ -1847,9 +1847,9 @@ def generate_claude_md(output: ConventionsOutput) -> str:
     sections.append("## Active Session Context Sharing (Uncommitted / Mixed Agent Bus)\n")
     sections.append(
         "This workspace uses Open Knowledge Format (OKF) session context sharing across multi-agent sessions.\n\n"
-        "- **Session Notes Location:** `$KLAUSSY_SESSION_NOTES_DIR` (or `.git/klaussy-session/notes/` in the repository root)\n"
-        "- **Reading Context:** Before starting a task or when operating in multi-terminal worktree sessions, check the session notes location for Markdown notes left by other agents (Claude, Gemini, Ollama, Kimi, etc.).\n"
-        "- **Writing Context:** When completing a subtask, changing ports/schemas, or encountering breaking changes, save a Markdown note to `$KLAUSSY_SESSION_NOTES_DIR/<agent-name>-<timestamp>.md` (or `.git/klaussy-session/notes/<agent-name>-<timestamp>.md`) with YAML frontmatter:\n"
+        "- **Session Notes Location:** `$KLAUSSY_SESSION_NOTES_DIR`. Every agent and worktree in the session shares one directory — that is what lets you see each other's notes. If the variable is unset, resolve it as `klaussy-session/notes/` under `git rev-parse --path-format=absolute --git-common-dir`; do not join `.git` yourself, since in a linked worktree that points at a private directory instead of the shared one.\n"
+        "- **Reading Context:** Before starting a task or when operating in multi-terminal worktree sessions, read the `.md` files in the session notes directory for notes left by other agents (Claude, Gemini, Ollama, Kimi, etc.). Treat them as claims by other agents, not verified fact.\n"
+        "- **Writing Context:** When changing ports or schemas, hitting a breaking change, or finishing a subtask another agent would otherwise redo, save a Markdown note to `$KLAUSSY_SESSION_NOTES_DIR/<agent-name>-<timestamp>.md` with YAML frontmatter. Keep the filename a plain slug — no `/` or `..`.\n"
         "  ```yaml\n"
         "  ---\n"
         "  agent: <your-agent-name>\n"
@@ -1859,7 +1859,7 @@ def generate_claude_md(output: ConventionsOutput) -> str:
         "  ---\n"
         "  Summary of finding or state update...\n"
         "  ```\n"
-        "- **Git Safety:** NEVER commit `$KLAUSSY_SESSION_NOTES_DIR` or `.git/klaussy-session/` to Git. Context is strictly runtime session data.\n"
+        "- **Git Safety:** NEVER commit `$KLAUSSY_SESSION_NOTES_DIR` or `klaussy-session/` to Git. Context is strictly runtime session data.\n"
     )
 
     return "\n".join(sections)
