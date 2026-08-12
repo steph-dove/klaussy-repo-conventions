@@ -1846,10 +1846,10 @@ def generate_claude_md(output: ConventionsOutput) -> str:
 
     sections.append("## Active Session Context Sharing (Uncommitted / Mixed Agent Bus)\n")
     sections.append(
-        "This workspace uses `klaussy-desktop` multi-agent session context sharing.\n\n"
-        "- **Session Notes Location:** `$KLAUSSY_SESSION_NOTES_DIR` (or `.git/klaussy-session/notes/`)\n"
-        "- **Reading Context:** Before starting a task or when operating in multi-terminal worktree sessions, check `$KLAUSSY_SESSION_NOTES_DIR` for Markdown notes left by other agents (Claude, Gemini, Ollama, Kimi, etc.).\n"
-        "- **Writing Context:** When completing a subtask, changing ports/schemas, or encountering breaking changes, save a Markdown note to `$KLAUSSY_SESSION_NOTES_DIR/<agent-name>-<timestamp>.md` with YAML frontmatter:\n"
+        "This workspace uses Open Knowledge Format (OKF) session context sharing across multi-agent sessions.\n\n"
+        "- **Session Notes Location:** `$KLAUSSY_SESSION_NOTES_DIR` (or `.git/klaussy-session/notes/` in the repository root)\n"
+        "- **Reading Context:** Before starting a task or when operating in multi-terminal worktree sessions, check the session notes location for Markdown notes left by other agents (Claude, Gemini, Ollama, Kimi, etc.).\n"
+        "- **Writing Context:** When completing a subtask, changing ports/schemas, or encountering breaking changes, save a Markdown note to `$KLAUSSY_SESSION_NOTES_DIR/<agent-name>-<timestamp>.md` (or `.git/klaussy-session/notes/<agent-name>-<timestamp>.md`) with YAML frontmatter:\n"
         "  ```yaml\n"
         "  ---\n"
         "  agent: <your-agent-name>\n"
