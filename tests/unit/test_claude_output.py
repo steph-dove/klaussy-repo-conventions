@@ -1021,6 +1021,25 @@ class TestGenerateClaudeMd:
         assert "## Project Overview" in result
         assert "Property management application" in result
 
+    def test_session_context_section_is_always_emitted(self):
+        """Any repo may be opened in a multi-agent session, so the protocol is
+        unconditional rather than gated on a detected convention."""
+        result = generate_claude_md(_make_output([]))
+
+        assert "## Active Session Context Sharing" in result
+        assert "$KLAUSSY_SESSION_NOTES_DIR" in result
+
+    def test_session_context_defers_to_the_env_var(self):
+        """A rebuilt path is wrong in a way agents cannot see: the channel is
+        per-session and lives outside the repo, so only the variable knows it."""
+        result = generate_claude_md(_make_output([]))
+        section = result[result.index("## Active Session Context Sharing"):]
+
+        assert "$KLAUSSY_SESSION_NOTES_DIR" in section
+        assert "do not guess or rebuild the path" in section
+        # No repo-relative location for an agent to reconstruct from.
+        assert ".git" not in section
+
 
 class TestWriteClaudeMd:
     """Tests for write_claude_md file writing."""
