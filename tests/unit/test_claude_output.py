@@ -1029,14 +1029,16 @@ class TestGenerateClaudeMd:
         assert "## Active Session Context Sharing" in result
         assert "$KLAUSSY_SESSION_NOTES_DIR" in result
 
-    def test_session_context_points_at_the_shared_git_dir(self):
-        """Joining `.git` gives a linked worktree a private directory, which
-        would leave each agent talking to itself."""
+    def test_session_context_defers_to_the_env_var(self):
+        """A rebuilt path is wrong in a way agents cannot see: the channel is
+        per-session and lives outside the repo, so only the variable knows it."""
         result = generate_claude_md(_make_output([]))
         section = result[result.index("## Active Session Context Sharing"):]
 
-        assert "--git-common-dir" in section
-        assert "`.git/klaussy-session/notes/`" not in section
+        assert "$KLAUSSY_SESSION_NOTES_DIR" in section
+        assert "do not guess or rebuild the path" in section
+        # No repo-relative location for an agent to reconstruct from.
+        assert ".git" not in section
 
 
 class TestWriteClaudeMd:
