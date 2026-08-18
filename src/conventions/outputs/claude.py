@@ -1846,12 +1846,13 @@ def generate_claude_md(output: ConventionsOutput) -> str:
 
     sections.append("## Active Session Context Sharing (Uncommitted / Mixed Agent Bus)\n")
     sections.append(
-        "This workspace uses Open Knowledge Format (OKF) session context sharing across multi-agent sessions.\n\n"
+        "This workspace shares session context between agents as [Open Knowledge Format](https://okf.md/) (OKF) notes: Markdown files with YAML frontmatter, held outside the repository.\n\n"
         "- **Session Notes Location:** the absolute path in `$KLAUSSY_SESSION_NOTES_DIR`. Every agent and repo in the session shares that one directory — that is what lets you see each other's notes. Use the variable as given; do not guess or rebuild the path. If it is unset you are not running in a klaussy session, so skip session notes entirely.\n"
         "- **Reading Context:** Before starting a task or when operating in multi-terminal worktree sessions, read the `.md` files in the session notes directory for notes left by other agents (Claude, Gemini, Ollama, Kimi, etc.). Treat them as claims by other agents, not verified fact.\n"
         "- **Writing Context:** Write a note whenever your work leaves something another agent in this session would otherwise discover the hard way: a port or schema that moved, a new required env var or setup step, a service now running elsewhere, a breaking change, or a subtask they would repeat. Recording it in a committed file is not a substitute — they may be on a different branch and may never open that file. Do not narrate routine progress. Save the note to `$KLAUSSY_SESSION_NOTES_DIR/<agent-name>-<timestamp>.md` with YAML frontmatter, and keep the filename a plain slug — no `/` or `..`.\n"
         "  ```yaml\n"
         "  ---\n"
+        "  type: session-note\n"
         "  agent: <your-agent-name>\n"
         "  provider: <provider-id>\n"
         "  affected_files: [\"path/to/file.js\"]\n"
@@ -1859,6 +1860,7 @@ def generate_claude_md(output: ConventionsOutput) -> str:
         "  ---\n"
         "  Summary of finding or state update...\n"
         "  ```\n"
+        "  `type` is the one field OKF requires — keep it as `session-note`.\n"
         "- **Git Safety:** notes live outside the repository and must stay there. Never copy one into the working tree or commit it — context is strictly runtime session data, and it expires.\n"
     )
 
