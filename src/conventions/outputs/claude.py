@@ -1853,14 +1853,13 @@ def generate_claude_md(output: ConventionsOutput) -> str:
         "  ```yaml\n"
         "  ---\n"
         "  type: session-note\n"
-        "  agent: <your-agent-name>\n"
-        "  provider: <provider-id>\n"
+        "  generated: { by: <provider-id>/<your-agent-name>, at: <ISO-8601 timestamp> }\n"
         "  affected_files: [\"path/to/file.js\"]\n"
         "  tags: [topic]\n"
         "  ---\n"
         "  Summary of finding or state update...\n"
         "  ```\n"
-        "  `type` is the one field OKF requires — keep it as `session-note`.\n"
+        "  `type` is the one field OKF requires — keep it as `session-note`. `generated` is OKF's provenance key (`by` is who wrote it, `at` is when); the older `agent:`/`provider:` keys are still read.\n"
         "- **Git Safety:** notes live outside the repository and must stay there. Never copy one into the working tree or commit it — context is strictly runtime session data, and it expires.\n"
     )
 
