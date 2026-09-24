@@ -21,13 +21,13 @@ def detect_languages(repo_root: Path, exclude_patterns: Optional[list[str]] = No
 
     languages: set[str] = set()
 
-    # Avoid scanning test and fixture directories for language auto-detection
-    # to prevent mock files/fixtures from triggering false positive language matches.
+    # Avoid scanning test directories for language auto-detection to prevent
+    # mock files from triggering false positive language matches. Fixture
+    # directories are already excluded everywhere by walk_files.
     detection_excludes = (exclude_patterns or []) + [
         "**/tests/**",
         "**/test/**",
         "**/__tests__/**",
-        "**/fixtures/**",
     ]
 
     # Check for Python files
