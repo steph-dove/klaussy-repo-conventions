@@ -66,9 +66,21 @@ CONTENT_EXCLUDES = {
     "demos",
 }
 
-# Every directory name excluded by one rule or the other. Retained as the
-# historical name; prefer the two sets above, which carry the matching depth.
-HARD_EXCLUDES = STRUCTURAL_EXCLUDES | CONTENT_EXCLUDES
+# Test data excludes — fixtures and database seeds are canned data and one-off
+# scripts, not code written to the project's conventions, so they produce false
+# positives in pattern analysis. They live nested (`tests/fixtures`,
+# `db/seeds`, `database/seeders`), so they are matched at ANY depth.
+DATA_EXCLUDES = {
+    "fixtures",
+    "__fixtures__",
+    "seeds",
+    "seed",
+    "seeders",
+}
+
+# Every directory name excluded by one rule or another. Retained as the
+# historical name; prefer the sets above, which carry the matching depth.
+HARD_EXCLUDES = STRUCTURAL_EXCLUDES | CONTENT_EXCLUDES | DATA_EXCLUDES
 
 # File size limit (skip very large files)
 MAX_FILE_SIZE_BYTES = 1024 * 1024  # 1MB
@@ -125,6 +137,12 @@ def should_exclude(
         parts = rel_path.parts
 
         if any(_matches_exclude(part, STRUCTURAL_EXCLUDES) for part in parts):
+            return True
+
+        # Data excludes match directory names only, so an extensionless file
+        # such as `bin/seed` is still scanned.
+        dir_parts = parts if path.is_dir() else parts[:-1]
+        if any(_matches_exclude(part, DATA_EXCLUDES) for part in dir_parts):
             return True
 
         # Content excludes apply only to a top-level directory: `parts[0]` is

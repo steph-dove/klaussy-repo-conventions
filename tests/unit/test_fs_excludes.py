@@ -133,6 +133,36 @@ class TestShouldExcludeStructuralExcludes:
         assert should_exclude(path, repo_root) is True
 
 
+class TestShouldExcludeDataExcludes:
+    """DATA_EXCLUDES (fixtures, seeds) apply at any depth, to directories only."""
+
+    @pytest.mark.parametrize(
+        "rel",
+        [
+            "fixtures/users.py",
+            "tests/fixtures/users.py",
+            "spec/fixtures/files/sample.rb",
+            "src/components/__fixtures__/props.ts",
+            "db/seeds/users.rb",
+            "prisma/seed/data.ts",
+            "database/seeders/UserSeeder.php",
+        ],
+    )
+    def test_data_dir_excluded_any_depth(self, repo_root: Path, rel: str):
+        path = touch(repo_root, rel)
+        assert should_exclude(path, repo_root) is True
+
+    @pytest.mark.parametrize("rel", ["tests/fixtures", "db/seeds"])
+    def test_data_dir_itself_excluded(self, repo_root: Path, rel: str):
+        d = make_dir(repo_root, rel)
+        assert should_exclude(d, repo_root) is True
+
+    @pytest.mark.parametrize("rel", ["bin/seed", "tests/fixtures.py", "db/seeds.rb"])
+    def test_file_named_like_data_dir_not_excluded(self, repo_root: Path, rel: str):
+        path = touch(repo_root, rel)
+        assert should_exclude(path, repo_root) is False
+
+
 class TestShouldExcludeGitignoreAndCustom:
     def test_custom_exclude_spec_matches(self, repo_root: Path):
         spec = create_exclude_spec(["*.log", "secret_*"])
