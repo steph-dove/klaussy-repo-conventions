@@ -1,5 +1,5 @@
 # Copyright © 2026 Dovatech LLC
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: FSL-1.1-MIT
 
 
 """CLI for conventions detection."""

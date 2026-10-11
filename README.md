@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/klaussy-repo-conventions.svg)](https://pypi.org/project/klaussy-repo-conventions/)
 [![Python versions](https://img.shields.io/pypi/pyversions/klaussy-repo-conventions.svg)](https://pypi.org/project/klaussy-repo-conventions/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: FSL-1.1-MIT](https://img.shields.io/badge/License-FSL--1.1--MIT-blue.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/steph-dove/klaussy-repo-conventions.svg?style=social)](https://github.com/steph-dove/klaussy-repo-conventions/stargazers)
 
 > **Discover once, align everywhere.** The core conventions discovery and repository mapping engine. It scans codebases for structural styles, rates conventions on a 1-5 scale, traces endpoint-to-store data flows, and compiles a canonical `CLAUDE.md` and rules folder consumed by `klaussy-agents`.
@@ -225,5 +225,5 @@ Contributions are welcome! To add support for new conventions:
 
 ## ⚖️ License & Governance
 
-*   **License:** MIT
-*   **Governance:** `klaussy-repo-conventions` is an open-source project owned and maintained by Dovatech LLC (founded and owned by Stephanie Dover).
+*   **License:** [FSL-1.1-MIT](LICENSE) (Functional Source License). Use, modify and self-host it for anything except a competing commercial product or service. Each release becomes MIT two years after it ships. Releases up to and including 1.9.1 remain MIT.
+*   **Governance:** `klaussy-repo-conventions` is a source-available project owned and maintained by Dovatech LLC (founded and owned by Stephanie Dover).
