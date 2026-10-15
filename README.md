@@ -227,5 +227,4 @@ Contributions are welcome! To add support for new conventions:
 
 ## ⚖️ License & Governance
 
-*   **License:** [FSL-1.1-MIT](LICENSE) (Functional Source License). Use, modify and self-host it for anything except a competing commercial product or service. Each release becomes MIT two years after it ships. Releases up to and including 1.9.1 remain MIT.
-*   **Governance:** `klaussy-repo-conventions` is a source-available project owned and maintained by Dovatech LLC (founded and owned by Stephanie Dover).
+*   **License:** [FSL-1.1-MIT](LICENSE) (Functional Source License). Use, modify and self-host it for anything except a competing commercial product or service. Each release becomes MIT two years after it ships.*   **Governance:** `klaussy-repo-conventions` is a source-available project owned and maintained by Dovatech LLC (founded and owned by Stephanie Dover).
