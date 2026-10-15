@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Shared graph utilities for data flow analysis.
 
 Language-agnostic data structures and algorithms for import graph analysis,

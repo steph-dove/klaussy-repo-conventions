@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """JUnit test convention detection shared across JVM languages."""
 
 from __future__ import annotations

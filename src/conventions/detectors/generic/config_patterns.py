@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Config and secret access patterns detector.
 
 Detects how the project accesses configuration and secrets.

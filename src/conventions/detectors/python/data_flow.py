@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Python data flow detector.
 
 Builds import graph, traces endpoint chains, and maps service dependencies.

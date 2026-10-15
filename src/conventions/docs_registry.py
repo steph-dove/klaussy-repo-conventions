@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Documentation URL registry for detected conventions and tools.
 
 This module provides a centralized mapping of tools, frameworks, and libraries

@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Python tooling conventions detector (formatters, linters, import sorting)."""
 
 from __future__ import annotations

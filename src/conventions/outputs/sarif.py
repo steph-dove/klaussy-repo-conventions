@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """SARIF (Static Analysis Results Interchange Format) output for conventions detection.
 
 SARIF is a standard format for static analysis tools, supported by GitHub Code Scanning.

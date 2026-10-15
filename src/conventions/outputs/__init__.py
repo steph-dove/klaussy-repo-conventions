@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Output format generators for conventions reports."""
 
 from .claude import generate_claude_md, write_claude_md

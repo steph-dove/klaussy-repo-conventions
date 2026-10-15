@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Incremental scanning cache for conventions detection.
 
 This module provides caching of scan results to enable incremental scanning,

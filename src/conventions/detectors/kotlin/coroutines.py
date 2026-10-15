@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Kotlin coroutines and structured-concurrency conventions detector."""
 
 from __future__ import annotations
