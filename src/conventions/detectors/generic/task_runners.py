@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Task runner conventions detector.
 
 Detects and parses Makefile, package.json scripts, Taskfile, and justfile.

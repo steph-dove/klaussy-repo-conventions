@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """Plugin system for custom convention detectors and rating rules.
 
 Plugins allow users to define custom detectors and rating rules in external

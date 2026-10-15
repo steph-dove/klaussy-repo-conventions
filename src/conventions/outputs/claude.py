@@ -1,3 +1,4 @@
+# Copyright 2026 Dovatech LLC. SPDX-License-Identifier: FSL-1.1-MIT
 """CLAUDE.md generator for conventions detection.
 
 Generates a structured CLAUDE.md file optimized for Claude Code. Conventions are
