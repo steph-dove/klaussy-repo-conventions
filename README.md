@@ -1,6 +1,6 @@
 # <img src="https://raw.githubusercontent.com/steph-dove/klaussy-repo-conventions/main/brand-mark.png" width="32" height="32" align="absmiddle" alt="Klaussy Logo"> klaussy-repo-conventions 🔍
 
-> **License: source-available, not open source.** © 2026 Dovatech LLC, licensed under the [Functional Source License (FSL-1.1-MIT)](https://github.com/steph-dove/klaussy-repo-conventions/blob/main/LICENSE). You can use and modify it for your own work, but copying it into a commercial product or service that competes with klaussy, or offers the same functionality, is not permitted and is copyright infringement. Releases up to and including 1.9.1 stay MIT, and each later release becomes MIT two years after it ships. For a commercial license, email stephanie@klaussy.com.
+> **License: source-available, not open source.** © 2026 Dovatech LLC. Current releases are licensed under the [Functional Source License (FSL-1.1-MIT)](https://github.com/steph-dove/klaussy-repo-conventions/blob/main/LICENSE). You can use and modify it for your own work, but copying it into a commercial product or service that competes with klaussy, or offers the same functionality, is not permitted and is copyright infringement. For a commercial license, email stephanie@klaussy.com.
 
 [![PyPI version](https://img.shields.io/pypi/v/klaussy-repo-conventions.svg)](https://pypi.org/project/klaussy-repo-conventions/)
 [![Python versions](https://img.shields.io/pypi/pyversions/klaussy-repo-conventions.svg)](https://pypi.org/project/klaussy-repo-conventions/)
